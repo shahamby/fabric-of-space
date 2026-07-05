@@ -1,0 +1,172 @@
+{
+  "_meta": {
+    "project": "fabric-of-space",
+    "generated_utc": "2026-07-04T14:59:22Z",
+    "epoch": "2026-07-04 00:00:00 TDB (JD 2461225.5)",
+    "frame": "Solar System Barycenter, ecliptic and mean equinox of J2000",
+    "units": {
+      "position": "AU",
+      "velocity": "AU/day",
+      "mass": "solar masses",
+      "radius": "km"
+    },
+    "G_au3_msun_day2": 0.0002959122082855911,
+    "source": "NASA/JPL Horizons API - full queries and checksums in provenance.csv",
+    "notes": "Planet entries are planet-system barycenters (planet + its moons as one point mass). 'Earth' is the Earth-Moon barycenter. Masses derived from DE-series inverse mass ratios."
+  },
+  "bodies": [
+    {
+      "name": "Sun",
+      "horizons_id": "10",
+      "mass_msun": 1.0,
+      "radius_km": 695700.0,
+      "color": "#ffd27f",
+      "position_au": [
+        -0.001800312702984366,
+        -0.005336219038963982,
+        0.0001062314541598241
+      ],
+      "velocity_au_day": [
+        6.440767859731386e-06,
+        1.908022166300103e-06,
+        -1.322537406639593e-07
+      ]
+    },
+    {
+      "name": "Mercury",
+      "horizons_id": "1",
+      "mass_msun": 1.6601367952719304e-07,
+      "radius_km": 2439.7,
+      "color": "#9e9e9e",
+      "position_au": [
+        -0.04659482663747697,
+        -0.4677088105152132,
+        -0.03357210806447561
+      ],
+      "velocity_au_day": [
+        0.02236613993141602,
+        -0.001276645133223479,
+        -0.002155386662069198
+      ]
+    },
+    {
+      "name": "Venus",
+      "horizons_id": "2",
+      "mass_msun": 2.4478383396645447e-06,
+      "radius_km": 6051.8,
+      "color": "#e6c89c",
+      "position_au": [
+        -0.6125103941595897,
+        -0.3902336187032875,
+        0.03005564886635903
+      ],
+      "velocity_au_day": [
+        0.01064867406269262,
+        -0.01720425309671856,
+        -0.0008505751030628049
+      ]
+    },
+    {
+      "name": "Earth",
+      "horizons_id": "3",
+      "mass_msun": 3.0404326462685257e-06,
+      "radius_km": 6371.0,
+      "color": "#4f7bd9",
+      "position_au": [
+        0.2042954195770773,
+        -1.000878436369706,
+        0.0001647435463143935
+      ],
+      "velocity_au_day": [
+        0.01657461954082207,
+        0.003425212773036419,
+        -4.346069049687761e-07
+      ]
+    },
+    {
+      "name": "Mars",
+      "horizons_id": "4",
+      "mass_msun": 3.2271514450538743e-07,
+      "radius_km": 3389.5,
+      "color": "#c1583c",
+      "position_au": [
+        1.145967748634409,
+        0.8733425670089605,
+        -0.009623743351071384
+      ],
+      "velocity_au_day": [
+        -0.00796551234382244,
+        0.0123080418746622,
+        0.0004532399725004075
+      ]
+    },
+    {
+      "name": "Jupiter",
+      "horizons_id": "5",
+      "mass_msun": 0.0009547919384243222,
+      "radius_km": 69911.0,
+      "color": "#d8b393",
+      "position_au": [
+        -2.951986881025015,
+        4.369945980878373,
+        0.0479376232964042
+      ],
+      "velocity_au_day": [
+        -0.006343329490482651,
+        -0.003868024179763897,
+        0.0001580112376719674
+      ]
+    },
+    {
+      "name": "Saturn",
+      "horizons_id": "6",
+      "mass_msun": 0.0002858859806661029,
+      "radius_km": 58232.0,
+      "color": "#e3d2a8",
+      "position_au": [
+        9.365026382924247,
+        1.272645482472236,
+        -0.3950061924233768
+      ],
+      "velocity_au_day": [
+        -0.001057977536954491,
+        0.005515902797764682,
+        -5.380573988635002e-05
+      ]
+    },
+    {
+      "name": "Uranus",
+      "horizons_id": "7",
+      "mass_msun": 4.3662440433515637e-05,
+      "radius_km": 25362.0,
+      "color": "#9fd6d2",
+      "position_au": [
+        9.241548987045064,
+        17.11614685638545,
+        -0.05615839109606673
+      ],
+      "velocity_au_day": [
+        -0.003489849400440771,
+        0.00168530207632754,
+        5.146754776691291e-05
+      ]
+    },
+    {
+      "name": "Neptune",
+      "horizons_id": "8",
+      "mass_msun": 5.151389020535497e-05,
+      "radius_km": 24622.0,
+      "color": "#4f6dd9",
+      "position_au": [
+        29.84970799827275,
+        1.094213617165293,
+        -0.7104504360565848
+      ],
+      "velocity_au_day": [
+        -0.000135644703571496,
+        0.003155641793644315,
+        -6.18592238947146e-05
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+# fabric-of-space
+
+Interactive 3D gravity visualizer. "Fabric of space" means the gravitational
+potential rendered as a displaced mesh under the bodies — real math,
+compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
+
+## Working agreement
+
+- You are pairing with a beginner coder who is a senior network security
+  professional. Explain every code block you produce: what it does and why.
+  Teaching beats speed.
+- 60/40 workload split: the human writes most of the code by following your
+  exemplar patterns. You scaffold the math-heavy modules (integrator,
+  potential mesh), supply data, and review. Do NOT write full solutions for
+  tasks assigned to the human — guide, hint, and review instead.
+- Propose a brief plan before any non-trivial change and wait for agreement.
+
+## Non-negotiable conventions
+
+- Physics never cheats. Only rendering cheats, and every display cheat is
+  logged in CHEATS.md (#1 body-size exaggeration, #2 sunlight decay disabled).
+- Simulation space: barycentric ecliptic J2000 coordinates in AU, days, and
+  solar masses (G is in data/bodies.json _meta). Rendering converts through
+  eclToScene(x, y, z) -> (x, z, -y) in bodyMesh.js. Never mix the two spaces.
+- 1 scene unit = 1 AU.
+- Every external dataset gets a row in data/provenance.csv: query URL,
+  retrieval timestamp UTC, SHA-256 of response, license. No untracked data.
+- Dependencies are `three` and `vite` only. Never add a package without
+  explicit human approval — minimal supply-chain surface is a requirement.
+- A milestone is done when: acceptance test passes, console is clean, work is
+  committed, and the Status section below is updated in the same commit.
+
+## Layout
+
+- main.js — stage (scene/camera/renderer) and animation loop
+- starfield.js — background stars
+- bodyMesh.js — body mesh factory, scale constants, eclToScene()
+- bodies.js — loads data/bodies.json, builds all body meshes
+- data/bodies.json — real state vectors, epoch 2026-07-04 TDB (JPL Horizons)
+- data/provenance.csv — data audit trail
+- CHEATS.md — ledger of every display-vs-reality divergence
+
+## Roadmap
+
+- v1 solar sandbox: M0 skeleton -> M1 static scene from Horizons data ->
+  M2 leapfrog N-body integrator (acceptance: Earth laps in ~365 sim days) ->
+  M3 potential fabric mesh -> M4 click-picking, info panel, time controls,
+  mass editing, spawn-a-body -> M5 live Horizons fetch with progress bar and
+  automated provenance writing.
+- v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search,
+  Gaia detail-on-demand, dark-matter halo toggle vs observed rotation curve.
+
+## Status (update at every commit)
+
+- M0: complete and committed. Starfield skeleton runs clean.
+- M1: complete, not yet committed. Static scene built from data/bodies.json:
+  starfield moved to starfield.js, bodies.js loads the 9 bodies via
+  bodyMesh.js, sunlight tracks the Sun's actual position, OrbitControls for
+  camera, GridHelper on the ecliptic plane, 'T' toggles true vs. exaggerated
+  scale, CHEATS.md logs both display cheats.
