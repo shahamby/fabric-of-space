@@ -46,7 +46,7 @@ scene.add(sunlight, new THREE.AmbientLight(0xffffff, 0.08));
 
 // Physics setup (runs once)
 const simBodies = buildSimBodies();
-computAcceleration(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
+computeAccelerations(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
 
 const DT = 0.5; // days per physics step, ~12 hours
 let timeScale = 20; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
@@ -81,8 +81,8 @@ function syncMeshes() {
 function animate(now) {              // 'now' = stopwatch reading from the browser
   requestAnimationFrame(animate);
 
-  const real = Math.min((now - last) / 1000, 0.1);  // secs since last frame,
-  last = now;                                       // clamped for tab-switches
+  const real = Math.min((now - lastTime) / 1000, 0.1);  // secs since last frame,
+  lastTime = now;                                       // clamped for tab-switches
 
   carry += real * timeScale;         // deposit the sim-days we owe
   while (carry >= DT) {              // spend them in fixed, identical steps
