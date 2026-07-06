@@ -53,8 +53,9 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 ## Status (update at every commit)
 
 - M0: complete and committed. Starfield skeleton runs clean.
-- M1: complete, not yet committed. Static scene built from data/bodies.json:
-  starfield moved to starfield.js, bodies.js loads the 9 bodies via
-  bodyMesh.js, sunlight tracks the Sun's actual position, OrbitControls for
-  camera, GridHelper on the ecliptic plane, 'T' toggles true vs. exaggerated
-  scale, CHEATS.md logs both display cheats.
+- M1: complete and committed. Static solar system from live Horizons data;
+  true-scale toggle; CHEATS.md logs both display cheats.
+- M2: complete and committed. Leapfrog N-body in motion. Instruments live:
+  day counter, energy-drift monitor (oscillates ~1e-7, no trend), Earth-lap
+  detector (365.0–365.5 days, half-day resolution).
+- M3: next. The fabric — gravitational potential as a displaced mesh.
