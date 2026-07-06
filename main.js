@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
 import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
-import { computeAccelerations, leapfrogStep } from './physics.js';
+import { computeAccelerations, leapfrogStep, totalEnergy } from './physics.js';
 import { eclToScene } from './bodyMesh.js';
 
 // ---------- 1. The stage ----------
@@ -54,6 +54,10 @@ let simDays = 0 // total days simulated since the page loaded. This is a running
 let carry = 0; // carry-over fraction of a day from the last frame, to keep the simulation smooth
 let lastTime = performance.now(); // milliseconds since page load, from the browser's clock
 
+// Instruments (setup)
+const hud = document.getElementById('hud'); // get the <div> added to index.html for the heads-up display by its id
+const E0 = totalEnergy(simBodies, G); // initial energy, for the energy at day zero
+
 // ---------- 4. True-scale toggle ----------
 // Cheat #1 is body-size exaggeration (see CHEATS.md). Press T to see the
 // real, true-to-data size of every body — most will vanish to a speck.
@@ -75,6 +79,16 @@ function syncMeshes() {
   }
 }
 
+// Lap detector: Earth's bearing as seen from the Sun's position, in the ecliptic plane.
+const earthSim = simBodies.find((body) => body.name === 'Earth');
+const sunSim = simBodies.find((body) => body.name === 'Sun');
+const heliocentricAngle = () =>
+  Math.atan2(earthSim.pos[1] - sunSim.pos[1], earthSim.pos[0] - sunSim.pos[0]);
+const wrap = a => Math.atan2(Math.sin(a), Math.cos(a)); // fold any angle into [-π, π]
+const startAngle = heliocentricAngle();
+let prevOffset = 0;
+let lastLapDay = 0;
+
 // ---------- 5. The loop ----------
 // requestAnimationFrame asks the browser to call us before every screen
 // refresh (~60x/sec). In M2, the physics step will live inside this loop.
@@ -93,6 +107,13 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
 
   syncMeshes();                                // simulation space -> screen
   sunlight.position.copy(sunMesh.position);    // the Sun moves now; its light follows
+  const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0); // relative energy drift since day zero
+  hud.textContent = `Day ${Math.floor(simDays)}\nEnergy drift: ${drift.toExponential(2)}`;
+  const offset = wrap(heliocentricAngle() - startAngle);
+  if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
+    lastLapDay = simDays;
+  }
+  prevOffset = offset;
   controls.update();
   renderer.render(scene, camera);
 }

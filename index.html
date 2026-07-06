@@ -6,10 +6,19 @@
   <style>
     /* Kill the browser's default page margin so the canvas fills edge to edge */
     body { margin: 0; overflow: hidden; background: #000; }
+    #hud {
+      position: fixed; /* pinned to the windows, not the page*/
+      top: 12px; left: 12px;
+      color: #9fb4d8;
+      font: 14px/1.4 monospace;
+      white-space: pre; /* preserve line breaks and spaces */
+      pointer-events: none; /* pass through mouse drags to the camera */
+    }
   </style>
 </head>
 <body>
   <!-- type="module" is what lets main.js use import statements -->
   <script type="module" src="/main.js"></script>
+  <div id="hud"></div>
 </body>
 </html>
