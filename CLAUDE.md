@@ -14,6 +14,9 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   potential mesh), supply data, and review. Do NOT write full solutions for
   tasks assigned to the human — guide, hint, and review instead.
 - Propose a brief plan before any non-trivial change and wait for agreement.
+- Visual-first teaching: for any math or physics concept, lead with a picture,
+  animation, or plain-language physical metaphor before any equation; when a
+  good video exists, recommend it.
 
 ## Non-negotiable conventions
 
