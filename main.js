@@ -111,6 +111,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
   hud.textContent = `Day ${Math.floor(simDays)}\nEnergy drift: ${drift.toExponential(2)}`;
   const offset = wrap(heliocentricAngle() - startAngle);
   if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
+    console.log(`The pale blue dot has completed another orbit around the Sun! ${(simDays - lastLapDay).toFixed(1)} simulated days since the last lap.`);
     lastLapDay = simDays;
   }
   prevOffset = offset;
