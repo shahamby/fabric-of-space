@@ -1,4 +1,3 @@
-import { computAcceleration, leapfrogStep } from './physics.js';
 import bodiesData from './data/bodies.json';
 import { makeBodyMesh } from './bodyMesh.js';
 
@@ -10,11 +9,12 @@ export function loadBodyMeshes() {
 // Simulation State
 // A working copy for the physics to scribble on, wihile the imported JSON remains pristine and auditable.
 
-export const G = solarSystem._meta.G_aus_msun_day2;
+export const G = bodiesData._meta.G_au3_msun_day2;
+console.assert(Number.isFinite(G), 'G failed to load from bodies.json');
 
 export function buildSimBodies() {
   const simBodies = [];                    // start with an empty array
-  for (const b of solarSystem.bodies) {    // walk the bodies in the JSON
+  for (const b of bodiesData.bodies) {    // walk the bodies in the JSON
     simBodies.push({                       // .push() appents to the array
       name: b.name,
       mass: b.mass_msun,                   // physics calls it "mass"

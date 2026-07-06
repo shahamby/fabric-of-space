@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
-import { loadBodyMeshes } from './bodies.js';
+import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
+import { computeAccelerations, leapfrogStep } from './physics.js';
+import { eclToScene } from './bodyMesh.js';
 
 // ---------- 1. The stage ----------
 // Think movie set: a Scene holds objects, a Camera views them,
@@ -42,6 +44,16 @@ sunlight.decay = 0;                                  // cheat #2
 sunlight.position.copy(sunMesh.position);            // tracks the Sun, not the origin
 scene.add(sunlight, new THREE.AmbientLight(0xffffff, 0.08));
 
+// Physics setup (runs once)
+const simBodies = buildSimBodies();
+computAcceleration(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
+
+const DT = 0.5; // days per physics step, ~12 hours
+let timeScale = 20; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
+let simDays = 0 // total days simulated since the page loaded. This is a running counter, not a delta.
+let carry = 0; // carry-over fraction of a day from the last frame, to keep the simulation smooth
+let lastTime = performance.now(); // milliseconds since page load, from the browser's clock
+
 // ---------- 4. True-scale toggle ----------
 // Cheat #1 is body-size exaggeration (see CHEATS.md). Press T to see the
 // real, true-to-data size of every body — most will vanish to a speck.
@@ -55,16 +67,36 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
+// The ONLY bridge betwween simulated space and rendered space.
+function syncMeshes() {
+  for (let i = 0; i < simBodies.length; i++) {
+    const [x, y, z] = simBodies[i].pos;
+    bodyMeshes[i].position.copy(eclToScene(x, y, z));
+  }
+}
+
 // ---------- 5. The loop ----------
 // requestAnimationFrame asks the browser to call us before every screen
 // refresh (~60x/sec). In M2, the physics step will live inside this loop.
-function animate() {
+function animate(now) {              // 'now' = stopwatch reading from the browser
   requestAnimationFrame(animate);
-  stars.rotation.y += 0.0003; // slow spin — pure proof of life for M0
-  controls.update(); // required each frame while damping is enabled
+
+  const real = Math.min((now - last) / 1000, 0.1);  // secs since last frame,
+  last = now;                                       // clamped for tab-switches
+
+  carry += real * timeScale;         // deposit the sim-days we owe
+  while (carry >= DT) {              // spend them in fixed, identical steps
+    leapfrogStep(simBodies, DT, G);
+    simDays += DT;
+    carry -= DT;
+  }
+
+  syncMeshes();                                // simulation space -> screen
+  sunlight.position.copy(sunMesh.position);    // the Sun moves now; its light follows
+  controls.update();
   renderer.render(scene, camera);
 }
-animate();
+requestAnimationFrame(animate);      // NOT animate() — the browser must supply 'now'
 
 // ---------- 6. Stay correct when the window resizes ----------
 window.addEventListener('resize', () => {
