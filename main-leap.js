@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
 import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
-import { computeAccelerations, leapfrogStep, totalEnergy, eulerStep } from './physics.js';
+import { computeAccelerations, leapfrogStep, totalEnergy } from './physics.js';
 import { eclToScene } from './bodyMesh.js';
 
 // ---------- 1. The stage ----------
@@ -49,7 +49,7 @@ const simBodies = buildSimBodies();
 computeAccelerations(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
 
 const DT = 0.5; // days per physics step, ~12 hours
-let timeScale = 50; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
+let timeScale = 20; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
 let simDays = 0 // total days simulated since the page loaded. This is a running counter, not a delta.
 let carry = 0; // carry-over fraction of a day from the last frame, to keep the simulation smooth
 let lastTime = performance.now(); // milliseconds since page load, from the browser's clock
@@ -100,7 +100,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
 
   carry += real * timeScale;         // deposit the sim-days we owe
   while (carry >= DT) {              // spend them in fixed, identical steps
-    eulerStep(simBodies, DT, G);
+    leapfrogStep(simBodies, DT, G);
     simDays += DT;
     carry -= DT;
   }

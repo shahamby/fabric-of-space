@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
 import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
-import { computeAccelerations, leapfrogStep, totalEnergy } from './physics.js';
+import { computeAccelerations, leapfrogStep, totalEnergy, eulerStep } from './physics.js';
 import { eclToScene } from './bodyMesh.js';
+import { makeFabric, updateFabric } from './fabric.js';
 
 // ---------- 1. The stage ----------
 // Think movie set: a Scene holds objects, a Camera views them,
@@ -29,11 +30,17 @@ controls.enableDamping = true;
 const stars = makeStarfield();
 scene.add(stars);
 
+// ---------- 3. The solar system (Flat) ----------
+// GridHelper's default plane is XZ at y=0, which is exactly the ecliptic
+// plane after eclToScene() — so it lines up with the bodies with no extra math.
+//const grid = new THREE.GridHelper(80, 16, 0x444466, 0x222233);
+//scene.add(grid);
+
 // ---------- 3. The solar system ----------
 // GridHelper's default plane is XZ at y=0, which is exactly the ecliptic
 // plane after eclToScene() — so it lines up with the bodies with no extra math.
-const grid = new THREE.GridHelper(80, 16, 0x444466, 0x222233);
-scene.add(grid);
+const fabric = makeFabric();
+scene.add(fabric);
 
 const bodyMeshes = loadBodyMeshes();
 scene.add(...bodyMeshes);
@@ -49,7 +56,7 @@ const simBodies = buildSimBodies();
 computeAccelerations(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
 
 const DT = 0.5; // days per physics step, ~12 hours
-let timeScale = 20; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
+let timeScale = 50; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
 let simDays = 0 // total days simulated since the page loaded. This is a running counter, not a delta.
 let carry = 0; // carry-over fraction of a day from the last frame, to keep the simulation smooth
 let lastTime = performance.now(); // milliseconds since page load, from the browser's clock
@@ -100,7 +107,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
 
   carry += real * timeScale;         // deposit the sim-days we owe
   while (carry >= DT) {              // spend them in fixed, identical steps
-    leapfrogStep(simBodies, DT, G);
+    eulerStep(simBodies, DT, G);
     simDays += DT;
     carry -= DT;
   }
@@ -114,6 +121,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     console.log(`The pale blue dot has completed another orbit around the Sun! ${(simDays - lastLapDay).toFixed(1)} simulated days since the last lap.`);
     lastLapDay = simDays;
   }
+  updateFabric(fabric, simBodies, G, trueScale);
   prevOffset = offset;
   controls.update();
   renderer.render(scene, camera);

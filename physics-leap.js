@@ -89,19 +89,3 @@ export function totalEnergy(bodies, G) {
   }
   return ke + pe;  // absolute value is meaningless to us; the DRIFT is everything
 }
-
-// eualerStep = the "obvious" (well for those that are good at math) method, and the control group for my little experiment.
-// Kept here for a reason and is to never be wired into real simulation. It is a control group for the leapfrog method, and is used to demonstrate the energy drift that occurs with the naive method.
-export function eulerStep(bodies, dt, G) {
-  computeAccelerations(bodies, G);     // aim Once: where does gravity pull, here?
-  for (const b of bodies) {            // Go STRAIGHT for the entire step.
-    b.pos[0] += b.vel[0] * dt;
-    b.pos[1] += b.vel[1] * dt;
-    b.pos[2] += b.vel[2] * dt;
-  }
-  for (const b of bodies) {            // Adjust the velocity for the next step -- but the position is already wrong.
-    b.vel[0] += b.acc[0] * dt;
-    b.vel[1] += b.acc[1] * dt;
-    b.vel[2] += b.acc[2] * dt;
-  }
-}
