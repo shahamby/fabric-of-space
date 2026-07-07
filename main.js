@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
 import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
 import { computeAccelerations, leapfrogStep, totalEnergy } from './physics.js';
-import { eclToScene, KM_PER_AU } from './bodyMesh.js';
+import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric } from './fabric.js';
 
 // ---------- 1. The stage ----------
@@ -60,7 +60,7 @@ let paused = false;  // Space toggles this; it gates the deposit only — render
 // Instruments (setup)
 const hud = document.getElementById('hud');       // heads-up display, top-left
 const panel = document.getElementById('panel');   // selection readout, top-right
-const E0 = totalEnergy(simBodies, G);             // sealed baseline: energy at day zero
+let E0 = totalEnergy(simBodies, G);             // Re-baselined on change; keep the alarm meaningful.
 
 // ---------- 4. Keyboard controls ----------
 // T = true scale (cheats off, see CHEATS.md). Space = pause. [ / ] = slower / faster.
@@ -76,6 +76,15 @@ window.addEventListener('keydown', (event) => {
     return;
   }
   if (event.code === 'Space') { paused = !paused; return; }   // .code, not .key — the key for
+  // Mass surgery on the selected body: '-' halves, '=' doubles ('=' is the + key)
+  if ((event.key === '-' || event.key === '=') && selected) {
+    const b = simBodies[bodyMeshes.indexOf(selected)];
+    b.mass *= (event.key === '=' ? 2 : 0.5);
+    computeAccelerations(simBodies, G);  // forces changed THIS instant — everyone re-aims
+    E0 = totalEnergy(simBodies, G);      // authorized change -> re-seal the baseline
+    return;
+  }
+  if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
 });
@@ -115,6 +124,39 @@ function syncMeshes() {
   }
 }
 
+// Rogue body factory
+let rogueCount = 0;
+function spawnRogue() {
+  rogueCount++;
+  const r = 12;                               // AU from our local star - outside of Saturn's traffic pattern
+  const theta = Math.random() * Math.PI * 2;  // random bearing on the ecliptic
+
+  // Circular-orbit speed: sqrt(G·M/r) is the entire secret of orbiting —
+  // move sideways exactly fast enough to keep missing the thing pulling you.
+  const vCirc = Math.sqrt(G * sunSim.mass / r);
+
+  const body = {                              // shaped like a bodies.json record,
+    name: `Rogue-${rogueCount}`,              // so makeBodyMesh accepts it happily
+    mass_msun: 9.55e-4,                       // one Jupiter's worth of trouble (infuckingsane bro)
+    radius_km: 30000,
+    color: '#ff4fa3',                         // no natural body is hot pink. Honest labeling.
+    position_au: [ sunSim.pos[0] + r * Math.cos(theta),
+                   sunSim.pos[1] + r * Math.sin(theta), 0 ],
+    velocity_au_day: [ sunSim.vel[0] - vCirc * Math.sin(theta),   // perpendicular to the
+                       sunSim.vel[1] + vCirc * Math.cos(theta),   // radius = sideways,
+                       0 ],                                       // riding along with the Sun
+  };
+
+  // Both worlds get told, same index, same instant — the alignment contract holds.
+  simBodies.push({ name: body.name, mass: body.mass_msun,
+    pos: [...body.position_au], vel: [...body.velocity_au_day], acc: [0, 0, 0] });
+  const mesh = makeBodyMesh(body);
+  bodyMeshes.push(mesh);
+  scene.add(mesh);
+
+  computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
+  E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
+}
 // Lap detector: Earth's bearing as seen from the Sun's position, in the ecliptic plane.
 const earthSim = simBodies.find((body) => body.name === 'Earth');
 const sunSim = simBodies.find((body) => body.name === 'Sun');
