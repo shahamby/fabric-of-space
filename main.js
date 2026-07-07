@@ -31,6 +31,8 @@ const stars = makeStarfield();
 scene.add(stars);
 
 // ---------- 3. The solar system ----------
+// GridHelper's default plane is XZ at y=0, which is exactly the ecliptic
+// plane after eclToScene() — so it lines up with the bodies with no extra math.
 const fabric = makeFabric();
 scene.add(fabric);
 
@@ -47,62 +49,27 @@ scene.add(sunlight, new THREE.AmbientLight(0xffffff, 0.08));
 const simBodies = buildSimBodies();
 computeAccelerations(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
 
-const DT = 0.5;      // sim days per physics step — the ACCURACY dial
-let timeScale = 20;  // sim days per real second — the SPEED dial ([ and ] halve/double)
-                     // 20 d/s = 20 × 86,400 sim-seconds per real second ≈ 1.7 million× real time
-let simDays = 0;     // the simulation's odometer — a running counter, not a delta
-let carry = 0;       // carry-over sim-days owed from the last frame
-let lastTime = performance.now();  // milliseconds since page load, from the browser's clock
-let paused = false;  // Space toggles this; it gates the deposit only — rendering never pauses
+const DT = 0.5; // days per physics step, ~12 hours
+let timeScale = 50; // days per real second - Speed up the simulation to make it interesting. 20 days/sec is ~6000x real time.
+let simDays = 0 // total days simulated since the page loaded. This is a running counter, not a delta.
+let carry = 0; // carry-over fraction of a day from the last frame, to keep the simulation smooth
+let lastTime = performance.now(); // milliseconds since page load, from the browser's clock
 
 // Instruments (setup)
-const hud = document.getElementById('hud');       // heads-up display, top-left
-const panel = document.getElementById('panel');   // selection readout, top-right
-const E0 = totalEnergy(simBodies, G);             // sealed baseline: energy at day zero
+const hud = document.getElementById('hud'); // get the <div> added to index.html for the heads-up display by its id
+const E0 = totalEnergy(simBodies, G); // initial energy, for the energy at day zero
 
-// ---------- 4. Keyboard controls ----------
-// T = true scale (cheats off, see CHEATS.md). Space = pause. [ / ] = slower / faster.
-// One listener routes every key — one firewall, many rules. Never add a second keydown.
+// ---------- 4. True-scale toggle ----------
+// Cheat #1 is body-size exaggeration (see CHEATS.md). Press T to see the
+// real, true-to-data size of every body — most will vanish to a speck.
 let trueScale = false;
 window.addEventListener('keydown', (event) => {
-  if (event.key.toLowerCase() === 't') {
-    trueScale = !trueScale;
-    for (const mesh of bodyMeshes) {
-      const radius = trueScale ? mesh.userData.trueRadiusAu : mesh.userData.displayRadiusAu;
-      mesh.scale.setScalar(radius);
-    }
-    return;
+  if (event.key.toLowerCase() !== 't') return;
+  trueScale = !trueScale;
+  for (const mesh of bodyMeshes) {
+    const radius = trueScale ? mesh.userData.trueRadiusAu : mesh.userData.displayRadiusAu;
+    mesh.scale.setScalar(radius);
   }
-  if (event.code === 'Space') { paused = !paused; return; }   // .code, not .key — the key for
-  if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
-  if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
-});
-
-// ---------- Picking (see the ray diagram) ----------
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
-let selected = null;
-let downX = 0, downY = 0;
-
-window.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY; });
-
-window.addEventListener('pointerup', (e) => {
-  // If the mouse traveled, that was an orbit-drag, not a click. Stand down.
-  if (Math.hypot(e.clientX - downX, e.clientY - downY) > 5) return;
-
-  // Screen pixels -> math coordinates: center (0,0), edges ±1. The y-flip is
-  // your third coordinate flip (eclToScene, the plane rotation, now this).
-  pointer.x =  (e.clientX / window.innerWidth)  * 2 - 1;
-  pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
-  raycaster.setFromCamera(pointer, camera);            // aim the ray
-  const hits = raycaster.intersectObjects(bodyMeshes); // everything skewered, nearest first
-  selected = hits.length > 0 ? hits[0].object : null;  // first hit wins; empty space deselects
-
-  // Soft glow on the chosen one. The Sun's material has no emissive, hence the
-  // guards — it self-selects by glowing anyway.
-  for (const m of bodyMeshes) if (m.material.emissive) m.material.emissive.set(0x000000);
-  if (selected && selected.material.emissive) selected.material.emissive.set(0x223344);
 });
 
 // The ONLY bridge betwween simulated space and rendered space.
@@ -124,48 +91,40 @@ let prevOffset = 0;
 let lastLapDay = 0;
 
 // ---------- 5. The loop ----------
-// Physics deposits in fixed steps, then everything below the while paints.
+// requestAnimationFrame asks the browser to call us before every screen
+// refresh (~60x/sec). In M2, the physics step will live inside this loop.
 function animate(now) {              // 'now' = stopwatch reading from the browser
   requestAnimationFrame(animate);
 
   const real = Math.min((now - lastTime) / 1000, 0.1);  // secs since last frame,
   lastTime = now;                                       // clamped for tab-switches
 
-  if (!paused) carry += real * timeScale;  // deposit the sim-days we owe — unless paused
-  while (carry >= DT) {                    // spend them in fixed, identical steps
-    leapfrogStep(simBodies, DT, G);        // the corroborated integrator. Accept no substitutes.
+  carry += real * timeScale;         // deposit the sim-days we owe
+  while (carry >= DT) {              // spend them in fixed, identical steps
+    eulerStep(simBodies, DT, G);
     simDays += DT;
     carry -= DT;
   }
 
   syncMeshes();                                // simulation space -> screen
-  sunlight.position.copy(sunMesh.position);    // the Sun moves; its light follows
-
-  const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0);
-  hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nEnergy drift: ${drift.toExponential(2)}`;
-
+  sunlight.position.copy(sunMesh.position);    // the Sun moves now; its light follows
+  const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0); // relative energy drift since day zero
+  hud.textContent = `Day ${Math.floor(simDays)}\nEnergy drift: ${drift.toExponential(2)}`;
   const offset = wrap(heliocentricAngle() - startAngle);
   if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
     console.log(`The pale blue dot has completed another orbit around the Sun! ${(simDays - lastLapDay).toFixed(1)} simulated days since the last lap.`);
     lastLapDay = simDays;
   }
-  prevOffset = offset;
-
-  if (selected) {
-    const b = simBodies[bodyMeshes.indexOf(selected)];   // mesh -> its physics twin
-    const rSun = Math.hypot(b.pos[0] - sunSim.pos[0], b.pos[1] - sunSim.pos[1], b.pos[2] - sunSim.pos[2]);
-    const v = Math.hypot(...b.vel) * KM_PER_AU / 86400;  // AU/day -> km/s
-    panel.textContent = `${b.name}\n` +
-      `mass: ${b.mass.toExponential(2)} M☉  (≈ ${(b.mass * 1.989e30).toExponential(2)} kg)\n` +
-      `from Sun: ${rSun.toFixed(2)} AU\n` +
-      `speed: ${v.toFixed(1)} km/s`;
-    panel.style.display = 'block';
-  } else {
-    panel.style.display = 'none';
-  }
-
   updateFabric(fabric, simBodies, G, trueScale);
+  prevOffset = offset;
   controls.update();
   renderer.render(scene, camera);
 }
 requestAnimationFrame(animate);      // NOT animate() — the browser must supply 'now'
+
+// ---------- 6. Stay correct when the window resizes ----------
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix(); // camera must recompute its math after changes
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
