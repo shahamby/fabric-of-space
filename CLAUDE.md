@@ -65,3 +65,8 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   day counter, energy-drift monitor (oscillates ~1e-7, no trend), Earth-lap
   detector (365.0–365.5 days, half-day resolution).
 - M3: next. The fabric — gravitational potential as a displaced mesh.
+- - M3: complete and committed. The fabric — potential-displaced wireframe;
+  cheats #3/#4; T flattens to honest depth.
+- M4: complete and committed. Picking, info panel, time controls (M4a);
+  mass surgery + rogue bodies with re-baseline on change (M4b).
+- M5: next. Live Horizons fetch with progress bar + provenance writer.
