@@ -3,22 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <title>Fabric of Space</title>
-  <style>
-    /* Kill the browser's default page margin so the canvas fills edge to edge */
-    body { margin: 0; overflow: hidden; background: #000; }
-    #hud {
-      position: fixed; /* pinned to the windows, not the page*/
-      top: 12px; left: 12px;
-      color: #9fb4d8;
-      font: 14px/1.4 monospace;
-      white-space: pre; /* preserve line breaks and spaces */
-      pointer-events: none; /* pass through mouse drags to the camera */
-    }
-  </style>
+ <style>
+  /* Kill the browser's default page margin so the canvas fills edge to edge */
+  body { margin: 0; overflow: hidden; background: #000; }
+  #hud {
+    position: fixed; /* pinned to the window, not the page */
+    top: 12px; left: 12px;
+    color: #9fb4d8;
+    font: 14px/1.4 monospace;
+    white-space: pre;      /* preserve line breaks and spaces */
+    pointer-events: none;  /* pass through mouse drags to the camera */
+  }
+  #panel {
+    position: fixed;
+    top: 12px; right: 12px;  /* same recipe as #hud, opposite corner */
+    color: #d8c89f;          /* warm gold, so the two readouts read as different */
+    font: 14px/1.4 monospace;
+    white-space: pre;
+    pointer-events: none;
+    display: none;           /* hidden until something is selected */
+  }
+</style>
 </head>
 <body>
   <!-- type="module" is what lets main.js use import statements -->
   <script type="module" src="/main.js"></script>
   <div id="hud"></div>
+  <div id="panel"></div>
 </body>
 </html>
