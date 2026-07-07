@@ -30,12 +30,6 @@ controls.enableDamping = true;
 const stars = makeStarfield();
 scene.add(stars);
 
-// ---------- 3. The solar system (Flat) ----------
-// GridHelper's default plane is XZ at y=0, which is exactly the ecliptic
-// plane after eclToScene() — so it lines up with the bodies with no extra math.
-//const grid = new THREE.GridHelper(80, 16, 0x444466, 0x222233);
-//scene.add(grid);
-
 // ---------- 3. The solar system ----------
 // GridHelper's default plane is XZ at y=0, which is exactly the ecliptic
 // plane after eclToScene() — so it lines up with the bodies with no extra math.

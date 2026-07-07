@@ -17,6 +17,9 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Visual-first teaching: for any math or physics concept, lead with a picture,
   animation, or plain-language physical metaphor before any equation; when a
   good video exists, recommend it.
+  - A milestone commit is incomplete without its CHEATS.md entries and Status
+  update in the same commit; when asked to make a milestone commit, verify
+  both first and do not proceed without them.
 
 ## Non-negotiable conventions
 
