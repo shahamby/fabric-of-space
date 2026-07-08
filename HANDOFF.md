@@ -1,0 +1,174 @@
+# fabric-of-space — Session Handoff (v1, through M4)
+
+Written 2026-07-07 by Claude at Shambu's request, to seed a new context.
+Scrubbed for public-repo safety — fine to commit as HANDOFF.md if desired.
+Complements CLAUDE.md (working agreement + status); does not replace it.
+
+## What this project is
+
+- Interactive 3D solar-system gravity visualizer. "Fabric of space" =
+  gravitational potential rendered as a physically displaced mesh — the
+  trampoline analogy, with real math and real data.
+- v1 = solar-system sandbox (nearly complete). v2 = Milky Way galaxy tier.
+- Repo (GROUND TRUTH — always clone/pull before advising):
+  https://github.com/shahamby/fabric-of-space (public)
+- Environment: Windows, VS Code workspace "MrGrouper", Chrome, Vite +
+  Three.js. Dependencies are `three` and `vite` ONLY — nothing added
+  without explicit approval. Commits are made by hand in the VS Code
+  Source Control panel. Claude Code is available in VS Code; the claude.ai
+  project chat is the planning/architecture room.
+
+## Working agreement (critical — also codified in CLAUDE.md)
+
+- Shambu: senior network security professional / ethical hacker; beginner
+  programmer learning JavaScript and Three.js through this project.
+- VISUAL-FIRST teaching: lead with a diagram, animation, or physical
+  metaphor BEFORE any equation; recommend videos and/or images for new concepts; explain
+  every code block (what + why).
+- 60/40 split: Shambu types most code following Claude's exemplar
+  patterns; Claude scaffolds the math-heavy modules, supplies data,
+  audits, and reviews. Calibrate to small typed-along steps with
+  checkpoints and plain-language "what correct looks like" descriptions.
+  Full assembled sections on request are fine — anchored to the repo's
+  REAL names and line numbers, never guessed.
+- Security framings land well: provenance, sealed baselines, fail-loud vs
+  fail-silent, compensating controls, change management, audits with
+  receipts.
+- Pedagogy that works: falsification experiments (predict -> run ->
+  observe), instruments as truth-tellers, an honest cheat ledger.
+- When guidance and repo diverge, the repo wins. Clone and read first.
+
+## Core conventions & contracts
+
+- Physics never cheats; only rendering cheats, and every cheat is logged
+  in CHEATS.md: #1 body-size exaggeration (+cap), #2 sunlight decay
+  disabled, #3 log-compressed fabric depth, #4 planet well gain x100 +
+  EPS 0.4 softening.
+- Simulation space: barycentric ecliptic J2000; units AU / days / solar
+  masses; G lives in data/bodies.json `_meta.G_au3_msun_day2`
+  (2.959122e-4). Rendering converts via `eclToScene(x,y,z) -> (x, z, -y)`
+  in bodyMesh.js. 1 scene unit = 1 AU. Never mix the two spaces.
+- `T` key = whole-truth toggle: true body sizes AND honest fabric depth.
+- Index-alignment contract: `simBodies[i]` <-> `bodyMeshes[i]`, both born
+  from the same source array; every mutation (e.g. spawn) updates both.
+- Energy baseline `E0` is `let`; re-seal (`E0 = totalEnergy(...)`) after
+  every AUTHORIZED change (mass surgery, spawn) — alarms must not cry
+  about approved work.
+- DT = 0.5 sim-days default (accuracy dial). Drop to 0.05 for rogue
+  swarms/close encounters — leapfrog's honesty guarantee holds only when
+  the timestep resolves the fastest encounter. timeScale default 20 d/s
+  (speed dial), keys `[` `]`, clamped 1–2048; `Space` pauses deposits
+  only (the render loop never stops).
+- Milestone commit ritual: code + CHEATS.md entries + CLAUDE.md Status in
+  the SAME commit. Enforced by `.git/hooks/commit-msg`, which blocks any
+  message starting `M<digit>` unless CLAUDE.md is staged. The hook fired
+  successfully on its maiden voyage (the M4b commit attempt).
+  Break-glass: `git commit --no-verify` (each use is a small confession).
+
+## File map (repo names — the real ones)
+
+- main.js — stage + loop; keyboard (T, Space, [, ], -, =, N); raycast
+  picking with drag guard; HUD `#hud` (day, d/s, paused, energy drift);
+  info panel `#panel` (name, mass in M-sun + kg, distance from Sun,
+  speed km/s); spawnRogue(); syncMeshes()
+- physics.js — computeAccelerations, leapfrogStep (LIVE integrator),
+  totalEnergy; eulerStep kept as a labeled FALSIFIED specimen — never
+  wire it in
+- bodies.js — imports data/bodies.json as `bodiesData`; loadBodyMeshes();
+  buildSimBodies(); exports G (with a console.assert tripwire)
+- bodyMesh.js — makeBodyMesh (unit sphere + scale; userData holds
+  {body, trueRadiusAu, displayRadiusAu}); eclToScene; KM_PER_AU; size
+  constants (planet x1200 capped at 0.25 AU, sun x60)
+- fabric.js — makeFabric (PlaneGeometry 80 AU, 120 segments, rotated
+  flat, wireframe); updateFabric (per-vertex potential sum + log
+  compression); dials: SIZE, SEGMENTS, DEPTH_SCALE, PHI_REF, EPS,
+  PLANET_GAIN
+- starfield.js — makeStarfield()
+- data/bodies.json — 9 bodies, real JPL Horizons state vectors, epoch
+  2026-07-04 TDB; masses from DE inverse ratios; _meta holds frame,
+  units, G
+- data/provenance.csv — per-body query URL, retrieved UTC, epoch,
+  SHA-256, license
+- CHEATS.md; CLAUDE.md (working agreement incl. visual-first line + hook
+  rule + Status block + Idea backlog); .git/hooks/commit-msg
+
+## State at handoff (VERIFY by pulling the repo first)
+
+- M0–M3 complete and committed. M4a committed (17dfcea). M4b BUILT and
+  demonstrated working, but its commit was blocked by the hook
+  (CLAUDE.md not staged). Unblock instructions were delivered: bring
+  Status current through M4, add the Idea backlog section, stage
+  CLAUDE.md with the code, recommit. FIRST TASK NEXT SESSION: confirm
+  the M4b commit landed and Status is current.
+- App verified live via screenshots: a Day-7959 run with drift -6.63e-7
+  (healthy) and a Venus panel matching NASA to three digits; lap logs
+  365.5 / 365.0 / 365.5 (the predicted half-day quantization
+  fingerprint). Chaos session: dozens of Jupiter-mass rogues; Saturn at
+  x128 mass (3.66e-2 M-sun) ejected to 169.8 AU at 125.7 km/s; drift
+  1.83e-1 correctly flagged unresolved close encounters.
+- Sim state does NOT persist — refresh reloads the 2026-07-04 epoch
+  (chaos is never saved). Possible future feature: scenario save/load.
+- User patterns to watch: dropped-letter typos (Tab-autocomplete habit
+  taught); Status updates were historically skipped (hook now enforces);
+  early backup-copy instinct retired in favor of
+  `git show <hash>:file` time travel.
+
+## Validated reference numbers
+
+- Healthy leapfrog drift: oscillates ~1e-8..1e-6, NO trend. Euler
+  (falsified): drift trends to ~5.6e-3 by day 365; Mercury illegally
+  reaches 0.875 AU (legal range 0.31–0.47).
+- Earth lap detector: 365.0–365.5 on the half-day ruler; truth is 365.25.
+- Fabric headless receipts: Sun funnel -7.89 units, sheet corner -0.56,
+  Jupiter dimple -3.64 display / -2.77 true; updateFabric ~3 ms on CPU.
+- Jupiter panel: 9.55e-4 M-sun ~ 1.90e27 kg, 5.0–5.5 AU, ~13 km/s.
+  Venus panel: 2.45e-6 M-sun ~ 4.87e24 kg, ~0.72–0.73 AU, ~35 km/s.
+
+## M5 plan (next milestone): the live data pipeline
+
+Goal: the app fetches its own state vectors from JPL Horizons at load or
+on demand ("load today's solar system"), with a progress bar — the
+original prompt's DataGathering status-bar requirement — replacing the
+static import; provenance recorded automatically; cached bodies.json as
+the offline fallback.
+
+- API: https://ssd.jpl.nasa.gov/api/horizons.api with params already
+  proven in this project: format=json, COMMAND='<id>' (10, 1–8),
+  EPHEM_TYPE='VECTORS', CENTER='500@0', OUT_UNITS='AU-D',
+  REF_PLANE='ECLIPTIC', CSV_FORMAT='YES', START/STOP/STEP. Parse the
+  $$SOE..$$EOE block, first row: JD, date, X, Y, Z, VX, VY, VZ.
+- 9 sequential fetches -> a natural 0–100% progress bar.
+- KNOWN-UNKNOWN: browser CORS on the Horizons API — verify first; if
+  blocked, teach Vite's dev proxy (vite.config `server.proxy`) as the fix.
+- Design decision to make together: browsers cannot write repo files —
+  runtime provenance options are a downloadable record, an in-app
+  provenance panel, or keeping the shipped provenance.csv for the
+  snapshot while logging runtime fetches. Masses/radii/colors stay in a
+  local table (Horizons supplies vectors only).
+- New concepts to teach visual-first: fetch + async/await, promises,
+  loading states, CORS.
+
+## Beyond M5 (v2 + backlog)
+
+- v2 galaxy tier: HYG (~120k stars) or ATHYG snapshot bulk-local; SIMBAD
+  name search + detail-on-demand; dark-matter halo toggle vs the observed
+  rotation curve (the killer feature); Sagittarius A* (4 million M-sun)
+  anchors the map.
+- Idea backlog (mirror in CLAUDE.md): event-horizon mode — r_s ~ 2.95 km
+  x mass_msun; when radius_km < r_s, render the rip (dark sphere, capped
+  funnel, horizon ring). The 30,000-km rogue rips at ~10,000 M-sun = 24
+  presses of `=` from Jupiter mass. Physics stays Newtonian (no c in
+  physics.js — an honest, logged limit).
+- Maybe-someday: scenario save/load; adaptive timestep; a drag slider for
+  mass; the barycenter-watch exercise (never confirmed done).
+
+## Session rituals
+
+- Always pull the repo before advising; audit with receipts (headless
+  runs of their own physics + data, eslint no-undef on a scratch config,
+  exact line anchors).
+- Milestones end with: acceptance test -> clean console -> commit
+  (code + CHEATS + Status together) -> report back.
+- Celebrate by VERIFYING their numbers against reality; end every build
+  with a concrete report-back cue. Tone: warm, collegial, precise,
+  playful when they are.
