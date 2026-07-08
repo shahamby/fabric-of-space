@@ -24,7 +24,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 ## Non-negotiable conventions
 
 - Physics never cheats. Only rendering cheats, and every display cheat is
-  logged in CHEATS.md (#1 body-size exaggeration, #2 sunlight decay disabled).
+  logged in CHEATS.md (#1-#4).
 - Simulation space: barycentric ecliptic J2000 coordinates in AU, days, and
   solar masses (G is in data/bodies.json _meta). Rendering converts through
   eclToScene(x, y, z) -> (x, z, -y) in bodyMesh.js. Never mix the two spaces.
@@ -64,9 +64,15 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - M2: complete and committed. Leapfrog N-body in motion. Instruments live:
   day counter, energy-drift monitor (oscillates ~1e-7, no trend), Earth-lap
   detector (365.0–365.5 days, half-day resolution).
-- M3: next. The fabric — gravitational potential as a displaced mesh.
-- - M3: complete and committed. The fabric — potential-displaced wireframe;
+- M3: complete and committed. The fabric — potential-displaced wireframe;
   cheats #3/#4; T flattens to honest depth.
 - M4: complete and committed. Picking, info panel, time controls (M4a);
   mass surgery + rogue bodies with re-baseline on change (M4b).
 - M5: next. Live Horizons fetch with progress bar + provenance writer.
+
+## Idea backlog
+
+- Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,
+  render the rip (dark sphere, capped funnel, horizon ring on the fabric).
+  Physics stays Newtonian; detection + display only. (Asked on day 4837,
+  the night of the rogue swarm.)
