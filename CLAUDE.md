@@ -76,3 +76,12 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   render the rip (dark sphere, capped funnel, horizon ring on the fabric).
   Physics stays Newtonian; detection + display only. (Asked on day 4837,
   the night of the rogue swarm.)
+
+## Open loose ends (non-milestone)
+
+- Barycenter-watch exercise: proposed after M2, never confirmed done.
+- HANDOFF.md needs an append-only header line ("append new sessions
+  below; never rewrite history").
+- M5c design decision pending: runtime provenance strategy (downloadable
+  record vs in-app panel vs shipped snapshot + runtime log).
+  
