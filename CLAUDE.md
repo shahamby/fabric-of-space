@@ -68,7 +68,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   cheats #3/#4; T flattens to honest depth.
 - M4: complete and committed. Picking, info panel, time controls (M4a);
   mass surgery + rogue bodies with re-baseline on change (M4b).
-- M5: next. Live Horizons fetch with progress bar + provenance writer.
+- M5a: complete — Vite proxy + live Horizons test fetch verified
 
 ## Idea backlog
 

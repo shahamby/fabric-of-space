@@ -220,3 +220,16 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix(); // camera must recompute its math after changes
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// Temporary function to test Horizons api fetch
+
+async function testHorizons() {
+  const params = 
+    "?format=json&COMMAND='399'&EPHEM_TYPE='VECTORS'&CENTER='500@0'" +
+    "&OUT_UNITS='AU-D'&REF_PLANE='ECLIPTIC'&CSV_FORMAT='YES'" +
+    "&START_TIME='2026-07-08'&STOP_TIME='2026-07-09'&STEP_SIZE='1d'";
+  const response = await fetch('/api/horizons' + params);
+  const data = await response.json();
+  console.log('Horizons data states:', data.result);
+}
+testHorizons();
