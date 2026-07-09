@@ -70,6 +70,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   mass surgery + rogue bodies with re-baseline on change (M4b).
 - M5a: complete — Vite proxy + live Horizons test fetch verified
 - M5b: complete - sequential live fetch + progress bar
+- M5c: complete plus strike the provenance decision from the loose ends — decision made: all three, one source)
 
 ## Idea backlog
 

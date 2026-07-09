@@ -26,6 +26,14 @@ document.body.appendChild(renderer.domElement); // the <canvas> lands in the pag
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
+// Hash helper
+async function sha256Hex(text) {
+  const bytes = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', bytes);
+  return [...new Uint8Array(hash)]
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // ---------- 2. The stars ----------
 const stars = makeStarfield();
 scene.add(stars);
@@ -88,7 +96,13 @@ window.addEventListener('keydown', (event) => {
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
   if (event.code === 'KeyL') fetchAllBodies(); // JPL data from Horizons
-});
+  if (event.code === 'KeyP') {
+    provPanel.style.display =
+      provPanel.style.display === 'none' ? 'block' : 'none';
+    renderProvenance()
+  }
+  if (event.code === 'KeyD') downloadProvenance();
+  });
 
 // ---------- Picking (see the ray diagram) ----------
 const raycaster = new THREE.Raycaster();
@@ -168,14 +182,14 @@ const startAngle = heliocentricAngle();
 let prevOffset = 0;
 let lastLapDay = 0;
 
-// Horizons sanity check
+// Horizons - ID mapping
 const HORIZONS_IDS = [
   ['Sun', '10'],
   ['Mercury', '1'], ['Venus', '2'], ['Earth', '3'], ['Mars', '4'],
   ['Jupiter', '5'], ['Saturn', '6'], ['Uranus', '7'], ['Neptune', '8'],
 ];
 
-// Horizons progress bar
+// Horizons - Progress bar
 // Plain div to leave index.html untouched
 const progressBox = document.createElement('div');
 progressBox.style.cssText =
@@ -187,26 +201,107 @@ progressFill.style.cssText = 'height:14px; width:0%; background:#1D9E75;';
 const progressLabel = document.createElement('div');
 progressBox.append(progressLabel, progressFill);
 document.body.append(progressBox);
+// Horizons - Panel setup
+const provPanel = document.createElement('div');
+provPanel.style.cssText =
+  'position:fixed; bottom:12px; right:12px; max-width:440px; max-height:60vh;' +
+  'overflow:auto; background:rgba(0,0,0,0.85); border:1px solid #555;' +
+  'color:#9fd; font:11px monospace; padding:8px; white-space:pre; display:none;';
+document.body.append(provPanel);
 
-// Horizons
+function renderProvenance() {
+  if (!sessionProvenance) {
+    provPanel.textContent =
+      'No live data this session — running on shipped snapshot (bodies.json).';
+    return;
+  }
+  const head =
+    `SOURCE   ${sessionProvenance.source}\n` +
+    `FRAME    ${sessionProvenance.frame}\n` +
+    `SESSION  ${sessionProvenance.session}\n\n`;
+  const rows = sessionProvenance.bodies.map(r =>
+    `${r.body.padEnd(8)} cmd=${r.command}  ${r.epoch}  ` +
+    `sha256=${r.sha256.slice(0, 12)}…  ${r.parsed}`
+  ).join('\n');
+  provPanel.textContent = head + rows;
+}
+
+// Horizons - Parser function
+function parseHorizonsVectors(text, expectedName) {
+  // Trust boundary checks — refuse before parsing, never after
+  if (!text.includes(expectedName)) {
+    throw new Error(`${expectedName} appears to be incorrect — wrong body?`);
+  }
+  const soe = text.indexOf('$$SOE');
+  const eoe = text.indexOf('$$EOE');
+  if (soe === -1 || eoe === -1) {
+    throw new Error(`No $$SOE/$$EOE fence for ${expectedName} — truncated response?`);
+  }
+  const firstRow = text.slice(soe + 5, eoe).trim().split('\n')[0];
+  const cols = firstRow.split(',').map(s => s.trim());
+  const nums = cols.slice(2, 8).map(Number);   // X Y Z VX VY VZ
+  if (nums.some(Number.isNaN)) {
+    throw new Error(`NaN in state vector for ${expectedName}: ${firstRow}`);
+  }
+  return { position: nums.slice(0, 3), velocity: nums.slice(3, 6) };
+}
+
+// Horizons - Fetch function
 async function fetchAllBodies() {
+  let sessionProvenance = null;
   progressBox.style.display = 'block';
   const results = {};
   for (let i = 0; i < HORIZONS_IDS.length; i++) {
     const [name, id] = HORIZONS_IDS[i];
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const stop  = new Date();                                // now
+    const start = new Date(stop.getTime() - msPerDay);       // 24h ago
+    const fmt = (d) => d.toISOString().slice(0, 10);         // → 'YYYY-MM-DD'
     progressLabel.textContent = `Collecting ${name} » (${i + 1}/9)`;
       const params = 
       `?format=json&COMMAND='${id}'&EPHEM_TYPE='VECTORS'&CENTER='500@0'` +
       "&OUT_UNITS='AU-D'&REF_PLANE='ECLIPTIC'&CSV_FORMAT='YES'" +
-      "&START_TIME='2026-07-08'&STOP_TIME='2026-07-09'&STEP_SIZE='1d'";
+      `&START_TIME='${fmt(start)}'&STOP_TIME='${fmt(stop)}'&STEP_SIZE='1d'`;
     const response = await fetch('/api/horizons' + params);
     const data = await response.json();
-    results[name] = data.result;
+    const records = [];
+    records.push({
+      body: name,
+      command: id,
+      epoch: `${fmt(start)} 00:00 TDB`,
+      fetchedAtUTC: new Date().toISOString(),
+      responseBytes: data.result.length,
+      sha256: await sha256Hex(data.result),
+      parsed: 'OK',
+    });
+        results[name] = parseHorizonsVectors(data.result, name);
     progressFill.style.width = `${((i + 1) / 9) * 100}%`;
   }
   progressLabel.textContent = 'All your base belong to us! √';
   console.log('Live Horizons Data:', results);
+  sessionProvenance = {
+    source: 'NASA/JPL Horizons API via local Vite proxy',
+    endpoint: 'https://ssd.jpl.nasa.gov/api/horizons.api',
+    frame: 'Solar System Barycenter, ecliptic J2000',
+    units: 'AU, AU/day',
+    session: new Date().toISOString(),
+    bodies: records,
+  };
+  console.log('Session provenance:', sessionProvenance);   // ← Option C, done
   return results
+}
+
+// Horizons - Download provenance
+function downloadProvenance() {
+  if (!sessionProvenance) return;
+  const blob = new Blob([JSON.stringify(sessionProvenance, null, 2)],
+                        { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `fabric-provenance-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ---------- 5. The loop ----------
@@ -223,7 +318,6 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     simDays += DT;
     carry -= DT;
   }
-
   syncMeshes();                                // simulation space -> screen
   sunlight.position.copy(sunMesh.position);    // the Sun moves; its light follows
 
