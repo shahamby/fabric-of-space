@@ -245,18 +245,20 @@ function parseHorizonsVectors(text, expectedName) {
   }
   return { position: nums.slice(0, 3), velocity: nums.slice(3, 6) };
 }
+// Horizons - Fetch setup
+let sessionProvenance = null;
 
 // Horizons - Fetch function
 async function fetchAllBodies() {
-  let sessionProvenance = null;
   progressBox.style.display = 'block';
   const results = {};
-  for (let i = 0; i < HORIZONS_IDS.length; i++) {
-    const [name, id] = HORIZONS_IDS[i];
+  const records = [];
     const msPerDay = 24 * 60 * 60 * 1000;
     const stop  = new Date();                                // now
     const start = new Date(stop.getTime() - msPerDay);       // 24h ago
     const fmt = (d) => d.toISOString().slice(0, 10);         // → 'YYYY-MM-DD'
+  for (let i = 0; i < HORIZONS_IDS.length; i++) {
+    const [name, id] = HORIZONS_IDS[i];
     progressLabel.textContent = `Collecting ${name} » (${i + 1}/9)`;
       const params = 
       `?format=json&COMMAND='${id}'&EPHEM_TYPE='VECTORS'&CENTER='500@0'` +
@@ -264,7 +266,7 @@ async function fetchAllBodies() {
       `&START_TIME='${fmt(start)}'&STOP_TIME='${fmt(stop)}'&STEP_SIZE='1d'`;
     const response = await fetch('/api/horizons' + params);
     const data = await response.json();
-    const records = [];
+    results[name] = parseHorizonsVectors(data.result, name);
     records.push({
       body: name,
       command: id,
@@ -274,7 +276,6 @@ async function fetchAllBodies() {
       sha256: await sha256Hex(data.result),
       parsed: 'OK',
     });
-        results[name] = parseHorizonsVectors(data.result, name);
     progressFill.style.width = `${((i + 1) / 9) * 100}%`;
   }
   progressLabel.textContent = 'All your base belong to us! √';
