@@ -87,6 +87,7 @@ window.addEventListener('keydown', (event) => {
   if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
+  if (event.code === 'KeyL') fetchAllBodies(); // JPL data from Horizons
 });
 
 // ---------- Picking (see the ray diagram) ----------
@@ -167,6 +168,47 @@ const startAngle = heliocentricAngle();
 let prevOffset = 0;
 let lastLapDay = 0;
 
+// Horizons sanity check
+const HORIZONS_IDS = [
+  ['Sun', '10'], ['Mercury', '199'], ['Venus', '299'], // Cross check ./data/bodies.json 
+  ['Earth', '399'], ['Mars', '499'], ['Jupiter', '599'], // Verify all names match and the order is correct
+  ['Saturn', '699'], ['Uranus', '799'], ['Neptune', '899'], // These are the JPL codes and x99 refers to the planet itself
+];
+
+// Horizons progress bar
+// Plain div to leave index.html untouched
+const progressBox = document.createElement('div');
+progressBox.style.cssText =
+  'position:fixed; top:12px; left:50%; transform:translateX(-50%);' +
+  'width:300px; background:#222; border:1px solid #555;' +
+  'font:12px monospace; color:#eee; padding:4px; display:none;';
+const progressFill = document.createElement('div');
+progressFill.style.cssText = 'height:14px; width:0%; background:#1D9E75;';
+const progressLabel = document.createElement('div');
+progressBox.append(progressLabel, progressFill);
+document.body.append(progressBox);
+
+// Horizons
+async function fetchAllBodies() {
+  progressBox.style.display = 'block';
+  const results = {};
+  for (let i = 0; i < HORIZONS_IDS.length; i++) {
+    const [name, id] = HORIZONS_IDS[i];
+    progressLabel.textContent = `Collecting ${name} » (${i + 1}/9)`;
+      const params = 
+      "?format=json&COMMAND='399'&EPHEM_TYPE='VECTORS'&CENTER='500@0'" +
+      "&OUT_UNITS='AU-D'&REF_PLANE='ECLIPTIC'&CSV_FORMAT='YES'" +
+      "&START_TIME='2026-07-08'&STOP_TIME='2026-07-09'&STEP_SIZE='1d'";
+    const response = await fetch('/api/horizons' + params);
+    const data = await response.json();
+    results[name] = data.result;
+    progressFill.style.width = '${((i + 1) / 9) * 100}%';
+  }
+  progressLabel.textContent = 'All your base belong to us! √';
+  console.log('Live Horizons Data:', data.result);
+  return results
+}
+
 // ---------- 5. The loop ----------
 // Physics deposits in fixed steps, then everything below the while paints.
 function animate(now) {              // 'now' = stopwatch reading from the browser
@@ -220,16 +262,3 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix(); // camera must recompute its math after changes
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
-
-// Temporary function to test Horizons api fetch
-
-async function testHorizons() {
-  const params = 
-    "?format=json&COMMAND='399'&EPHEM_TYPE='VECTORS'&CENTER='500@0'" +
-    "&OUT_UNITS='AU-D'&REF_PLANE='ECLIPTIC'&CSV_FORMAT='YES'" +
-    "&START_TIME='2026-07-08'&STOP_TIME='2026-07-09'&STEP_SIZE='1d'";
-  const response = await fetch('/api/horizons' + params);
-  const data = await response.json();
-  console.log('Horizons data states:', data.result);
-}
-testHorizons();
