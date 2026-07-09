@@ -196,16 +196,16 @@ async function fetchAllBodies() {
     const [name, id] = HORIZONS_IDS[i];
     progressLabel.textContent = `Collecting ${name} » (${i + 1}/9)`;
       const params = 
-      "?format=json&COMMAND='399'&EPHEM_TYPE='VECTORS'&CENTER='500@0'" +
+      `?format=json&COMMAND='${id}'&EPHEM_TYPE='VECTORS'&CENTER='500@0'` +
       "&OUT_UNITS='AU-D'&REF_PLANE='ECLIPTIC'&CSV_FORMAT='YES'" +
       "&START_TIME='2026-07-08'&STOP_TIME='2026-07-09'&STEP_SIZE='1d'";
     const response = await fetch('/api/horizons' + params);
     const data = await response.json();
     results[name] = data.result;
-    progressFill.style.width = '${((i + 1) / 9) * 100}%';
+    progressFill.style.width = `${((i + 1) / 9) * 100}%`;
   }
   progressLabel.textContent = 'All your base belong to us! √';
-  console.log('Live Horizons Data:', data.result);
+  console.log('Live Horizons Data:', results);
   return results
 }
 
