@@ -181,6 +181,22 @@ const wrap = a => Math.atan2(Math.sin(a), Math.cos(a)); // fold any angle into [
 const startAngle = heliocentricAngle();
 let prevOffset = 0;
 let lastLapDay = 0;
+// Notify on mismatch
+function applyLiveVectors(results) {
+  for (const [name, state] of Object.entries(results)) {
+    const body = simBodies.find((b) => b.name === name);
+    if (!body) {
+      throw new Error(`Live data for "${name}" has no sim twin — roster mismatch?`);
+    }
+    body.pos = [...state.position];
+    body.vel = [...state.velocity];
+  }
+  simDays = 0;                          // new epoch — reset the odometer
+  lastLapDay = 0;                       // lap detector starts fresh too
+  computeAccelerations(simBodies, G);   // forces changed — everyone re-aims
+  E0 = totalEnergy(simBodies, G);       // authorized change — re-seal the baseline
+  console.log('Sim reborn from live Horizons epoch.');
+}
 
 // Horizons - ID mapping
 const HORIZONS_IDS = [
@@ -289,6 +305,7 @@ async function fetchAllBodies() {
     bodies: records,
   };
   console.log('Session provenance:', sessionProvenance);   // ← Option C, done
+  applyLiveVectors(results);
   return results
 }
 
