@@ -170,9 +170,9 @@ let lastLapDay = 0;
 
 // Horizons sanity check
 const HORIZONS_IDS = [
-  ['Sun', '10'], ['Mercury', '199'], ['Venus', '299'], // Cross check ./data/bodies.json 
-  ['Earth', '399'], ['Mars', '499'], ['Jupiter', '599'], // Verify all names match and the order is correct
-  ['Saturn', '699'], ['Uranus', '799'], ['Neptune', '899'], // These are the JPL codes and x99 refers to the planet itself
+  ['Sun', '10'],
+  ['Mercury', '1'], ['Venus', '2'], ['Earth', '3'], ['Mars', '4'],
+  ['Jupiter', '5'], ['Saturn', '6'], ['Uranus', '7'], ['Neptune', '8'],
 ];
 
 // Horizons progress bar
