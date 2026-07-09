@@ -56,7 +56,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search,
   Gaia detail-on-demand, dark-matter halo toggle vs observed rotation curve.
 
-## Status (update at every commit)
+## Status (update at every commit) v1's data pipeline is closed
 
 - M0: complete and committed. Starfield skeleton runs clean.
 - M1: complete and committed. Static solar system from live Horizons data;
@@ -71,6 +71,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - M5a: complete — Vite proxy + live Horizons test fetch verified
 - M5b: complete - sequential live fetch + progress bar
 - M5c: complete plus strike the provenance decision from the loose ends — decision made: all three, one source)
+- M6: complete
 
 ## Idea backlog
 
