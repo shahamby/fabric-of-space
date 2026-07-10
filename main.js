@@ -34,6 +34,32 @@ async function sha256Hex(text) {
     .map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Black hole helper
+const BLACK_HOLE_MAT = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+function makeHorizonRing() {
+  const geo = new THREE.RingGeometry(1.4, 1.7, 48);   // unit-sphere units
+  geo.rotateX(-Math.PI / 2);                          // lie flat in the ecliptic
+  const mat = new THREE.MeshBasicMaterial({ color: 0xffaa33,
+    side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+  return new THREE.Mesh(geo, mat);
+}
+
+function setCollapseVisual(mesh, collapsed) {
+  if (collapsed && !mesh.userData.originalMaterial) {
+    mesh.userData.originalMaterial = mesh.material;   // save the planet's clothes
+    mesh.material = BLACK_HOLE_MAT;
+    mesh.userData.ring = makeHorizonRing();
+    mesh.add(mesh.userData.ring);   // child of the mesh: rides along, inherits scale
+  }
+  if (!collapsed && mesh.userData.originalMaterial) {
+    mesh.material = mesh.userData.originalMaterial;   // clothes back on
+    mesh.userData.originalMaterial = null;
+    mesh.remove(mesh.userData.ring);
+    mesh.userData.ring = null;
+  }
+}
+
 // ---------- 2. The stars ----------
 const stars = makeStarfield();
 scene.add(stars);
@@ -90,7 +116,7 @@ window.addEventListener('keydown', (event) => {
     b.mass *= (event.key === '=' ? 2 : 0.5);
     computeAccelerations(simBodies, G);  // forces changed THIS instant — everyone re-aims
     E0 = totalEnergy(simBodies, G);      // authorized change -> re-seal the baseline
-    checkCollapse(b);
+    setCollapseVisual(selected, checkCollapse(b));
     return;
   }
   if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
@@ -126,8 +152,7 @@ window.addEventListener('pointerup', (e) => {
   const hits = raycaster.intersectObjects(bodyMeshes); // everything skewered, nearest first
   selected = hits.length > 0 ? hits[0].object : null;  // first hit wins; empty space deselects
 
-  // Soft glow on the chosen one. The Sun's material has no emissive, hence the
-  // guards — it self-selects by glowing anyway.
+  // Soft glow on the chosen one. The Sun's material has no emissive, hence the guards — it self-selects by glowing anyway.
   for (const m of bodyMeshes) if (m.material.emissive) m.material.emissive.set(0x000000);
   if (selected && selected.material.emissive) selected.material.emissive.set(0x223344);
 });
@@ -208,13 +233,19 @@ function schwarzschildRadiusKm(massMsun) {
 
 function checkCollapse(body) {
   const rs = schwarzschildRadiusKm(body.mass);
-  if (body.radius_km < rs) {
+  const collapsed = body.radius_km < rs;
+  if (collapsed && !body.collapsed) {
     console.log(`${body.name} has collapsed into a black hole! ` +
       `r_s ${rs.toFixed(1)} km > radius ${body.radius_km.toFixed(1)} km`);
-    return true;
   }
-  return false;
+  if (!collapsed && body.collapsed) {
+    console.log(`${body.name} has un-collapsed — the horizon receded inside the body.`);
+  }
+  body.collapsed = collapsed;   // the twin now carries its own state
+  body.rsKm = rs;               // and its horizon size, for the fabric to read
+  return collapsed;
 }
+
 
 // Horizons - ID mapping
 const HORIZONS_IDS = [

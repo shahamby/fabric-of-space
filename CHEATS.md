@@ -42,3 +42,7 @@ drawn honestly it would punch through the scene floor. Vertex depth is
 True planetary dents are whispers on the Sun's slope. For display, planet
 masses are boosted 100x (fabric only) and distances softened by 0.4 AU so
 dimples span several grid cells. Press `T` for honest depth (gain = 1).
+
+## #5, r_s in the info panel for every body, status update. Go tear something
+
+**Where:** `main.js`
