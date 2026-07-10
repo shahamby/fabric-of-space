@@ -8,12 +8,15 @@ import * as THREE from 'three';
 const SIZE = 80; // Sheet spans plus (+) and minus (-) 40 AU; Neptune's orbit is -30 AU, so the sheet is big enough to see the whole solar system.
 const SEGMENTS = 120; // The sheet is a grid of 120x120 square grid -> 14.641 vertices asking the question
 
-// Display dials ( cheats #3 and #4 -- SEE CHEATS.md for details )
+// Display dials ( cheats #3, #4, and #5 -- SEE CHEATS.md for details )
 const DEPTH_SCALE = 5; // seen units for the deepest part of the gravity well.
 const PHI_REF = 2e-5; // "sea level": potential this weak barely bends the fabric, so it is the reference for the depth scale. The deepest part of the well is ~5x this value, so the well is 5x deeper than the "sea level" of space.
 const EPS = 0.4; // softening factor for the gravity well. The potential is singular at the center of a body, so this factor makes the well look like a smooth bowl instead of a sharp spike. The value is tuned to make the Sun's well look like a nice bowl, and it works for all other bodies too.
 const PLANET_GAIN = 100; // display-only planet mass boost to exaggerate the depth of the wells so they are visible. The Sun is already deep enough to be seen, so it is not boosted.
                          // (true mdoe sets this to 1 - honest, and nearly flat
+const HOLE_DEPTH = 12;   // Cheat #5: tear floor, scene units — deeper than any honest funnel (~8 max)
+const HOLE_GAIN = 1500;  // Cheat #5: display gain on the horizon radius so the rip is visible
+const KM_PER_AU = 149597870.7;
 
 export function makeFabric() {
   const geometry = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
@@ -43,7 +46,23 @@ export function updateFabric(fabric, simBodies, G, trueMode = false) {
     }
 
     // Cheat #3: log compression, so the Sun's funnel doesn't punch through the floor
-    pos.setY(i, -DEPTH_SCALE * Math.log10(1 + phi / PHI_REF));
+    let y = -DEPTH_SCALE * Math.log10(1 + phi / PHI_REF);
+
+    // Cheat #5: the rip. Inside a collapsed body's (display-scaled) horizon,
+    // the honest curve is abandoned — the vertex slams to a fixed floor,
+    // producing near-vertical walls where the smooth funnel used to be.
+    for (const b of simBodies) {
+      if (!b.collapsed) continue;
+      const hdx = x - b.pos[0];
+      const hdy = yEcl - b.pos[1];
+      const holeR = Math.max(1.0, (b.rsKm / KM_PER_AU) * HOLE_GAIN);
+      if (hdx * hdx + hdy * hdy < holeR * holeR) {  // d² < r² — same answer, no sqrt
+        y = -HOLE_DEPTH;
+        break;                                      // one hole is enough
+      }
+    }
+
+    pos.setY(i, y);
   }
   pos.needsUpdate = true;  // flag the buffer so the GPU re-uploads it this frame
 }

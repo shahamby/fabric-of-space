@@ -17,14 +17,14 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Visual-first teaching: for any math or physics concept, lead with a picture,
   animation, or plain-language physical metaphor before any equation; when a
   good video exists, recommend it.
-  - A milestone commit is incomplete without its CHEATS.md entries and Status
+- A milestone commit is incomplete without its CHEATS.md entries and Status
   update in the same commit; when asked to make a milestone commit, verify
   both first and do not proceed without them.
 
 ## Non-negotiable conventions
 
 - Physics never cheats. Only rendering cheats, and every display cheat is
-  logged in CHEATS.md (#1-#4).
+  logged in CHEATS.md (#1-#5).
 - Simulation space: barycentric ecliptic J2000 coordinates in AU, days, and
   solar masses (G is in data/bodies.json _meta). Rendering converts through
   eclToScene(x, y, z) -> (x, z, -y) in bodyMesh.js. Never mix the two spaces.
@@ -51,7 +51,8 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Click        select body (drag-guarded); info panel shows its stats
 - T            toggle true-scale display (escape hatch for CHEATS #1/#2)
 - Space        pause / resume the integrator
-- = / -        double / halve selected body's mass (re-aims + re-seals E0)
+- = / -        double / halve selected body's mass (re-aims + re-seals E0;
+               triggers collapse/un-collapse check)
 - N            spawn a rogue body
 - [ / ]        halve / double time scale (1 to 2048 d/s)
 - L            load live epoch — re-anchors sim to real yesterday-00:00 TDB
@@ -65,9 +66,9 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   M2 leapfrog N-body integrator (acceptance: Earth laps in ~365 sim days) ->
   M3 potential fabric mesh -> M4 click-picking, info panel, time controls,
   mass editing, spawn-a-body -> M5 live Horizons fetch with progress bar and
-  automated provenance writing. -> M6 live-epoch splice into the running sim ->
-  M7a: Schwarzschild detection — collapse check on mass change
-- v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search, 
+  automated provenance writing -> M6 live-epoch splice into the running sim ->
+  M7 event-horizon renderer (Schwarzschild detection, rip display, ledger).
+- v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search,
   Gaia detail-on-demand, dark-matter halo toggle vs observed rotation curve.
 
 ## Status (update at every commit)
@@ -91,18 +92,30 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 - M6: complete — live epoch rebirth. L re-anchors sim state to real
   yesterday-00:00 TDB, resets odometer, re-seals E0.
 - M7a: complete — detection fires at radius < r_s; Jupiter collapses on press 25
+- M7b: complete — the rip: black sphere + horizon ring on collapse (reversible
+  via -), fabric tears to a fixed floor inside the display-scaled horizon.
+  Verified in the wild: collapsed Jupiter ejected to 176,411 AU (~2.8 ly).
+- M7c: complete — ledger close-out. CHEATS #5 (Newtonian detection, 1500×
+  horizon gain + 1 AU floor, fixed tear depth), r_s shown in info panel for
+  every body, fabric.js tear code committed, roadmap/status synced.
 
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,
   render the rip (dark sphere, capped funnel, horizon ring on the fabric).
   Physics stays Newtonian; detection + display only. (Asked on day 4837,
-  the night of the rogue swarm.)
+  the night of the rogue swarm.) — SHIPPED as M7.
+- Post-Newtonian gravity (1PN correction term): makes Mercury's perihelion
+  precess — the 43 arcsec/century Newton couldn't explain. Extra acceleration
+  term in physics.js; a live demo of where Einstein departs from Newton.
 
 ## Open loose ends (non-milestone)
 
 - Barycenter-watch exercise: proposed after M2, never confirmed done.
 - HANDOFF.md needs an append-only header line ("append new sessions
   below; never rewrite history").
+- Commit-msg hook has a prefix bypass: messages like "Commit: M7b: ..." dodge
+  the M* pattern check (observed on the M7b commit). Tighten the match.
+- Stray dev server may be holding port 5173 (current session moved to 5174).
 - ~~M5c provenance design decision~~ — RESOLVED: one source, three views
   (console / P panel / D download). Shipped in M5c.
