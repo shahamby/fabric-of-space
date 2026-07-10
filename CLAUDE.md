@@ -46,17 +46,32 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - data/provenance.csv — data audit trail
 - CHEATS.md — ledger of every display-vs-reality divergence
 
+## Controls (key map — source of truth is the keydown handler in main.js)
+
+- Click        select body (drag-guarded); info panel shows its stats
+- T            toggle true-scale display (escape hatch for CHEATS #1/#2)
+- Space        pause / resume the integrator
+- = / -        double / halve selected body's mass (re-aims + re-seals E0)
+- N            spawn a rogue body
+- [ / ]        halve / double time scale (1 to 2048 d/s)
+- L            load live epoch — re-anchors sim to real yesterday-00:00 TDB
+               via Horizons; resets day odometer and lap detector; re-seals E0
+- P            toggle provenance panel (source, epoch, per-body SHA-256)
+- D            download session provenance as JSON
+
 ## Roadmap
 
 - v1 solar sandbox: M0 skeleton -> M1 static scene from Horizons data ->
   M2 leapfrog N-body integrator (acceptance: Earth laps in ~365 sim days) ->
   M3 potential fabric mesh -> M4 click-picking, info panel, time controls,
   mass editing, spawn-a-body -> M5 live Horizons fetch with progress bar and
-  automated provenance writing.
+  automated provenance writing. -> M6 live-epoch splice into the running sim
 - v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search,
   Gaia detail-on-demand, dark-matter halo toggle vs observed rotation curve.
 
-## Status (update at every commit) v1's data pipeline is closed
+## Status (update at every commit)
+
+v1's data pipeline is closed: NASA → proxy → parser → provenance → physics → fabric.
 
 - M0: complete and committed. Starfield skeleton runs clean.
 - M1: complete and committed. Static solar system from live Horizons data;
@@ -69,9 +84,11 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - M4: complete and committed. Picking, info panel, time controls (M4a);
   mass surgery + rogue bodies with re-baseline on change (M4b).
 - M5a: complete — Vite proxy + live Horizons test fetch verified
-- M5b: complete - sequential live fetch + progress bar
-- M5c: complete plus strike the provenance decision from the loose ends — decision made: all three, one source)
-- M6: complete
+- M5b: complete — sequential live fetch + progress bar, keyed to L.
+- M5c: complete — provenance ledger, one source with three views
+  (console log, P panel, D download); SHA-256 per body.
+- M6: complete — live epoch rebirth. L re-anchors sim state to real
+  yesterday-00:00 TDB, resets odometer, re-seals E0.
 
 ## Idea backlog
 
@@ -82,9 +99,8 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 
 ## Open loose ends (non-milestone)
 
-- Barycenter-watch exercise: proposed after M2, never confirmed done.
+- ~~Barycenter-watch exercise: proposed after M2, never confirmed done.~~
 - HANDOFF.md needs an append-only header line ("append new sessions
   below; never rewrite history").
 - M5c design decision pending: runtime provenance strategy (downloadable
   record vs in-app panel vs shipped snapshot + runtime log).
-  
