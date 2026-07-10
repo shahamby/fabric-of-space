@@ -99,8 +99,8 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 
 ## Open loose ends (non-milestone)
 
-- ~~Barycenter-watch exercise: proposed after M2, never confirmed done.~~
+- Barycenter-watch exercise: proposed after M2, never confirmed done.
 - HANDOFF.md needs an append-only header line ("append new sessions
   below; never rewrite history").
-- M5c design decision pending: runtime provenance strategy (downloadable
-  record vs in-app panel vs shipped snapshot + runtime log).
+- ~~M5c provenance design decision~~ — RESOLVED: one source, three views
+  (console / P panel / D download). Shipped in M5c.
