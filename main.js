@@ -405,7 +405,9 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     panel.textContent = `${b.name}\n` +
       `mass: ${b.mass.toExponential(2)} M☉  (≈ ${(b.mass * 1.989e30).toExponential(2)} kg)\n` +
       `from Sun: ${rSun.toFixed(2)} AU\n` +
-      `speed: ${v.toFixed(1)} km/s`;
+      `speed: ${v.toFixed(1)} km/s\n` +
+      `r_s: ${schwarzschildRadiusKm(b.mass).toFixed(4)} km` +
+      (b.collapsed ? '  — COLLAPSED' : '');
     panel.style.display = 'block';
   } else {
     panel.style.display = 'none';
