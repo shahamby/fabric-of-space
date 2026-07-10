@@ -65,8 +65,9 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   M2 leapfrog N-body integrator (acceptance: Earth laps in ~365 sim days) ->
   M3 potential fabric mesh -> M4 click-picking, info panel, time controls,
   mass editing, spawn-a-body -> M5 live Horizons fetch with progress bar and
-  automated provenance writing. -> M6 live-epoch splice into the running sim
-- v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search,
+  automated provenance writing. -> M6 live-epoch splice into the running sim ->
+  M7a: Schwarzschild detection — collapse check on mass change
+- v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search, 
   Gaia detail-on-demand, dark-matter halo toggle vs observed rotation curve.
 
 ## Status (update at every commit)
@@ -89,6 +90,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   (console log, P panel, D download); SHA-256 per body.
 - M6: complete — live epoch rebirth. L re-anchors sim state to real
   yesterday-00:00 TDB, resets odometer, re-seals E0.
+- M7a: complete — detection fires at radius < r_s; Jupiter collapses on press 25
 
 ## Idea backlog
 

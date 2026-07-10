@@ -90,6 +90,7 @@ window.addEventListener('keydown', (event) => {
     b.mass *= (event.key === '=' ? 2 : 0.5);
     computeAccelerations(simBodies, G);  // forces changed THIS instant — everyone re-aims
     E0 = totalEnergy(simBodies, G);      // authorized change -> re-seal the baseline
+    checkCollapse(b);
     return;
   }
   if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
@@ -163,7 +164,7 @@ function spawnRogue() {
   };
 
   // Both worlds get told, same index, same instant — the alignment contract holds.
-  simBodies.push({ name: body.name, mass: body.mass_msun,
+simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_km,
     pos: [...body.position_au], vel: [...body.velocity_au_day], acc: [0, 0, 0] });
   const mesh = makeBodyMesh(body);
   bodyMeshes.push(mesh);
@@ -172,6 +173,7 @@ function spawnRogue() {
   computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
   E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
 }
+
 // Lap detector: Earth's bearing as seen from the Sun's position, in the ecliptic plane.
 const earthSim = simBodies.find((body) => body.name === 'Earth');
 const sunSim = simBodies.find((body) => body.name === 'Sun');
@@ -181,6 +183,7 @@ const wrap = a => Math.atan2(Math.sin(a), Math.cos(a)); // fold any angle into [
 const startAngle = heliocentricAngle();
 let prevOffset = 0;
 let lastLapDay = 0;
+
 // Notify on mismatch
 function applyLiveVectors(results) {
   for (const [name, state] of Object.entries(results)) {
@@ -196,6 +199,21 @@ function applyLiveVectors(results) {
   computeAccelerations(simBodies, G);   // forces changed — everyone re-aims
   E0 = totalEnergy(simBodies, G);       // authorized change — re-seal the baseline
   console.log('Sim reborn from live Horizons epoch.');
+}
+
+// Schwarzschild equation
+function schwarzschildRadiusKm(massMsun) {
+  return 2.95 * massMsun;    // r_s of the Sun is 2.95 km; linear in mass
+}
+
+function checkCollapse(body) {
+  const rs = schwarzschildRadiusKm(body.mass);
+  if (body.radius_km < rs) {
+    console.log(`${body.name} has collapsed into a black hole! ` +
+      `r_s ${rs.toFixed(1)} km > radius ${body.radius_km.toFixed(1)} km`);
+    return true;
+  }
+  return false;
 }
 
 // Horizons - ID mapping

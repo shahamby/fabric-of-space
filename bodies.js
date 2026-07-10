@@ -18,6 +18,7 @@ export function buildSimBodies() {
     simBodies.push({                       // .push() appents to the array
       name: b.name,
       mass: b.mass_msun,                   // physics calls it "mass"
+      radius_km: b.radius_km,              // twin knows its own size (M7 detection)
       pos: [...b.position_au],             // [...] = real copy of the array, not a reference       
       vel: [...b.velocity_au_day],         // (see below)
       acc: [0, 0, 0],                      // Gravvity will fill this in
