@@ -172,3 +172,107 @@ the offline fallback.
 - Celebrate by VERIFYING their numbers against reality; end every build
   with a concrete report-back cue. Tone: warm, collegial, precise,
   playful when they are.
+
+---
+
+APPEND-ONLY FILE: add new session notes below; never rewrite history above.
+
+---
+
+# Session append — 2026-07-08 through 2026-07-10 (M5a → M7c + public release)
+
+Note to self (Claude → Claude). Read CLAUDE.md first; this is the color
+commentary that the spec doesn't carry.
+
+## What happened this session, in one paragraph
+
+The entire live-data arc shipped: M5a (Vite reverse proxy over NASA/JPL
+Horizons — CORS confirmed blocked by testing headers directly, proxy is the
+permanent answer), M5b (sequential nine-body fetch with honest progress bar,
+keyed to L), M5c (provenance: ONE sessionProvenance object, THREE views —
+console log, P panel via textContent-only rendering, D download via Blob;
+SHA-256 per body via crypto.subtle), M6 (applyLiveVectors splices live
+vectors into the running sim: L = "anchor to reality," resets simDays +
+lastLapDay, re-aims, re-seals E0), and all of M7 (event horizon:
+schwarzschildRadiusKm = 2.95 * massMsun; checkCollapse with edge-detected
+transition logging; black MeshBasicMaterial swap + amber RingGeometry child
+mesh; fabric tear in fabric.js — vertices inside display-scaled horizon slam
+to HOLE_DEPTH=12; cheat #5 = 1500× horizon gain, 1 AU floor, Newtonian
+detection). Then public release prep: README.md at root, docs/tear.png
+screenshot, MIT LICENSE added via GitHub UI. Jupiter collapses on the 25TH
+press of = (not 24 — I corrected my own earlier estimate; 24 leaves r_s
+~47,000 km, still inside the 69,911 km radius). Field observation now in
+CLAUDE.md: a collapsed Jupiter got ejected to 176,411 AU (~2.8 ly) at
+64.6 km/s with drift at e-14. Barycenter Horizons IDs: Sun='10',
+Mercury..Neptune = '1'..'8' (NOT 9 — that's Pluto; Shambu caught my error).
+
+## Shambu's bug taxonomy (updated — check these FIRST when auditing)
+
+1. Dropped backticks: template literals typed with plain quotes → ${} never
+   interpolates → silently wrong strings (fetched Earth 9×; progress bar
+   never filled). JS fails silent; this is the #1 recurring pattern.
+2. Wrong room: correct code, wrong brace level. sessionProvenance declared
+   inside fetchAllBodies; records declared inside the loop. Tell: a
+   ReferenceError naming something he KNOWS he declared. Ask "which braces
+   was I inside?"
+3. Instruction text pasted as records: my errand sentences ended up as a
+   CLAUDE.md status line AND a CHEATS.md #5 title, verbatim. When writing
+   ledger updates for him, give exact paste-ready text; when auditing, grep
+   for my own phrasing in his docs.
+4. Skipped typed edits between file drops: when I hand him replacement
+   files PLUS a typed edit, the typed edit gets missed (panel r_s line).
+   Verify main.js changes independently after any mixed delivery.
+5. Field names singular/plural (data.results vs .result). Teach: log the
+   whole envelope, inspect compartments, stop guessing.
+
+## Process facts that matter
+
+- Repo is truth. Audit pattern unchanged: rm -rf + shallow clone + grep -n.
+  EVERY "committed and synced" claim gets verified by a fresh pull — this
+  session caught real gaps three separate times (fabric.js absent from M7b
+  commit entirely; M7b status line missing; panel edit skipped while the
+  commit message claimed it).
+- The commit-msg hook has a KNOWN BYPASS: messages starting with any prefix
+  word ("Commit: M7b:") dodge the M* match. Logged in loose ends. Also
+  learned: the hook checks that CLAUDE.md was touched, not that it's TRUE —
+  the audit step is the real control.
+- Vite dev server moved to port 5174 at one point → a stray server was
+  likely holding 5173. Logged in loose ends; suggest netstat/kill next time
+  it appears.
+- Filesystem MCP (his local machine) timed out when tried once — bash-clone
+  auditing is the reliable path.
+- Teaching metaphors that landed hard this session: fetch/await = deli
+  claim ticket; CORS = browser-side DLP that shreds at the desk; scope =
+  nested rooms/lobby; provenance = evidence must not change after
+  collection (spread-copy [...arr] to avoid shared references); parser =
+  trust boundary, validate BEFORE the ledger claims OK.
+
+## Open threads (mirror of CLAUDE.md loose ends + next moves)
+
+- Barycenter-watch exercise: STILL never confirmed. Quickest wonder
+  available: pause, T, zoom Sun, watch it orbit a point outside itself.
+- Hook prefix bypass: tighten pattern.
+- Stray 5173 listener.
+- Backlog next candidates: (a) 1PN post-Newtonian term in physics.js →
+  Mercury's perihelion precession, 43 arcsec/century, ~15 lines, huge
+  payoff — probably the next milestone; (b) v2 galaxy tier (HYG/ATHYG,
+  SIMBAD, Gaia, dark-matter halo, Sgr A*).
+- Architecture ruling given and accepted: platform contract = "acceleration
+  given state." Tier 1 plug-ins (radiation pressure, 1PN); Tier 2 with
+  integrator care (magnetism → Boris integrator; GW energy loss as
+  detection+display); Tier 3 = separate engines beside the sim (ray-traced
+  light, full GR, quantum). No rearchitecture debt.
+
+## The person, briefly
+
+This project matters to him — he said so explicitly ("meaningful,"
+excitement/anxious together). He hand-types the majority (60/40 holds),
+catches my errors (Pluto ID), verifies before trusting, and responds best
+to: security framings, visual-first teaching, honest ledgers, being treated
+as the capable instrument-keeper he is. Celebrate observations ("the jump
+IS the proof"). Correct my own mistakes openly — it models the audit
+culture and he values it. The pale-blue-dot lap message and "All your base
+belong to us" flavor are his; protect the playfulness.
+
+Current HEAD at session close: 2b6116c (panel r_s fix) + README/LICENSE
+commits landing this evening. v1 is COMPLETE through M7 and public-ready.
