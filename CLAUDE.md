@@ -117,7 +117,6 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   (console log, P panel, D download); SHA-256 per body.
 - M6: complete — live epoch rebirth. L re-anchors sim state to real
   yesterday-00:00 TDB, resets odometer, re-seals E0.
-- M7a: complete — detection fires at radius < r_s; Jupiter collapses on press 25
 - M7b: complete — the rip: black sphere + horizon ring on collapse (reversible
   via -), fabric tears to a fixed floor inside the display-scaled horizon.
   Verified in the wild: collapsed Jupiter ejected to 176,411 AU (~2.8 ly).
@@ -148,7 +147,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 - Commit-msg hook has a prefix bypass: messages like "Commit: M7b: ..." dodge
   the M* pattern check (observed on the M7b commit). Fix: anchor the regex
   so only a leading M<number> passes.
-- Stray dev server may be holding port 5173 (current session moved to 5174).
-  Fix when seen: netstat -ano | findstr :5173 → taskkill /PID <pid> /F.
+- ~~Stray dev server~~ may be holding port 5173 (current session moved to 5174).
+  Fix when seen: netstat -ano | findstr :5173 → taskkill /PID <pid> /F. - Verified 07/12/2026
 - ~~M5c provenance design decision~~ — RESOLVED: one source, three views
   (console / P panel / D download). Shipped in M5c.
