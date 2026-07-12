@@ -32,6 +32,7 @@ export function computeAccelerations(bodies, G) {
       B.acc[0] -= sB * dx;  B.acc[1] -= sB * dy;  B.acc[2] -= sB * dz;
       // ^ This +=/-= pair is Newton's third law written as code:
       //   equal pulls, opposite directions, computed once per pair.
+      if (PN1.on) apply1PN(bodies, G);   // Einstein rides inside every re-aim
     }
   }
 }
@@ -103,5 +104,30 @@ export function eulerStep(bodies, dt, G) {
     b.vel[0] += b.acc[0] * dt;
     b.vel[1] += b.acc[1] * dt;
     b.vel[2] += b.acc[2] * dt;
+  }
+}
+
+// M8b — first post-Newtonian correction (1PN), Sun's field only.
+// Newton is the fast-and-far-away approximation of gravity. This is
+// Einstein's leading correction: suppressed by 1/c², so it only matters
+// deep in the well, moving fast — which is Mercury's exact job description.
+export const PN1 = { on: false };        // main.js flips this with the E key
+const C_AU_DAY = 173.144632;             // speed of light in our units
+
+function apply1PN(bodies, G) {
+  const sun = bodies.find(b => b.name === 'Sun');
+  const gm = G * sun.mass;
+  for (const b of bodies) {
+    if (b === sun) continue;
+    const rx = b.pos[0]-sun.pos[0], ry = b.pos[1]-sun.pos[1], rz = b.pos[2]-sun.pos[2];
+    const vx = b.vel[0]-sun.vel[0], vy = b.vel[1]-sun.vel[1], vz = b.vel[2]-sun.vel[2];
+    const r  = Math.hypot(rx, ry, rz);
+    const v2 = vx*vx + vy*vy + vz*vz;
+    const rdotv = rx*vx + ry*vy + rz*vz;
+    const k = gm / (C_AU_DAY*C_AU_DAY * r*r*r);   // the 1/c² volume knob
+    const radial = 4*gm/r - v2;                    // reshapes the pull with depth & speed
+    b.acc[0] += k * (radial*rx + 4*rdotv*vx);      // second piece drags along
+    b.acc[1] += k * (radial*ry + 4*rdotv*vy);      // the direction of motion —
+    b.acc[2] += k * (radial*rz + 4*rdotv*vz);      // Newton has no such term at all
   }
 }

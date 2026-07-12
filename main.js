@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
 import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
-import { computeAccelerations, leapfrogStep, totalEnergy } from './physics.js';
+import { computeAccelerations, leapfrogStep, totalEnergy, PN1 } from './physics.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric } from './fabric.js';
 
@@ -108,6 +108,14 @@ window.addEventListener('keydown', (event) => {
       const radius = trueScale ? mesh.userData.trueRadiusAu : mesh.userData.displayRadiusAu;
       mesh.scale.setScalar(radius);
     }
+    return;
+  }
+  if (event.key.toLowerCase() === 'e') {
+    PN1.on = !PN1.on;
+    computeAccelerations(simBodies, G);  // the rules changed THIS instant — re-aim
+    E0 = totalEnergy(simBodies, G);      // authorized physics change — re-seal
+    resetPerihelionInstrument();         // new universe, new ledger
+    console.log(`1PN ${PN1.on ? 'ON — Einstein has entered the sim' : 'OFF — pure Newton'}`);
     return;
   }
   if (event.code === 'Space') { paused = !paused; return; }   // .code, not .key — the key for
@@ -255,6 +263,13 @@ function checkPerihelion() {
   }
   periRPrev2 = periRPrev;
   periRPrev = r;
+}
+
+function resetPerihelionInstrument() {
+  periRPrev2 = Infinity; periRPrev = Infinity;  // re-arm the valley trigger
+  periAngleLast = null;  periFirstDay = null;   // old epoch's stamps are void
+  periDriftTotal = 0;    periLaps = 0;          // fresh ledger for the new epoch
+  periHud = 'Mercury perihelion: awaiting first laps';  
 }
 
 // Notify on mismatch
