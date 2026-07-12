@@ -83,7 +83,7 @@ scene.add(sunlight, new THREE.AmbientLight(0xffffff, 0.08));
 const simBodies = buildSimBodies();
 computeAccelerations(simBodies, G); // prime the accelerations for the first leapfrog step, before the loop starts
 
-const DT = 0.5;      // sim days per physics step — the ACCURACY dial
+const DT = 0.05;      // sim days per physics step — the ACCURACY dial
 let timeScale = 20;  // sim days per real second — the SPEED dial ([ and ] halve/double)
                      // 20 d/s = 20 × 86,400 sim-seconds per real second ≈ 1.7 million× real time
 let simDays = 0;     // the simulation's odometer — a running counter, not a delta
@@ -95,6 +95,7 @@ let paused = false;  // Space toggles this; it gates the deposit only — render
 const hud = document.getElementById('hud');       // heads-up display, top-left
 const panel = document.getElementById('panel');   // selection readout, top-right
 let E0 = totalEnergy(simBodies, G);             // Re-baselined on change; keep the alarm meaningful.
+
 
 // ---------- 4. Keyboard controls ----------
 // T = true scale (cheats off, see CHEATS.md). Space = pause. [ / ] = slower / faster.
@@ -209,6 +210,53 @@ const startAngle = heliocentricAngle();
 let prevOffset = 0;
 let lastLapDay = 0;
 
+// Perihelion instrument (M8a): stamp Mercury's Sun-relative bearing at each
+// closest approach. Stamp-to-stamp drift IS the precession we're hunting.
+const mercurySim = simBodies.find((body) => body.name === 'Mercury');
+const mercurySunDistance = () => Math.hypot(
+  mercurySim.pos[0] - sunSim.pos[0],
+  mercurySim.pos[1] - sunSim.pos[1],
+  mercurySim.pos[2] - sunSim.pos[2]
+);
+const mercuryAngle = () =>
+  Math.atan2(mercurySim.pos[1] - sunSim.pos[1],
+             mercurySim.pos[0] - sunSim.pos[0]);
+
+const ARCSEC_PER_RAD = 206264.8;   // one radian, expressed in arcseconds
+const DAYS_PER_CENTURY = 36525;    // Julian century, in days
+
+let periRPrev2 = Infinity, periRPrev = Infinity; // Infinity = trigger disarmed
+let periAngleLast = null;   // bearing at the previous stamp
+let periFirstDay = null;    // simDays at the first stamp — the clock starts there
+let periDriftTotal = 0;     // accumulated drift, radians
+let periLaps = 0;           // laps measured since the reference stamp
+let periHud = 'Mercury perihelion: awaiting first laps';
+
+function checkPerihelion() {
+  const r = mercurySunDistance();
+  // Valley test: was falling, now rising — the bottom was one step ago.
+  // The isFinite guard keeps the trigger disarmed for two steps after any
+  // reset, so a mid-orbit rebirth can't fake a perihelion.
+  if (Number.isFinite(periRPrev2) && periRPrev2 > periRPrev && periRPrev <= r) {
+    const angle = mercuryAngle();
+    if (periAngleLast === null) {
+      periFirstDay = simDays;               // first stamp = reference, not a lap
+    } else {
+      periDriftTotal += wrap(angle - periAngleLast);  // wrap() eats the ±π seam
+      periLaps++;
+      const elapsed = simDays - periFirstDay;
+      const rate = (periDriftTotal * ARCSEC_PER_RAD / elapsed) * DAYS_PER_CENTURY;
+      periHud = `Mercury perihelion drift: ${rate.toFixed(1)}″/century over ${periLaps} laps`;
+      if (periLaps <= 3 || periLaps % 25 === 0) {
+        console.log(`Perihelion #${periLaps} — day ${simDays.toFixed(1)}, ${periHud}`);
+      }
+    }
+    periAngleLast = angle;
+  }
+  periRPrev2 = periRPrev;
+  periRPrev = r;
+}
+
 // Notify on mismatch
 function applyLiveVectors(results) {
   for (const [name, state] of Object.entries(results)) {
@@ -221,6 +269,10 @@ function applyLiveVectors(results) {
   }
   simDays = 0;                          // new epoch — reset the odometer
   lastLapDay = 0;                       // lap detector starts fresh too
+  periRPrev2 = Infinity; periRPrev = Infinity;  // re-arm the valley trigger
+  periAngleLast = null;  periFirstDay = null;   // old epoch's stamps are void
+  periDriftTotal = 0;    periLaps = 0;          // fresh ledger for the new epoch
+  periHud = 'Mercury perihelion: awaiting first laps';
   computeAccelerations(simBodies, G);   // forces changed — everyone re-aims
   E0 = totalEnergy(simBodies, G);       // authorized change — re-seal the baseline
   console.log('Sim reborn from live Horizons epoch.');
@@ -383,13 +435,14 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
   while (carry >= DT) {                    // spend them in fixed, identical steps
     leapfrogStep(simBodies, DT, G);        // the corroborated integrator. Accept no substitutes.
     simDays += DT;
+    checkPerihelion();                     // per-STEP instrument — this line was the missing hook
     carry -= DT;
   }
   syncMeshes();                                // simulation space -> screen
   sunlight.position.copy(sunMesh.position);    // the Sun moves; its light follows
 
   const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0);
-  hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nEnergy drift: ${drift.toExponential(2)}`;
+  hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nEnergy drift: ${drift.toExponential(2)}\n${periHud}`;
 
   const offset = wrap(heliocentricAngle() - startAngle);
   if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {

@@ -45,4 +45,12 @@ dimples span several grid cells. Press `T` for honest depth (gain = 1).
 
 ## #5 — Event horizon display: Newtonian detection, 1500× horizon gain + 1 AU floor, fixed tear depth
 
-**Where:** `main.js`
+**Where:** `main.js` (detection, 2.95 × mass), `fabric.js` (`HOLE_DEPTH` / `HOLE_GAIN` / 1 AU floor).
+
+Detection is honest Newtonian bookkeeping: a body collapses when its radius
+drops below r_s = 2.95 km × mass in solar masses — the real Schwarzschild
+radius, no relativity simulated. The display then cheats twice: the horizon
+radius is boosted 1500× (a true stellar-mass horizon is ~3 km, invisible at
+1 scene unit = 1 AU) with a 1 AU minimum so the rip spans grid cells, and
+the tear floor is a fixed −12 scene units rather than honest potential
+depth. Physics never sees any of it; `-` reverses the collapse.

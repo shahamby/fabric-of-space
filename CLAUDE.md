@@ -124,6 +124,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 - M7c: complete — ledger close-out. CHEATS #5 (Newtonian detection, 1500×
   horizon gain + 1 AU floor, fixed tear depth), r_s shown in info panel for
   every body, fabric.js tear code committed, roadmap/status synced.
+- M8a: complete — Mercury perihelion instrument (per-step valley detector,
+  Sun-relative bearing, telescoping drift ledger, HUD + throttled log, resets
+  on L). Calibration: integrator creep ≈ −210k″/cy at DT 0.5 → −1.4k…−4.6k
+  band at DT 0.05 — error ∝ DT², prediction confirmed. Determinism verified:
+  identical epochs replay to the decimal. Measurement DT for M8: 0.05.
 
 ## Idea backlog
 
