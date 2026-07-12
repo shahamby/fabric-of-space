@@ -32,9 +32,9 @@ export function computeAccelerations(bodies, G) {
       B.acc[0] -= sB * dx;  B.acc[1] -= sB * dy;  B.acc[2] -= sB * dz;
       // ^ This +=/-= pair is Newton's third law written as code:
       //   equal pulls, opposite directions, computed once per pair.
-      if (PN1.on) apply1PN(bodies, G);   // Einstein rides inside every re-aim
     }
   }
+  if (PN1.on) apply1PN(bodies, G);   // Einstein rides ONCE per re-aim, roster-wide
 }
 
 // ---------- The integrator: leapfrog (kick-drift-kick) ----------
