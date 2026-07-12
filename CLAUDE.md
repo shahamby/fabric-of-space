@@ -128,6 +128,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   on L). Calibration: integrator creep ≈ −210k″/cy at DT 0.5 → −1.4k…−4.6k
   band at DT 0.05 — error ∝ DT², prediction confirmed. Determinism verified:
   identical epochs replay to the decimal. Measurement DT for M8: 0.05.
+- M8b: complete — 1PN correction term in physics.js behind PN1 toggle (E key,
+  re-aim + re-seal + instrument reset on flip). First landing was 36× hot —
+  hook inside the pair loop, pattern #2 — caught by same-epoch replay diff,
+  fixed to single application per re-aim. Known limitation: totalEnergy is
+  Newtonian bookkeeping, so drift gains a tiny bounded wobble with 1PN on.
 
 ## Idea backlog
 
