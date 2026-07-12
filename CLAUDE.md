@@ -20,6 +20,13 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - A milestone commit is incomplete without its CHEATS.md entries and Status
   update in the same commit; when asked to make a milestone commit, verify
   both first and do not proceed without them.
+- Surface the payoffs: open every session with a fresh-clone audit, then
+  explicitly name any physics beauty on the table and tie it to the passion
+  map. Not everything fits in one sitting — log deferred payoffs so none
+  slide by unnamed.
+- Check SillyUserQuestions.md every session: answer each OPEN question with
+  verified, credible references, then wrap the answered line in an HTML
+  comment with the date and where the answer lives.
 
 ## Non-negotiable conventions
 
@@ -45,6 +52,9 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - data/bodies.json — real state vectors, epoch 2026-07-04 TDB (JPL Horizons)
 - data/provenance.csv — data audit trail
 - CHEATS.md — ledger of every display-vs-reality divergence
+- SillyUserQuestions.md — ClaudinatorFile #4, the question ledger: questions
+  Shambu logs mid-project as a learning tool. Uncommented lines below the
+  marker are OPEN.
 
 ## Controls (key map — source of truth is the keydown handler in main.js)
 
@@ -70,6 +80,22 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   M7 event-horizon renderer (Schwarzschild detection, rip display, ledger).
 - v2 galaxy tier: HYG/ATHYG star snapshot (bulk local), SIMBAD search,
   Gaia detail-on-demand, dark-matter halo toggle vs observed rotation curve.
+
+## Passion → tier map (the why behind every milestone)
+
+Driving interests: quantum, dimensional, gravity, magnetics, light.
+Every milestone traces to one. Platform contract: "acceleration given state."
+
+- Gravity — Tier 1, native. The whole sim; M8 = 1PN term (Mercury's
+  43″/century). Later: GW energy loss as detection + display.
+- Magnetics — Tier 2. Charged bodies + Lorentz force need a Boris
+  integrator beside leapfrog; demo: solar wind riding field lines.
+- Light — Tier 3 engine. Ray-traced lensing around the M7 horizon;
+  light-travel-time mode ("you are seeing Neptune 4 hours ago").
+- Dimensional — cross-cutting. The fabric IS the dimensional teaching
+  tool (3D potential as a 2D sheet); candidate: 4D→3D projection demos.
+- Quantum — Tier 3 engine, farthest out. Separate sandbox (double-slit,
+  tunneling) beside the sim; never wired into the N-body core.
 
 ## Status (update at every commit)
 
