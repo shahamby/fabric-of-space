@@ -139,13 +139,16 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   momentum-conserving inelastic merge, AUDIT line with KE destroyed,
   E0 re-seal, post-merge collapse check. Zero new physics cheats (CHEATS #6
   is a rendering-of-reality confession, not a physics one).
-- **M8d: IN TEST** — 1PN TOCTOU fix: leapfrog velocities lag positions by half
-  a step, so Einstein's velocity-dependent term read a stale speedometer every
-  step (secular energy leak, climbing diff line in the M8c logs). apply1PN now
-  dead-reckons velocity to the position clock (vLead = dt/2 mid-step, 0 at
-  prime). Prediction: energy drift returns to the Newtonian floor and the diff
-  column sits flat. Verdict by two-boot differential; flips to COMPLETE with
-  the measured number.
+- **M8d: COMPLETE** — 1PN TOCTOU fix verified 07/13: diff column flat to ±0.05″
+  over 150 laps; energy drift back at the Newtonian floor (e-10 both runs).
+- **M8e: COMPLETE** — LRL (eccentricity-vector) witness mounted beside the stamp
+  instrument; honest apsidal readout from pure orbital state, reset unified.
+- **M8c: MEASURED — +42.9″/century.** Two-boot differential on the LRL witness,
+  flat at +42.9 from lap 1 through 150 (GR predicts +42.98). Lab replication of
+  physics.js: +42.99, with piece decomposition −2u +1u +4u = 3u — textbook GR
+  structure confirmed empirically. Le Verrier's ledger, paid in full.
+  OPEN: the valley-stamp instrument misreports perturbation differentials
+  (−91 where LRL reads +43), bias DT-invariant — see SillyUserQuestions.
 
 ## Idea backlog
 

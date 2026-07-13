@@ -29,3 +29,5 @@ The following are questions the user has throught of during this project.
 
 <!-- ANSWERED 2026-07-13: hooks never travel with clones — the repo cannot testify. Negative tests on local machine: leading-prefix BLOCKED; old bypass landed once (since reset); regex tightened to word-boundary match; sterile retest BLOCKED. Details: CLAUDE.md loose ends. --> 
 <!-- Did I ever actually tighten the commit-msg hook regex on my machine, or does that loose end stand? (Logged by Claudester after seven unanswered askings — 07/12/2026) -->
+
+Why does the valley-stamp bearing misreport perturbation differentials (−91″/cy) that the LRL witness reads true (+43″/cy), and why is that bias DT-invariant? Four mechanisms tested and eliminated in the 07/13 lab session. (Logged the night we measured Einstein — 07/13/2026)

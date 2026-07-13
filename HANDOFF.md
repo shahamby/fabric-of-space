@@ -309,3 +309,36 @@ with ZERO new CHEATS entries — physics upgrades, not display tricks.
   incident response. Action: add AUDIT console lines to both controls.
   Untracked assets/ folder of foreign JS on disk — never entered the repo;
   delete it; dependencies stay three + vite only.
+
+  ---
+## 2026-07-13 — session append: the night the dime landed
+
+**Arc:** M9 shipped (contact physics — Venus absorbed live, Jupiter slingshotted
+by conservation of momentum, AUDIT confessing KE destroyed). M8c's first verdict
+convicted a counterfeit Einstein: diff column climbing −1.9/lap, energy leaking
+17×. Interrogation found the formula innocent and the integration guilty — a
+TOCTOU bug in physics form: leapfrog velocities live half a step behind
+positions, and the velocity-dependent 1PN term read a stale speedometer every
+step. M8d dead-reckoned the read to the position clock; diff went flat to
+±0.05″, energy returned to the floor.
+
+**The flat line read −91, not +43.** Claudester imported physics.js into a node
+lab (zero Three.js dependencies made it portable): cross-machine determinism
+confirmed to the decimal (−1394.3 on Windows/Chrome = −1394.3 on Linux/node),
+DT-invariance ruled out numerics, two-body ruled out the other planets, and the
+LRL eccentricity vector ruled the truth: the code produces +42.99 vs +42.98
+analytic, with the three 1PN pieces decomposing −2u +1u +4u = 3u, exactly per
+theory. The valley-stamp instrument was the biased witness all along —
+mechanism still unknown, logged OPEN.
+
+**M8e** mounted the LRL witness in the browser. Two-boot differential:
+**+42.9″/century, flat from lap 1.** Einstein measured on this machine.
+
+**Bug patterns fed:** #4 struck four consecutive times (question wrap ×3, DRY
+reset ×1 — the skipped DRY edit created a live divergence within the hour,
+caught because E-after-L habit masked it). #8 struck once: LRL witness computed
+but never displayed — the gauge without a needle. #6 reached a commit message
+("sesssion").
+
+**Loose ends:** stamp-bias mystery (OPEN, SillyUserQuestions). Weekly recap
+W29 due Sunday — verify the scheduled task fired.

@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { makeStarfield } from './starfield.js';
-import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
-import { computeAccelerations, leapfrogStep, totalEnergy, PN1, findContacts, mergeBodies } from './physics.js';
+import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric } from './fabric.js';
+import { computeAccelerations, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy } from './physics.js';
+import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
 // Think movie set: a Scene holds objects, a Camera views them,
@@ -243,6 +243,7 @@ let periFirstDay = null;    // simDays at the first stamp — the clock starts t
 let periDriftTotal = 0;     // accumulated drift, radians
 let periLaps = 0;           // laps measured since the reference stamp
 let periHud = 'Mercury perihelion: awaiting first laps';
+let periLRLLast = null, periLRLDrift = 0;
 
 function checkPerihelion() {
   handleContacts();                      // M9 — surfaces exist; per-STEP, same honesty rule as the instrument
@@ -252,6 +253,18 @@ function checkPerihelion() {
   // reset, so a mid-orbit rebirth can't fake a perihelion.
   if (Number.isFinite(periRPrev2) && periRPrev2 > periRPrev && periRPrev <= r) {
     const angle = mercuryAngle();
+    // M8e - LRL witness: the eccentricity vector points at the true perihelion from pure orbital state.
+    // (v x h)/gm - r̂, drift accumluated like the stamp.
+    const rx=mercurySim.pos[0]-sunSim.pos[0], ry=mercurySim.pos[1]-sunSim.pos[1], rz=mercurySim.pos[2]-sunSim.pos[2];
+    const vx=mercurySim.vel[0]-sunSim.vel[0], vy=mercurySim.vel[1]-sunSim.vel[1], vz=mercurySim.vel[2]-sunSim.vel[2];
+    const rr=Math.hypot(rx,ry,rz), gmS=G*sunSim.mass;
+    const hx=ry*vz-rz*vy, hy=rz*vx-rx*vz, hz=rx*vy-ry*vx;
+    const ex=(vy*hz-vz*hy)/gmS-rx/rr, ey=(vz*hx-vx*hz)/gmS-ry/rr, ez=(vx*hy-vy*hx)/gmS-rz/rr;
+    if (periLRLLast) {
+      const P=periLRLLast, cx=P[1]*ez-P[2]*ey, cy=P[2]*ex-P[0]*ez, cz=P[0]*ey-P[1]*ex;
+      periLRLDrift += Math.sign(cx*hx+cy*hy+cz*hz)*Math.atan2(Math.hypot(cx,cy,cz), P[0]*ex+P[1]*ey+P[2]*ez);
+    }
+    periLRLLast = [ex,ey,ez];
     if (periAngleLast === null) {
       periFirstDay = simDays;               // first stamp = reference, not a lap
     } else {
@@ -259,7 +272,8 @@ function checkPerihelion() {
       periLaps++;
       const elapsed = simDays - periFirstDay;
       const rate = (periDriftTotal * ARCSEC_PER_RAD / elapsed) * DAYS_PER_CENTURY;
-      periHud = `Mercury perihelion drift: ${rate.toFixed(1)}″/century over ${periLaps} laps`;
+      const lrlRate = (periLRLDrift * ARCSEC_PER_RAD / elapsed) * DAYS_PER_CENTURY;
+      periHud = `Mercury perihelion drift: ${rate.toFixed(1)}″/century over ${periLaps} laps` + `\nLRL witness: ${lrlRate.toFixed(1)}″/century`;
       if (periLaps <= 3 || periLaps % 25 === 0) {
         console.log(`Perihelion #${periLaps} — day ${simDays.toFixed(1)}, ${periHud}`);
       }
@@ -274,6 +288,7 @@ function resetPerihelionInstrument() {
   periRPrev2 = Infinity; periRPrev = Infinity;  // re-arm the valley trigger
   periAngleLast = null;  periFirstDay = null;   // old epoch's stamps are void
   periDriftTotal = 0;    periLaps = 0;          // fresh ledger for the new epoch
+  periLRLLast = null;  periLRLDrift = 0;    // the witness forgets the old universe too
   periHud = 'Mercury perihelion: awaiting first laps';  
 }
 
@@ -289,10 +304,8 @@ function applyLiveVectors(results) {
   }
   simDays = 0;                          // new epoch — reset the odometer
   lastLapDay = 0;                       // lap detector starts fresh too
-  periRPrev2 = Infinity; periRPrev = Infinity;  // re-arm the valley trigger
-  periAngleLast = null;  periFirstDay = null;   // old epoch's stamps are void
-  periDriftTotal = 0;    periLaps = 0;          // fresh ledger for the new epoch
-  periHud = 'Mercury perihelion: awaiting first laps';
+  resetPerihelionInstrument();          // ONE reset policy, ONE enforcement point —
+                                        // the inline copy missed the LRL state. Never again.
   computeAccelerations(simBodies, G);   // forces changed — everyone re-aims
   E0 = totalEnergy(simBodies, G);       // authorized change — re-seal the baseline
   console.log('Sim reborn from live Horizons epoch.');
