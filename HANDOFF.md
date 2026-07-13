@@ -276,3 +276,36 @@ belong to us" flavor are his; protect the playfulness.
 
 Current HEAD at session close: 2b6116c (panel r_s fix) + README/LICENSE
 commits landing this evening. v1 is COMPLETE through M7 and public-ready.
+
+---
+## Session append — 2026-07-12 (M8 hackathon: Einstein enters the sim)
+
+Arc: M8a shipped, M8b shipped, M8c ceremony pending. First milestones ever
+with ZERO new CHEATS entries — physics upgrades, not display tricks.
+
+- M8a: perihelion instrument (per-step valley detector, Sun-relative bearing,
+  telescoping drift ledger). Calibration: integrator creep ≈ −210k″/cy at
+  DT 0.5 → −1.4k…−4.6k band at DT 0.05. Error ∝ DT² — predicted, then
+  confirmed. Determinism proven in the wild: same epoch replays to the
+  decimal. It is now both our integrity checker and our measurement design.
+- M8b: 1PN term behind PN1 / E toggle. First landing ran 36× hot — hook
+  pasted INSIDE the pair loop (pattern #2), convicted by same-epoch replay
+  diff + fresh-clone grep. C_AU_DAY exonerated digit by digit. Lesson:
+  amplification that scales with C(N,2) is a roster-dependent fingerprint.
+- M8c protocol (NOT yet run clean): two fresh loads, same epoch. Run A pure
+  Newton. Run B: pause → E → resume BEFORE the first stamp. Record #25–#175
+  in both, subtract columns. Expected residue ≈ +43″/century, prograde.
+  Mid-flight toggles cannot resolve it — noise only cancels when common-mode.
+- New patterns: #7 cloned exemplar blocks carry duplicate declarations
+  (const collision = fail-LOUD; the parser is a friend). #8 defined-but-
+  never-called instrument = fail-SILENT (805 orbits, zero stamps; only
+  monitoring catches the reading that never changes).
+- Process facts: WIP commit double-tapped; "ix:" commit lost its F
+  (pattern #6 reaches commit messages); M8b commit satisfied the hook with
+  an unrelated CLAUDE.md line — "checks touched, not TRUE," caught live.
+- End-of-day incident: mid-run orbital derangement (Earth year → ~187 d,
+  Mercury → ~2.7 d) by an UNLOGGED privileged control — mass surgery and
+  spawnRogue print nothing. Recovered twice via L: provenance pipeline as
+  incident response. Action: add AUDIT console lines to both controls.
+  Untracked assets/ folder of foreign JS on disk — never entered the repo;
+  delete it; dependencies stay three + vite only.
