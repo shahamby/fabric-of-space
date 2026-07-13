@@ -27,4 +27,5 @@ The following are questions the user has throught of during this project.
 
 <center><B><I>LINES BELOW THAT ARE NOT COMMENTED OUT ARE TO BE TREATED AS OPEN</center></B></I>
 
-Did I ever actually tighten the commit-msg hook regex on my machine, or does that loose end stand? (Logged by Claudester after seven unanswered askings — 07/12/2026)
+<!-- ANSWERED 2026-07-13: hooks never travel with clones — the repo cannot testify. Negative tests on local machine: leading-prefix BLOCKED; old bypass landed once (since reset); regex tightened to word-boundary match; sterile retest BLOCKED. Details: CLAUDE.md loose ends. --> 
+<!-- Did I ever actually tighten the commit-msg hook regex on my machine, or does that loose end stand? (Logged by Claudester after seven unanswered askings — 07/12/2026) -->

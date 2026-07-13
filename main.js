@@ -123,6 +123,8 @@ window.addEventListener('keydown', (event) => {
   if ((event.key === '-' || event.key === '=') && selected) {
     const b = simBodies[bodyMeshes.indexOf(selected)];
     b.mass *= (event.key === '=' ? 2 : 0.5);
+    console.log(`AUDIT: mass surgery — ${b.name} ${event.key === '=' ? 'doubled' : 'halved'} ` +
+      `to ${b.mass.toExponential(3)} Msun at day ${simDays.toFixed(1)}`);
     computeAccelerations(simBodies, G);  // forces changed THIS instant — everyone re-aims
     E0 = totalEnergy(simBodies, G);      // authorized change -> re-seal the baseline
     setCollapseVisual(selected, checkCollapse(b));
@@ -203,6 +205,8 @@ simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_k
   const mesh = makeBodyMesh(body);
   bodyMeshes.push(mesh);
   scene.add(mesh);
+  console.log(`AUDIT: rogue spawn — ${body.name} injected at day ${simDays.toFixed(1)} ` +
+    `(${body.mass_msun.toExponential(3)} Msun, ${body.radius_km} km)`);
 
   computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
   E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
