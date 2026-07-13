@@ -134,7 +134,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   re-aim + re-seal + instrument reset on flip). First landing was 36× hot —
   hook inside the pair loop, pattern #2 — caught by same-epoch replay diff,
   fixed to single application per re-aim. Known limitation: totalEnergy is
-  Newtonian bookkeeping, so drift gains a tiny bounded wobble with 1PN on. 
+  Newtonian bookkeeping, so drift gains a tiny bounded wobble with 1PN on.
+- **M9: COMPLETE** — per-step contact detection at physical radii,
+  momentum-conserving inelastic merge, AUDIT line with KE destroyed,
+  E0 re-seal, post-merge collapse check. Zero new physics cheats (CHEATS #6
+  is a rendering-of-reality confession, not a physics one).
 
 ## Idea backlog
 
@@ -157,3 +161,8 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   Fix when seen: netstat -ano | findstr :5173 → taskkill /PID <pid> /F. - Verified 07/12/2026
 - ~~M5c provenance design decision~~ — RESOLVED: one source, three views
   (console / P panel / D download). Shipped in M5c.
+- M9 known limits: DT 0.05 can tunnel a planet-planet contact at extreme
+  closing speed (step length exceeds the radius sum — leapfrog only sees
+  what the timestep resolves); lower DT for collision studies. Instruments
+  hold startup references — a merge that eats Sun/Earth/Mercury deranges
+  the perihelion and lap detectors.

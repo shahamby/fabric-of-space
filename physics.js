@@ -131,3 +131,32 @@ function apply1PN(bodies, G) {
     b.acc[2] += k * (radial*rz + 4*rdotv*vz);      // Newton has no such term at all
   }
 }
+
+// M9 - Contact phyiscs. Point masses get surfaces: the overlap is measured at PHYSICAL radii.
+// The inflated display radii will lie for visibility (it CHEATS).
+// The following function will not read them.
+export function findContacts(bodies, kmPerAu) { // function to compute contacts
+  const hits = [];
+  for (let i = 0; i < bodies.length; i++) {
+    for (let j = i + 1; j < bodies.length; j++) {
+      const A  = bodies[i], B = bodies[j];
+      const dx = B.pos[0], dy = B.pos[1], dz = B.pos[2];
+      const r = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      if (r < (A.radius_km + B.radius_km) / kmPerAu) hits.push([i, j]);
+    }
+  }
+  return hits;  // paired indexes only - the roster remains untouched
+}
+
+// A pair of trailer park girls collide and latch onto each others hair. Determined to not let go,
+// the pair rolls on with their combined momentum, v = (mA*vA + mB*vB)/(mA+mB). The mass adds,
+// and so does the volume (r³+r³), the position goes to the mass-weighted of the collision.
+export function mergeBodies(A, B) {          // A survives, B is absorbed
+  const m = A.mass + B.mass;
+  for (let k = 0; k < 3; k++) {
+    A.pos[k] = (A.mass*A.pos[k] + B.mass*B.pos[k]) / m;
+    A.vel[k] = (A.mass*A.vel[k] + B.mass*B.vel[k]) / m;
+  }
+  A.radius_km = Math.cbrt(A.radius_km**3 + B.radius_km**3);
+  A.mass = m;
+}

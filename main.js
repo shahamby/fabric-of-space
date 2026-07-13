@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { makeStarfield } from './starfield.js';
 import { loadBodyMeshes, buildSimBodies, G } from './bodies.js';
-import { computeAccelerations, leapfrogStep, totalEnergy, PN1 } from './physics.js';
+import { computeAccelerations, leapfrogStep, totalEnergy, PN1, findContacts, mergeBodies } from './physics.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric } from './fabric.js';
 
@@ -241,6 +241,7 @@ let periLaps = 0;           // laps measured since the reference stamp
 let periHud = 'Mercury perihelion: awaiting first laps';
 
 function checkPerihelion() {
+  handleContacts();                      // M9 — surfaces exist; per-STEP, same honesty rule as the instrument
   const r = mercurySunDistance();
   // Valley test: was falling, now rising — the bottom was one step ago.
   // The isFinite guard keeps the trigger disarmed for two steps after any
@@ -313,6 +314,30 @@ function checkCollapse(body) {
   return collapsed;
 }
 
+// M9 — contact handler - runs all physics. Momentum survives the
+// crash; kinetic energy dies in it, and the AUDIT line confesses exactly
+// how much before the baseline re-seals.
+function handleContacts() {
+  const hits = findContacts(simBodies, KM_PER_AU);
+  if (hits.length === 0) return;
+  const [i, j] = hits[0];                    // one crash at a time; rescan after
+  const [si, ei] = simBodies[i].mass >= simBodies[j].mass ? [i, j] : [j, i];
+  const survivor = simBodies[si], eaten = simBodies[ei];
+  const eBefore = totalEnergy(simBodies, G);
+  mergeBodies(survivor, eaten);
+  if (selected === bodyMeshes[ei]) selected = null;   // don't inspect a ghost
+  scene.remove(bodyMeshes[ei]);
+  bodyMeshes.splice(ei, 1);                  // BOTH arrays, SAME index — the
+  simBodies.splice(ei, 1);                   // body<->mesh twin coupling is positional
+  const eAfter = totalEnergy(simBodies, G);
+  console.log(`AUDIT: contact merge — ${survivor.name} absorbed ${eaten.name} ` +
+    `at day ${simDays.toFixed(1)}. New mass ${survivor.mass.toExponential(3)} Msun, ` +
+    `radius ${survivor.radius_km.toFixed(0)} km, KE destroyed ${(eBefore - eAfter).toExponential(2)}.`);
+  E0 = eAfter;                               // authorized change — re-seal AFTER confessing
+  const sIdx = simBodies.indexOf(survivor);
+  setCollapseVisual(bodyMeshes[sIdx], checkCollapse(survivor));  // heavier now — horizon check
+  handleContacts();                          // indices shifted; rescan fresh
+}
 
 // Horizons - ID mapping
 const HORIZONS_IDS = [
