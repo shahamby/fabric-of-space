@@ -151,9 +151,8 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 - ~~Barycenter-watch exercise~~ — DONE: observed 07/11/2026, Sun loops the origin.
 - ~~HANDOFF.md needs an append-only header line~~ — DONE: landed with the
   M5–M7 session append (commit 4f5db44).
-- ~~Commit-msg hook has a prefix bypass:~~ messages like "Commit: M7b: ..." dodge
-  the M* pattern check (observed on the M7b commit). Fix: anchor the regex
-  so only a leading M<number> passes.
+- ~~Commit-msg hook prefix bypass~~ — CONFIRMED live 07/13 by negative test,
+  regex tightened to word-boundary M<number>: match, sterile retest BLOCKED. CLOSED.
 - ~~Stray dev server~~ may be holding port 5173 (current session moved to 5174).
   Fix when seen: netstat -ano | findstr :5173 → taskkill /PID <pid> /F. - Verified 07/12/2026
 - ~~M5c provenance design decision~~ — RESOLVED: one source, three views
