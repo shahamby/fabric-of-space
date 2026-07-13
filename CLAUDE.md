@@ -132,7 +132,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   re-aim + re-seal + instrument reset on flip). First landing was 36× hot —
   hook inside the pair loop, pattern #2 — caught by same-epoch replay diff,
   fixed to single application per re-aim. Known limitation: totalEnergy is
-  Newtonian bookkeeping, so drift gains a tiny bounded wobble with 1PN on.
+  Newtonian bookkeeping, so drift gains a tiny bounded wobble with 1PN on. 
 
 ## Idea backlog
 
