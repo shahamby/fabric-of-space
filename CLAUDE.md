@@ -55,6 +55,8 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - SillyUserQuestions.md — ClaudinatorFile #4, the question ledger: questions
   Shambu logs mid-project as a learning tool. Uncommented lines below the
   marker are OPEN.
+- docs/weekly/ — weekly two-edition recaps, one file per week (yyyy-w#.md)
+- docs/UserNotes/ — Shambu's personal session notes; not audited
 
 ## Controls (key map — source of truth is the keydown handler in main.js)
 
