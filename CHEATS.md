@@ -26,7 +26,6 @@ which would leave Neptune (30 AU out) essentially unlit relative to Mercury —
 correct physics, unreadable visualization. Decay is disabled so every body is
 lit at roughly the same brightness regardless of true distance from the Sun.
 
-
 ## #3 — Log-compressed fabric depth
 
 **Where:** `fabric.js`, `DEPTH_SCALE` / `PHI_REF`.
@@ -56,9 +55,9 @@ the tear floor is a fixed −12 scene units rather than honest potential
 depth. Physics never sees any of it; `-` reverses the collapse.
 
 ## 6. Collisions merge instantly, with no debris (M9)
+
 Reality shatters and throws fragments; we latch two bodies into one point
 mass in a single step. Momentum is conserved exactly and the destroyed
 kinetic energy is printed in the AUDIT line — but the fireworks are not
 modeled. Detection uses PHYSICAL radii; the inflated display radii still
 touch on screen without consequence, as ever.
-
