@@ -7,7 +7,7 @@
 // Newton: every pair of bodies attracts with F = G·mA·mB / r².
 // We want each body's ACCELERATION (a = F/m), so each body's own mass
 // drops out of its side of the equation.
-export function computeAccelerations(bodies, G) {
+export function computeAccelerations(bodies, G, vLead = 0) {
   for (const b of bodies) b.acc[0] = b.acc[1] = b.acc[2] = 0;
 
   // Visit every unique PAIR exactly once (j always starts above i).
@@ -34,7 +34,7 @@ export function computeAccelerations(bodies, G) {
       //   equal pulls, opposite directions, computed once per pair.
     }
   }
-  if (PN1.on) apply1PN(bodies, G);   // Einstein rides ONCE per re-aim, roster-wide
+  if (PN1.on) apply1PN(bodies, G, vLead);   // Einstein rides ONCE per re-aim, roster-wide
 }
 
 // ---------- The integrator: leapfrog (kick-drift-kick) ----------
@@ -60,7 +60,8 @@ export function leapfrogStep(bodies, dt, G) {
     b.pos[1] += b.vel[1] * dt;
     b.pos[2] += b.vel[2] * dt;
   }
-  computeAccelerations(bodies, G);     // gravity at the NEW positions
+  computeAccelerations(bodies, G, h);  // gravity at the NEW positions — and tell
+                                       // Einstein how far the velocities lag them
   for (const b of bodies) {            // KICK: the other half
     b.vel[0] += b.acc[0] * h;
     b.vel[1] += b.acc[1] * h;
@@ -114,13 +115,22 @@ export function eulerStep(bodies, dt, G) {
 export const PN1 = { on: false };        // main.js flips this with the E key
 const C_AU_DAY = 173.144632;             // speed of light in our units
 
-function apply1PN(bodies, G) {
+function apply1PN(bodies, G, vLead) {
   const sun = bodies.find(b => b.name === 'Sun');
   const gm = G * sun.mass;
   for (const b of bodies) {
     if (b === sun) continue;
     const rx = b.pos[0]-sun.pos[0], ry = b.pos[1]-sun.pos[1], rz = b.pos[2]-sun.pos[2];
-    const vx = b.vel[0]-sun.vel[0], vy = b.vel[1]-sun.vel[1], vz = b.vel[2]-sun.vel[2];
+    // M8d TOCTOU fix — time-of-check vs time-of-use. Mid-leapfrog, positions
+    // sit at t+dt but velocities at t+dt/2: Einstein's velocity-dependent term
+    // was reading a speedometer from half a step ago, every step, forever —
+    // a systematic lag that leaked energy secularly (the 17x drift). Dead-reckon
+    // the velocity forward to the positions' instant using the fresh Newtonian
+    // acc the pair loop just wrote. vLead = dt/2 mid-step, 0 at prime/re-aim
+    // (where clocks are already synchronized).
+    const vx = (b.vel[0] + b.acc[0]*vLead) - (sun.vel[0] + sun.acc[0]*vLead);
+    const vy = (b.vel[1] + b.acc[1]*vLead) - (sun.vel[1] + sun.acc[1]*vLead);
+    const vz = (b.vel[2] + b.acc[2]*vLead) - (sun.vel[2] + sun.acc[2]*vLead);
     const r  = Math.hypot(rx, ry, rz);
     const v2 = vx*vx + vy*vy + vz*vz;
     const rdotv = rx*vx + ry*vy + rz*vz;

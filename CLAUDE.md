@@ -139,6 +139,13 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   momentum-conserving inelastic merge, AUDIT line with KE destroyed,
   E0 re-seal, post-merge collapse check. Zero new physics cheats (CHEATS #6
   is a rendering-of-reality confession, not a physics one).
+- **M8d: IN TEST** — 1PN TOCTOU fix: leapfrog velocities lag positions by half
+  a step, so Einstein's velocity-dependent term read a stale speedometer every
+  step (secular energy leak, climbing diff line in the M8c logs). apply1PN now
+  dead-reckons velocity to the position clock (vLead = dt/2 mid-step, 0 at
+  prime). Prediction: energy drift returns to the Newtonian floor and the diff
+  column sits flat. Verdict by two-boot differential; flips to COMPLETE with
+  the measured number.
 
 ## Idea backlog
 
