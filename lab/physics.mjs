@@ -150,7 +150,7 @@ export function findContacts(bodies, kmPerAu) { // function to compute contacts
   for (let i = 0; i < bodies.length; i++) {
     for (let j = i + 1; j < bodies.length; j++) {
       const A  = bodies[i], B = bodies[j];
-      const dx = B.pos[0], dy = B.pos[1], dz = B.pos[2];
+      const dx = B.pos[0] - A.pos[0], dy = B.pos[1] - A.pos[1], dz = B.pos[2] - A.pos[2];
       const r = Math.sqrt(dx*dx + dy*dy + dz*dz);
       if (r < (A.radius_km + B.radius_km) / kmPerAu) hits.push([i, j]);
     }

@@ -182,9 +182,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   what the timestep resolves); lower DT for collision studies. Instruments
   hold startup references — a merge that eats Sun/Earth/Mercury deranges
   the perihelion and lap detectors.
-- M9 findContacts measures B's distance from the BARYCENTER, not from A
-  (`const dx = B.pos[0]` — the `- A.pos[k]` terms dropped; cloned pair-loop
-  opening, pattern #6/#7). Touching planet pairs are invisible; bodies near
-  the origin false-positive; the Venus demo worked only because A=Sun ≈
-  barycenter. One-line fix + regression receipts in
-  docs/stamp-bias-verdict.md. HIGH priority.
+- ~~M9 findContacts measured B's distance from the BARYCENTER, not from A~~ —
+  FIXED 07/14: `- A.pos[k]` restored; receipt lab/contactsReceipt.mjs runs
+  FAIL-before / PASS-after; the Venus-demo blind spot is documented in
+  docs/stamp-bias-verdict.md.
