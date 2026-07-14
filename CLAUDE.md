@@ -143,12 +143,18 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   over 150 laps; energy drift back at the Newtonian floor (e-10 both runs).
 - **M8e: COMPLETE** — LRL (eccentricity-vector) witness mounted beside the stamp
   instrument; honest apsidal readout from pure orbital state, reset unified.
-- **M8c: MEASURED — +42.9″/century.** Two-boot differential on the LRL witness,
-  flat at +42.9 from lap 1 through 150 (GR predicts +42.98). Lab replication of
-  physics.js: +42.99, with piece decomposition −2u +1u +4u = 3u — textbook GR
-  structure confirmed empirically. Le Verrier's ledger, paid in full.
-  OPEN: the valley-stamp instrument misreports perturbation differentials
-  (−91 where LRL reads +43), bias DT-invariant — see SillyUserQuestions.
+- **M8c: COMPLETE** — the two-boot differential ceremony, run clean 07/14:
+  stamp +42.8″/cy and LRL +42.9″/cy, flat laps 25–150, spike-free, vs GR's
+  42.98. The stamp's earlier −91 anomaly RESOLVED by M8f; verdict in
+  docs/stamp-bias-verdict.md.
+- **M8f: COMPLETE** — stamp witness rehabilitated. Verdict: 1PN retimes the
+  perihelion (+1.140 s/lap, DT-invariant — Einstein's quiet second door); the
+  grid-locked stamp read that slide as −124.7″/cy of fake retrograde on top of
+  true +42.8, clean −81.9 at every DT, plus one-lap ±ω·DT staircase spikes
+  that scattered naive readouts (−91 was one draw). Fix: parabolic sub-step
+  stamping — lag ≡ 0, schedule side-channel closed. Stamp and LRL now agree
+  to their frames (+42.8 ecliptic vs +43.0 in-plane; 7° projection = 0.996).
+  Zero new cheats. Lab: lab/ (node, dependency-free, hash-pinned physics).
 
 ## Idea backlog
 
@@ -176,3 +182,9 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   what the timestep resolves); lower DT for collision studies. Instruments
   hold startup references — a merge that eats Sun/Earth/Mercury deranges
   the perihelion and lap detectors.
+- M9 findContacts measures B's distance from the BARYCENTER, not from A
+  (`const dx = B.pos[0]` — the `- A.pos[k]` terms dropped; cloned pair-loop
+  opening, pattern #6/#7). Touching planet pairs are invisible; bodies near
+  the origin false-positive; the Venus demo worked only because A=Sun ≈
+  barycenter. One-line fix + regression receipts in
+  docs/stamp-bias-verdict.md. HIGH priority.

@@ -342,3 +342,28 @@ but never displayed — the gauge without a needle. #6 reached a commit message
 
 **Loose ends:** stamp-bias mystery (OPEN, SillyUserQuestions). Weekly recap
 W29 due Sunday — verify the scheduled task fired.
+
+## 2026-07-14 — session append: the shutter and the runner
+
+Arc: the stamp-bias mystery, handed to Claudester whole, is CLOSED. The lab
+(node, hash-pinned physics.js) convicted a timing side-channel: 1PN doesn't
+just rotate the ellipse — it delays every perihelion by 1.140 s/lap. The
+grid-locked stamp photographed run B earlier in its swing each lap: −ω·slide
+= −124.7″/cy of forged retrograde over true +42.8 → clean −81.9 at EVERY DT
+(the DT-invariance was the fingerprint). Staircase spikes of exactly ±ω·DT
+(±1138″ @ 0.05) scattered naive readouts; −91 and +112 are draws of one broken
+estimator. Predicted-then-confirmed to 0.3″/cy, five experiments. M8d was
+TOCTOU in the force; this was TOCTOU in the witness. LRL immune: shape, not
+schedule. Fix = M8f oracle stamping (lag ≡ 0), patch delivered as a separate
+typed edit (pattern #4 protection). Zero new CHEATS — third clean milestone
+running. Audit also convicted M9 findContacts (measures |B|, not |B−A|;
+receipts in verdict; Venus demo sat in the one blind-spot-free config).
+Claudester logged one of its own: a dropped unit factor in the prediction
+column, caught because 42.8 made no sense as a prediction of −81.9 — the
+parser is a friend, and so is a number that refuses to fit.
+
+Acceptance test PASSED on Shambu's machine 07/14: two-boot differential flat
++42.8″ (stamp) / +42.9″ (LRL) from lap 25 to 150, zero spikes — the 0.1″ gap
+is the 7° projection, right where it belongs. Confession: the two boots
+pulled live epochs two minutes apart (13:24 vs 13:26 UTC), off-protocol; the
+verdict held anyway — an unplanned robustness result, not a license.

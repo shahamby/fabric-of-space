@@ -27,7 +27,19 @@ The following are questions the user has throught of during this project.
 
 <center><B><I>LINES BELOW THAT ARE NOT COMMENTED OUT ARE TO BE TREATED AS OPEN</center></B></I>
 
-<!-- ANSWERED 2026-07-13: hooks never travel with clones — the repo cannot testify. Negative tests on local machine: leading-prefix BLOCKED; old bypass landed once (since reset); regex tightened to word-boundary match; sterile retest BLOCKED. Details: CLAUDE.md loose ends. --> 
-<!-- Did I ever actually tighten the commit-msg hook regex on my machine, or does that loose end stand? (Logged by Claudester after seven unanswered askings — 07/12/2026) -->
+<!-- ANSWERED 2026-07-13: the stamp lied about WHEN, not WHERE. 1PN retimes
+Mercury — each perihelion arrives +1.140 s later per lap (DT-invariant;
+physics, not numerics). Both boots share one step grid and the stamp reads
+bearing ~a step after the minimum, so run B is photographed earlier in its
+swing each lap: bias = −ω·(1.140 s/lap) = −124.7″/cy on top of true +42.8 →
+clean −81.9″/cy at every DT. One-lap ±ω·DT staircase spikes (±1138″ at DT
+0.05) scattered the naive readout: −91 (browser) and +112 (lab) are two draws
+of the same broken estimator. Despiked, five experiments collapse to −81.9;
+predicted-then-confirmed to 0.3″/cy. LRL immune: shape, not schedule. Fix:
+M8f oracle stamping (lag ≡ 0). Verdict: docs/stamp-bias-verdict.md; lab: lab/. -->
 
-Why does the valley-stamp bearing misreport perturbation differentials (−91″/cy) that the LRL witness reads true (+43″/cy), and why is that bias DT-invariant? Four mechanisms tested and eliminated in the 07/13 lab session. (Logged the night we measured Einstein — 07/13/2026)
+<!-- ANSWERED 2026-07-13: hooks never travel with clones — the repo cannot testify. Negative tests on local machine: leading-prefix BLOCKED; old bypass landed once (since reset); regex tightened to word-boundary match; sterile retest BLOCKED. Details: CLAUDE.md loose ends. -->
+
+<!-- Why does the valley-stamp bearing misreport perturbation differentials (−91″/cy) that the LRL witness reads true (+43″/cy), and why is that bias DT-invariant? Four mechanisms tested and eliminated in the 07/13 lab session. (Logged the night we measured Einstein — 07/13/2026) -->
+
+<!-- Did I ever actually tighten the commit-msg hook regex on my machine, or does that loose end stand? (Logged by Claudester after seven unanswered askings — 07/12/2026) -->

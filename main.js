@@ -244,19 +244,30 @@ let periDriftTotal = 0;     // accumulated drift, radians
 let periLaps = 0;           // laps measured since the reference stamp
 let periHud = 'Mercury perihelion: awaiting first laps';
 let periLRLLast = null, periLRLDrift = 0;
+let periRel2 = null, periRel1 = null;  // M8f — the last two Sun-relative positions: the Oracle's memory, shifted in lockstep with r
 
 function checkPerihelion() {
   handleContacts();                      // M9 — surfaces exist; per-STEP, same honesty rule as the instrument
-  const r = mercurySunDistance();
+  const rx = mercurySim.pos[0] - sunSim.pos[0],
+        ry = mercurySim.pos[1] - sunSim.pos[1],
+        rz = mercurySim.pos[2] - sunSim.pos[2];
+  const r = Math.hypot(rx, ry, rz);
   // Valley test: was falling, now rising — the bottom was one step ago.
   // The isFinite guard keeps the trigger disarmed for two steps after any
   // reset, so a mid-orbit rebirth can't fake a perihelion.
   if (Number.isFinite(periRPrev2) && periRPrev2 > periRPrev && periRPrev <= r) {
-    const angle = mercuryAngle();
-    // M8e - LRL witness: the eccentricity vector points at the true perihelion from pure orbital state.
-    // (v x h)/gm - r̂, drift accumluated like the stamp.
-    const rx=mercurySim.pos[0]-sunSim.pos[0], ry=mercurySim.pos[1]-sunSim.pos[1], rz=mercurySim.pos[2]-sunSim.pos[2];
-    const vx=mercurySim.vel[0]-sunSim.vel[0], vy=mercurySim.vel[1]-sunSim.vel[1], vz=mercurySim.vel[2]-sunSim.vel[2];
+    // M8f — the de-biased stamp. A parabola through the last three r samples
+    // finds the TRUE minimum (offset s from the middle sample, in steps);
+    // the same parabola interpolates the position there. lag ≡ 0: the
+    // schedule side-channel is closed (docs/stamp-bias-verdict.md).
+    const den = periRPrev2 - 2 * periRPrev + r;
+    const s = den !== 0 ? (periRPrev2 - r) / (2 * den) : 0;
+    const ix = periRel1[0] + (rx - periRel2[0]) / 2 * s
+             + (periRel2[0] - 2 * periRel1[0] + rx) / 2 * s * s;
+    const iy = periRel1[1] + (ry - periRel2[1]) / 2 * s
+             + (periRel2[1] - 2 * periRel1[1] + ry) / 2 * s * s;
+    const angle = Math.atan2(iy, ix);
+      const vx=mercurySim.vel[0]-sunSim.vel[0], vy=mercurySim.vel[1]-sunSim.vel[1], vz=mercurySim.vel[2]-sunSim.vel[2];
     const rr=Math.hypot(rx,ry,rz), gmS=G*sunSim.mass;
     const hx=ry*vz-rz*vy, hy=rz*vx-rx*vz, hz=rx*vy-ry*vx;
     const ex=(vy*hz-vz*hy)/gmS-rx/rr, ey=(vz*hx-vx*hz)/gmS-ry/rr, ez=(vx*hy-vy*hx)/gmS-rz/rr;
@@ -282,6 +293,8 @@ function checkPerihelion() {
   }
   periRPrev2 = periRPrev;
   periRPrev = r;
+  periRel2 = periRel1;              // the oracle's memory shifts with the
+  periRel1 = [rx, ry, rz];          // valley trigger's — same clock, always
 }
 
 function resetPerihelionInstrument() {
@@ -289,6 +302,7 @@ function resetPerihelionInstrument() {
   periAngleLast = null;  periFirstDay = null;   // old epoch's stamps are void
   periDriftTotal = 0;    periLaps = 0;          // fresh ledger for the new epoch
   periLRLLast = null;  periLRLDrift = 0;    // the witness forgets the old universe too
+    periRel2 = null;  periRel1 = null;        // and so does the oracle
   periHud = 'Mercury perihelion: awaiting first laps';  
 }
 
