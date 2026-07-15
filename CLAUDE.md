@@ -17,7 +17,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Visual-first teaching: for any math or physics concept, lead with a picture,
   animation, or plain-language physical metaphor before any equation; when a
   good video exists, recommend it.
-- A milestone commit is COMPLETE without its CHEATS.md entries and Status
+- A milestone commit is NOT COMPLETE without its CHEATS.md entries and Status
   update in the same commit; when asked to make a milestone commit, verify
   both first and do not proceed without them.
 - Surface the payoffs: open every session with a fresh-clone audit, then
@@ -163,6 +163,9 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   stamping — lag ≡ 0, schedule side-channel closed. Stamp and LRL now agree
   to their frames (+42.8 ecliptic vs +43.0 in-plane; 7° projection = 0.996).
   Zero new cheats. Lab: lab/ (node, dependency-free, hash-pinned physics).
+- **M10a: COMPLETE** — Boris rotation proven in the lab (solar-wind proton, 5 nT):
+  speed conserved to rounding, period/radius match analytic in the DT² band,
+  err(DT)/err(DT/2) ≈ 4. CHECK 4 charge-sign handedness written by hand.
 - **M10b: COMPLETE** — Boris turn married into leapfrogStep as a half-turn
   bracket (turn/2, kick, drift, kick, turn/2): placement review beat the spec
   2.7×, bracket restored the DT² law (×3.83 on halving, receipt in lab/).
