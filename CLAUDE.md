@@ -27,6 +27,10 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Check SillyUserQuestions.md every session: answer each OPEN question with
   verified, credible references, then wrap the answered line in an HTML
   comment with the date and where the answer lives.
+- Assignment format: any task handed to the human is delivered as numbered
+  steps with a picture or physical demo first — never buried in a paragraph.
+  Every symbol gets a plain-word name on first use (vy = "the forward part
+  of the velocity"), and the plain word travels with the symbol after that.****
 
 ## Non-negotiable conventions
 
@@ -155,6 +159,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   stamping — lag ≡ 0, schedule side-channel closed. Stamp and LRL now agree
   to their frames (+42.8 ecliptic vs +43.0 in-plane; 7° projection = 0.996).
   Zero new cheats. Lab: lab/ (node, dependency-free, hash-pinned physics).
+
 
 ## Idea backlog
 
