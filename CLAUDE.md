@@ -17,7 +17,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Visual-first teaching: for any math or physics concept, lead with a picture,
   animation, or plain-language physical metaphor before any equation; when a
   good video exists, recommend it.
-- A milestone commit is inCOMPLETE** without its CHEATS.md entries and Status
+- A milestone commit is COMPLETE without its CHEATS.md entries and Status
   update in the same commit; when asked to make a milestone commit, verify
   both first and do not proceed without them.
 - Surface the payoffs: open every session with a fresh-clone audit, then
@@ -30,7 +30,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Assignment format: any task handed to the human is delivered as numbered
   steps with a picture or physical demo first — never buried in a paragraph.
   Every symbol gets a plain-word name on first use (vy = "the forward part
-  of the velocity"), and the plain word travels with the symbol after that.****
+  of the velocity"), and the plain word travels with the symbol after that.
 
 ## Non-negotiable conventions
 
