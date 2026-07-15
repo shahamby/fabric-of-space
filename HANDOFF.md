@@ -367,3 +367,85 @@ Acceptance test PASSED on Shambu's machine 07/14: two-boot differential flat
 is the 7° projection, right where it belongs. Confession: the two boots
 pulled live epochs two minutes apart (13:24 vs 13:26 UTC), off-protocol; the
 verdict held anyway — an unplanned robustness result, not a license.
+
+## 2026-07-15 — session append: the sandwich and the skeleton
+
+Tier 2 is open. M10a and M10b shipped tonight: the Boris rotation proven
+in the lab first (solar-wind proton in 5 nT — four checks, the fourth
+written by Shambu's own hand from a right-hand-rule prediction posed at
+the desk before any code ran), then married into leapfrogStep. Charged
+dust spawns on C in electric cyan, the uniform field toggles on B with an
+AUDIT line, and the dreaded SI-to-sim unit bridge collapsed to one exact
+constant: SEC_PER_DAY = 86400. A rotation only needs an angle; an angle is
+turns-per-second times seconds; the AU never enters. And the energy
+monitor cannot see the field at all — not a cheat, physics: magnetic force
+does no work, so the E0 seal holds with the field on. A free watchdog.
+
+The review that outranked the spec: Claudester's Edit A said the turn goes
+above the DRIFT loop. Shambu's typing landed it above the first KICK — and
+when the deviation went on trial (lab-style, uniform gravity + field
+against a converged reference), the deviation won 2.7x. Unroll consecutive
+steps and his placement centers every turn between two half kicks: the
+textbook Boris sandwich. The spec left the turn dangling off a fused full
+kick. The same trial caught BOTH simple placements failing the DT² law
+(x2 shrink on halving, not x4) — a one-time seam at the very first step.
+The shipped fix is the half-turn bracket: turn/2, kick, drift, kick,
+turn/2. The halves fuse between steps, the seam irons out, DT² walks back
+in at x4.00, and the error falls ~74x. Receipt: lab/turnOrderLab.mjs
+(added with this append). Pattern for the ages: where a new beat sits
+inside the integrator is physics, not style — unroll and measure before
+trusting any spec, including Claudester's.
+
+Three breaks caught before they burned, all in one review Shambu called
+on himself ("I do not want to mess up our streak"):
+1. The skeleton ate the engine (pattern #9): a landing-spot diagram with
+   "// ...unchanged..." placeholders was typed IN PLACE of leapfrogStep's
+   real loops. Every planet would have frozen on launch. New rule in the
+   working agreement: no elided skeletons, ever — complete blocks or
+   exact single lines only.
+2. The clone split the donor (pattern #10): cloning spawnRogue into
+   spawnDust migrated the donor's entire bottom half into the clone. The
+   N key died silently. New rule: after any clone, audit BOTH halves.
+3. The missing qm (pattern #8 in new clothes): the dust's PHYSICS twin
+   never received qm — declared in the display record, dropped at the
+   simBodies.push. Press B, press C, watch nothing happen, every piece
+   individually "correct." THE line M10b hangs on now carries a comment
+   saying exactly that.
+
+Recovery was a golden-image restore — full files rebuilt from last known
+good plus the agreed changes, never in-place patching of a corrupted
+original — with receipts run before handoff: the rebuilt engine held a
+test Earth at 1.0000 AU for a full year (drift 1.6e-14); a lone dust
+grain gyrated 48.481 days measured against 48.481 predicted; speed hash
+silent at 1.6e-15. The files landed in the repo byte-identical (missing
+final newline at EOF on both — harmless, heals on next edit).
+
+Errata, for the honest ledger: HEAD 4c42781's commit message says "M10a:"
+— it is the M10b milestone. The hook checks that AN M-number exists, not
+that it is the RIGHT one; the human eye remains the enforcement point.
+History stands; this line corrects the record. Also this session:
+find-replace collateral in the working agreement repaired (673bdb9), and
+the assignment-format rule (numbered steps, picture or physical demo
+first, plain-word names for every symbol) was committed after Shambu
+rightly called a halt on a symbol-dense paragraph.
+
+State at close: M0–M10b complete. CHEATS.md: six entries, ZERO new across
+the entire M8-to-M10 run. SillyUserQuestions: closed. Speed-hash
+watchdog: armed, twice per step, silent. W29 recap due Sunday 07/19 —
+verify the scheduled task fires.
+
+Next steps (M10c — the payoff):
+- Solar dipole field: a B(pos) function in physics.js, moment along
+  ecliptic z, 1/r³ falloff; borisTurn samples it per body. The bracket
+  already samples pre- and post-drift positions — the plumbing is ready
+  for a field that varies in space.
+- First expected CHEATS entry since M7c: field-LINE rendering (density,
+  length, and scale chosen for eyes; the physics never reads them).
+- Demo acceptance: dust spiraling along field lines; watch for magnetic
+  mirror bounce near the poles — grad-B is real in a dipole, and if it
+  bounces, that is the aurora's opening act.
+- Instrument candidates: HUD shows field ON/OFF (console-only today —
+  instruments beat memory); info panel shows qm for charged bodies;
+  optional gravitational-drift check against the g/omega prediction.
+- Shelf, still named: GW energy loss (gravity tier), lensing and
+  light-travel time (light tier), 4D-to-3D projections (dimensional).

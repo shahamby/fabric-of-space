@@ -31,6 +31,10 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   steps with a picture or physical demo first — never buried in a paragraph.
   Every symbol gets a plain-word name on first use (vy = "the forward part
   of the velocity"), and the plain word travels with the symbol after that.
+- No elided skeletons: code is delivered as complete blocks or exact single
+  lines — placeholder diagrams read as code and get typed as code.
+- Cloning a function can split the donor: after any clone, audit BOTH the
+  copy and the original before running.
 
 ## Non-negotiable conventions
 
