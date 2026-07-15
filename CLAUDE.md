@@ -17,7 +17,7 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - Visual-first teaching: for any math or physics concept, lead with a picture,
   animation, or plain-language physical metaphor before any equation; when a
   good video exists, recommend it.
-- A milestone commit is incomplete without its CHEATS.md entries and Status
+- A milestone commit is inCOMPLETE** without its CHEATS.md entries and Status
   update in the same commit; when asked to make a milestone commit, verify
   both first and do not proceed without them.
 - Surface the payoffs: open every session with a fresh-clone audit, then
@@ -107,34 +107,34 @@ Every milestone traces to one. Platform contract: "acceleration given state."
 
 v1's data pipeline is closed: NASA → proxy → parser → provenance → physics → fabric.
 
-- M0: complete and committed. Starfield skeleton runs clean.
-- M1: complete and committed. Static solar system from live Horizons data;
+- **M0: COMPLETE** and committed. Starfield skeleton runs clean.
+- **M1: COMPLETE** and committed. Static solar system from live Horizons data;
   true-scale toggle; CHEATS.md logs both display cheats.
-- M2: complete and committed. Leapfrog N-body in motion. Instruments live:
+- **M2: COMPLETE** and committed. Leapfrog N-body in motion. Instruments live:
   day counter, energy-drift monitor (oscillates ~1e-7, no trend), Earth-lap
   detector (365.0–365.5 days, half-day resolution).
-- M3: complete and committed. The fabric — potential-displaced wireframe;
+- **M3: COMPLETE** and committed. The fabric — potential-displaced wireframe;
   cheats #3/#4; T flattens to honest depth.
-- M4: complete and committed. Picking, info panel, time controls (M4a);
+- **M4: COMPLETE** and committed. Picking, info panel, time controls (M4a);
   mass surgery + rogue bodies with re-baseline on change (M4b).
-- M5a: complete — Vite proxy + live Horizons test fetch verified
-- M5b: complete — sequential live fetch + progress bar, keyed to L.
-- M5c: complete — provenance ledger, one source with three views
+- **M5a: COMPLETE** — Vite proxy + live Horizons test fetch verified
+- **M5b: COMPLETE** — sequential live fetch + progress bar, keyed to L.
+- **M5c: COMPLETE** — provenance ledger, one source with three views
   (console log, P panel, D download); SHA-256 per body.
-- M6: complete — live epoch rebirth. L re-anchors sim state to real
+- **M6: COMPLETE** — live epoch rebirth. L re-anchors sim state to real
   yesterday-00:00 TDB, resets odometer, re-seals E0.
-- M7b: complete — the rip: black sphere + horizon ring on collapse (reversible
+- **M7b: COMPLETE** — the rip: black sphere + horizon ring on collapse (reversible
   via -), fabric tears to a fixed floor inside the display-scaled horizon.
   Verified in the wild: collapsed Jupiter ejected to 176,411 AU (~2.8 ly).
-- M7c: complete — ledger close-out. CHEATS #5 (Newtonian detection, 1500×
+- **M7c: COMPLETE** — ledger close-out. CHEATS #5 (Newtonian detection, 1500×
   horizon gain + 1 AU floor, fixed tear depth), r_s shown in info panel for
   every body, fabric.js tear code committed, roadmap/status synced.
-- M8a: complete — Mercury perihelion instrument (per-step valley detector,
+- **M8a: COMPLETE** — Mercury perihelion instrument (per-step valley detector,
   Sun-relative bearing, telescoping drift ledger, HUD + throttled log, resets
   on L). Calibration: integrator creep ≈ −210k″/cy at DT 0.5 → −1.4k…−4.6k
   band at DT 0.05 — error ∝ DT², prediction confirmed. Determinism verified:
   identical epochs replay to the decimal. Measurement DT for M8: 0.05.
-- M8b: complete — 1PN correction term in physics.js behind PN1 toggle (E key,
+- **M8b: COMPLETE** — 1PN correction term in physics.js behind PN1 toggle (E key,
   re-aim + re-seal + instrument reset on flip). First landing was 36× hot —
   hook inside the pair loop, pattern #2 — caught by same-epoch replay diff,
   fixed to single application per re-aim. Known limitation: totalEnergy is
@@ -159,7 +159,9 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   stamping — lag ≡ 0, schedule side-channel closed. Stamp and LRL now agree
   to their frames (+42.8 ecliptic vs +43.0 in-plane; 7° projection = 0.996).
   Zero new cheats. Lab: lab/ (node, dependency-free, hash-pinned physics).
-
+- **M10a: COMPLETE** — Boris rotation proven in the lab (solar-wind proton, 5 nT):
+  speed conserved to rounding, period/radius match analytic in the DT² band,
+  err(DT)/err(DT/2) ≈ 4. CHECK 4 charge-sign handedness written by hand.
 
 ## Idea backlog
 
