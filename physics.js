@@ -47,9 +47,13 @@ export function computeAccelerations(bodies, G, vLead = 0) {
 // Contract: bodies[i].acc must be current when this is called. Prime it
 // with one computeAccelerations() at startup; every step after that
 // leaves acc fresh for the next.
+//
+// M10b: charged bodies (qm ≠ 0) get a half TURN at each edge of the step.
+// Consecutive steps fuse the trailing half with the next leading half —
+// the textbook Boris sandwich, with every seam ironed (see lab receipt).
 export function leapfrogStep(bodies, dt, G) {
   const h = dt / 2;
-
+  if (BFIELD.on) borisTurn(bodies, dt / 2);  // TURN: first half — speed untouched
   for (const b of bodies) {            // KICK: half-step the velocity
     b.vel[0] += b.acc[0] * h;
     b.vel[1] += b.acc[1] * h;
@@ -67,6 +71,7 @@ export function leapfrogStep(bodies, dt, G) {
     b.vel[1] += b.acc[1] * h;
     b.vel[2] += b.acc[2] * h;
   }
+  if (BFIELD.on) borisTurn(bodies, dt / 2);  // TURN: other half — fuses with next step's first
 }
 
 // ---------- The integrity monitor ----------
@@ -169,4 +174,36 @@ export function mergeBodies(A, B) {          // A survives, B is absorbed
   }
   A.radius_km = Math.cbrt(A.radius_km**3 + B.radius_km**3);
   A.mass = m;
+}
+
+// ---------- M10b: the magnetic turn ----------
+// Steering only — a magnetic field can never change a body's speed,
+// so this rotates velocity vectors and touches nothing else.
+export const BFIELD = { on: false, tesla: [0, 0, 5e-9] }; // main.js flips with B key
+
+const SEC_PER_DAY = 86400;   // the entire unit bridge — exact by definition
+
+function borisTurn(bodies, dt) {
+  const halfTurnTime = dt * SEC_PER_DAY / 2;      // our day-clock, in their seconds
+  for (const b of bodies) {
+    if (!b.qm) continue;                          // neutral bodies are immune
+    const k  = b.qm * halfTurnTime;
+    const t  = [BFIELD.tesla[0] * k, BFIELD.tesla[1] * k, BFIELD.tesla[2] * k];
+    const t2 = t[0] * t[0] + t[1] * t[1] + t[2] * t[2];
+    const s  = [2 * t[0] / (1 + t2), 2 * t[1] / (1 + t2), 2 * t[2] / (1 + t2)];
+    const v  = b.vel;
+    const hashBefore = Math.hypot(v[0], v[1], v[2]);   // speed is the integrity hash
+    const vp = [
+      v[0] + v[1] * t[2] - v[2] * t[1],
+      v[1] + v[2] * t[0] - v[0] * t[2],
+      v[2] + v[0] * t[1] - v[1] * t[0],
+    ];
+    v[0] += vp[1] * s[2] - vp[2] * s[1];
+    v[1] += vp[2] * s[0] - vp[0] * s[2];
+    v[2] += vp[0] * s[1] - vp[1] * s[0];
+    const hashAfter = Math.hypot(v[0], v[1], v[2]);
+    if (Math.abs(hashAfter - hashBefore) / hashBefore > 1e-12) {
+      console.warn(`AUDIT boris: speed hash broke on ${b.name} — integrator tampering`);
+    }
+  }
 }

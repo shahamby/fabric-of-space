@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric } from './fabric.js';
-import { computeAccelerations, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy } from './physics.js';
+import { computeAccelerations, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD } from './physics.js';
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -118,6 +118,11 @@ window.addEventListener('keydown', (event) => {
     console.log(`1PN ${PN1.on ? 'ON — Einstein has entered the sim' : 'OFF — pure Newton'}`);
     return;
   }
+  if (event.key.toLowerCase() === 'b') {
+    BFIELD.on = !BFIELD.on;
+    console.log(`AUDIT field: uniform 5 nT ${BFIELD.on ? 'ON' : 'OFF'}`);
+    return;
+  }
   if (event.code === 'Space') { paused = !paused; return; }   // .code, not .key — the key for
   // Mass surgery on the selected body: '-' halves, '=' doubles ('=' is the + key)
   if ((event.key === '-' || event.key === '=') && selected) {
@@ -131,6 +136,7 @@ window.addEventListener('keydown', (event) => {
     return;
   }
   if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
+  if (event.key.toLowerCase() === 'c') { spawnDust(); return; }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
   if (event.code === 'KeyL') fetchAllBodies(); // JPL data from Horizons
@@ -200,13 +206,54 @@ function spawnRogue() {
   };
 
   // Both worlds get told, same index, same instant — the alignment contract holds.
-simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_km,
+  simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_km,
     pos: [...body.position_au], vel: [...body.velocity_au_day], acc: [0, 0, 0] });
   const mesh = makeBodyMesh(body);
   bodyMeshes.push(mesh);
   scene.add(mesh);
   console.log(`AUDIT: rogue spawn — ${body.name} injected at day ${simDays.toFixed(1)} ` +
     `(${body.mass_msun.toExponential(3)} Msun, ${body.radius_km} km)`);
+
+  computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
+  E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
+}
+
+// Charged dust factory (M10b) — same skeleton as spawnRogue, plus the one
+// field the magnetic turn actually reads: qm, the steering sensitivity.
+let dustCount = 0;
+function spawnDust() {
+  dustCount++;
+  const r = 3;                                // AU — close in, where the loops are visible
+  const theta = Math.random() * Math.PI * 2;  // random bearing on the ecliptic
+
+  // Circular-orbit speed: sqrt(G·M/r) is the entire secret of orbiting —
+  // move sideways exactly fast enough to keep missing the thing pulling you.
+  const vCirc = Math.sqrt(G * sunSim.mass / r);
+
+  const body = {                              // shaped like a bodies.json record,
+    name: `Dust-${dustCount}`,                // so makeBodyMesh accepts it happily
+    mass_msun: 1e-12,                         // a speck — the roster barely feels it
+    radius_km: 3000,                          // asteroid-sized, so the dot stays visible
+    qm: 300,                                  // steering sensitivity, C/kg — sandbox-declared
+    color: '#4fd8ff',                         // electric cyan: charged things get cold light
+    position_au: [ sunSim.pos[0] + r * Math.cos(theta),
+                   sunSim.pos[1] + r * Math.sin(theta), 0 ],
+    velocity_au_day: [ sunSim.vel[0] - vCirc * Math.sin(theta),   // perpendicular to the
+                       sunSim.vel[1] + vCirc * Math.cos(theta),   // radius = sideways,
+                       0 ],                                       // riding along with the Sun
+  };
+
+  // Both worlds get told, same index, same instant — and the PHYSICS twin
+  // must carry qm, or the field can never grip it. This is THE line
+  // M10b hangs on: a dust grain without qm is just a slow rogue.
+  simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_km,
+    qm: body.qm,
+    pos: [...body.position_au], vel: [...body.velocity_au_day], acc: [0, 0, 0] });
+  const mesh = makeBodyMesh(body);
+  bodyMeshes.push(mesh);
+  scene.add(mesh);
+  console.log(`AUDIT: dust spawn — ${body.name} injected at day ${simDays.toFixed(1)} ` +
+    `(${body.mass_msun.toExponential(3)} Msun, ${body.radius_km} km, qm ${body.qm} C/kg)`);
 
   computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
   E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
@@ -329,7 +376,7 @@ function applyLiveVectors(results) {
 function schwarzschildRadiusKm(massMsun) {
   return 2.95 * massMsun;    // r_s of the Sun is 2.95 km; linear in mass
 }
-
+// No more light can leave
 function checkCollapse(body) {
   const rs = schwarzschildRadiusKm(body.mass);
   const collapsed = body.radius_km < rs;
@@ -473,7 +520,7 @@ async function fetchAllBodies() {
     endpoint: 'https://ssd.jpl.nasa.gov/api/horizons.api',
     frame: 'Solar System Barycenter, ecliptic J2000',
     units: 'AU, AU/day',
-    session: new Date().toISOString(),
+    session: new Date().toISOString(), 
     bodies: records,
   };
   console.log('Session provenance:', sessionProvenance);   // ← Option C, done

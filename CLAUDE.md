@@ -159,9 +159,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   stamping — lag ≡ 0, schedule side-channel closed. Stamp and LRL now agree
   to their frames (+42.8 ecliptic vs +43.0 in-plane; 7° projection = 0.996).
   Zero new cheats. Lab: lab/ (node, dependency-free, hash-pinned physics).
-- **M10a: COMPLETE** — Boris rotation proven in the lab (solar-wind proton, 5 nT):
-  speed conserved to rounding, period/radius match analytic in the DT² band,
-  err(DT)/err(DT/2) ≈ 4. CHECK 4 charge-sign handedness written by hand.
+- **M10b: COMPLETE** — Boris turn married into leapfrogStep as a half-turn
+  bracket (turn/2, kick, drift, kick, turn/2): placement review beat the spec
+  2.7×, bracket restored the DT² law (×3.83 on halving, receipt in lab/).
+  Unit bridge is SEC_PER_DAY alone. Dust on C loops the ~48.5-day prediction;
+  energy floor unchanged; speed-hash silent.
 
 ## Idea backlog
 
