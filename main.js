@@ -120,6 +120,7 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.key.toLowerCase() === 'b') {
     BFIELD.on = !BFIELD.on;
+    fieldLines.visible = BFIELD.on;             // the skeleton appears with the field
     console.log(`AUDIT field: ideal solar dipole ${BFIELD.on ? 'ON' : 'OFF'} — 5 nT at the 1 AU equator, 1/r³ falloff, moment ecliptic-south. MODEL dial, not the real Parker-spiral heliosphere.`);
     return;
   }
@@ -136,6 +137,7 @@ window.addEventListener('keydown', (event) => {
     return;
   }
   if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
+  if (event.key === 'C') { spawnPolarDust(); return; }   // capital C: Shift held — the bouncers
   if (event.key.toLowerCase() === 'c') { spawnDust(); return; }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
@@ -184,6 +186,35 @@ function syncMeshes() {
 
 // Rogue body factory
 let rogueCount = 0;
+// Field lines used for the sky's skeleton
+// Display only (CHEATS #7): shells, longitudes, truncation radius, and glow are
+// chosen for eyes. The geometry is honest — every line is r = L·cos²(latitude),
+// the exact shape dipoleTesla() enforces — but the physics never reads a vertex.
+function makeFieldLines() {
+  const group = new THREE.Group();
+  const mat = new THREE.LineBasicMaterial({ color: 0x66ffcc, transparent: true, opacity: 0.35 });
+  const R_TRUNC = 0.3;                          // AU — just outside the drawn Sun, so lines
+  for (const L of [0.5, 0.8, 1.2, 1.8]) {       //   appear to enter its poles. 0.8 = the dust rail.
+    const latMax = Math.acos(Math.sqrt(Math.min(1, R_TRUNC / L)));
+    for (let p = 0; p < 8; p++) {               // eight longitudes out of infinity
+      const phi = p * Math.PI / 4;
+      const pts = [];
+      for (let i = 0; i <= 64; i++) {
+        const lat = -latMax + (2 * latMax * i) / 64;
+        const r = L * Math.cos(lat) ** 2;       // the dipole line: r = L cos²(latitude)
+        pts.push(eclToScene(r * Math.cos(lat) * Math.cos(phi),
+                            r * Math.cos(lat) * Math.sin(phi),
+                            r * Math.sin(lat)));
+      }
+      group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat));
+    }
+  }
+  group.visible = BFIELD.on;                    // born matching the switch
+  return group;
+}
+const fieldLines = makeFieldLines();
+scene.add(fieldLines);
+
 function spawnRogue() {
   rogueCount++;
   const r = 12;                               // AU from our local star - outside of Saturn's traffic pattern
@@ -260,6 +291,50 @@ function spawnDust() {
       console.log(`AUDIT dust field: local |B| ${(Bmag * 1e9).toFixed(2)} nT → ` +
         `predicted loop ${(2 * Math.PI / (body.qm * Bmag * 86400)).toFixed(1)} days ` +
         `(field ${BFIELD.on ? 'ON' : 'OFF'})`);
+
+  computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
+  E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
+}
+
+// Polar dust (M10c) — the same speck, launched with CLIMB: half its orbital
+// speed points along the field line (ecliptic north), pitch ≈ 63°. It helixes
+// up the 0.8 rail, feels the squeeze, and BOUNCES — the mirror, live in the
+// sky. qm 1000 keeps the helix tight and adiabatic (gyro-loop ~7.4 d at spawn;
+// resolution floor for qm 1000 is r ≈ 0.41 AU — it never goes near it).
+// Measured in lab/polarBounceLab.mjs: mirrors at ±16° latitude, ~160-day shuttle.
+let polarCount = 0;
+function spawnPolarDust() {
+  polarCount++;
+  const r = 0.8;                              // AU — the same home rail as Dust
+  const theta = Math.random() * Math.PI * 2;
+  const vCirc = Math.sqrt(G * sunSim.mass / r);
+
+  const body = {
+    name: `Polar-${polarCount}`,
+    mass_msun: 1e-12,
+    radius_km: 3000,
+    qm: 1000,                                 // stiffer steering than Dust's 300
+    color: '#7dff9a',                         // aurora green: the bouncers
+    position_au: [ sunSim.pos[0] + r * Math.cos(theta),
+                   sunSim.pos[1] + r * Math.sin(theta), 0 ],
+    velocity_au_day: [ sunSim.vel[0] - vCirc * Math.sin(theta),
+                       sunSim.vel[1] + vCirc * Math.cos(theta),
+                       sunSim.vel[2] + 0.5 * vCirc ],   // the CLIMB, along the line
+  };
+
+  simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_km,
+    qm: body.qm,
+    pos: [...body.position_au], vel: [...body.velocity_au_day], acc: [0, 0, 0] });
+  const mesh = makeBodyMesh(body);
+  bodyMeshes.push(mesh);
+  scene.add(mesh);
+
+  const Bloc = dipoleTesla(body.position_au, sunSim.pos);
+  const Bmag = Math.hypot(Bloc[0], Bloc[1], Bloc[2]);
+  console.log(`AUDIT: polar spawn — ${body.name} at day ${simDays.toFixed(1)}, qm ${body.qm} C/kg, ` +
+    `pitch 63° (climb = vCirc/2). Local |B| ${(Bmag * 1e9).toFixed(2)} nT, ` +
+    `gyro-loop ${(2 * Math.PI / (body.qm * Bmag * 86400)).toFixed(1)} d. ` +
+    `Watch the bounce: ±16° latitude, ~160-day shuttle (field ${BFIELD.on ? 'ON' : 'OFF'}).`);
 
   computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
   E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
@@ -564,9 +639,10 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
   }
   syncMeshes();                                // simulation space -> screen
   sunlight.position.copy(sunMesh.position);    // the Sun moves; its light follows
+  fieldLines.position.copy(sunMesh.position);  // the field lines ride the magnet
 
   const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0);
-  hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nEnergy drift: ${drift.toExponential(2)}\n${periHud}`;
+  hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nField: ${BFIELD.on ? 'dipole ON' : 'off'}\nEnergy drift: ${drift.toExponential(2)}\n${periHud}`;
 
   const offset = wrap(heliocentricAngle() - startAngle);
   if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
@@ -584,6 +660,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
       `from Sun: ${rSun.toFixed(2)} AU\n` +
       `speed: ${v.toFixed(1)} km/s\n` +
       `r_s: ${schwarzschildRadiusKm(b.mass).toFixed(4)} km` +
+      (b.qm ? `\nqm: ${b.qm} C/kg — charged` : '') +
       (b.collapsed ? '  — COLLAPSED' : '');
     panel.style.display = 'block';
   } else {

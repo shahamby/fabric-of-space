@@ -171,6 +171,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   2.7×, bracket restored the DT² law (×3.83 on halving, receipt in lab/).
   Unit bridge is SEC_PER_DAY alone. Dust on C loops the ~48.5-day prediction;
   energy floor unchanged; speed-hash silent.
+- **M10c: COMPLETE** — the Sun's dipole made visible and survivable: field-line
+  skeleton rendered (CHEATS #7, first confession since M7c), HUD field state,
+  qm in the info panel, and Shift+C polar dust (qm 1000, pitch 63°) that rides
+  the 0.8 shell and MIRRORS at ±16° latitude, ~160-day shuttle — receipt
+  lab/polarBounceLab.mjs 4/4. Energy seal held through gravity+field+bounce.
 
 ## Idea backlog
 

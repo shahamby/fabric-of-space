@@ -61,3 +61,15 @@ mass in a single step. Momentum is conserved exactly and the destroyed
 kinetic energy is printed in the AUDIT line — but the fireworks are not
 modeled. Detection uses PHYSICAL radii; the inflated display radii still
 touch on screen without consequence, as ever.
+
+## 7. Field lines are stagecraft (M10c)
+
+**Where:** `main.js`, `makeFieldLines()` — shells, longitudes, truncation, glow.
+
+The dipole's geometry is real — every drawn line is r = L·cos²(latitude), the
+same shape the physics samples through dipoleTesla(). Everything else is
+theater: four shells (0.5/0.8/1.2/1.8 AU) out of a continuum, eight longitudes
+out of infinity, lines truncated at 0.3 AU so they appear to enter the drawn
+Sun's poles (the Sun's size being itself a confessed cheat), and an opacity
+chosen for contemplation. The field exists everywhere; we draw a skeleton.
+Physics never reads a single vertex of it.
