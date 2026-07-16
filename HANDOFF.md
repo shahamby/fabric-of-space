@@ -449,3 +449,58 @@ Next steps (M10c — the payoff):
   optional gravitational-drift check against the g/omega prediction.
 - Shelf, still named: GW energy loss (gravity tier), lensing and
   light-travel time (light tier), 4D-to-3D projections (dimensional).
+
+## 2026-07-16 — session 01: M10c COMPLETE — the mirror left the lab
+(spans 07-15 evening into 07-16; closes the arc session 00 opened)
+
+Shipped, in three receipted phases:
+- dipoleLab.mjs (SI): falloff 8.000000000, pole/equator 2.000000000, speed
+  hash 4.03e-13 across 11.4M steps, and THE MIRROR — a 30° tilt bounced at
+  3.9998x home field, 33.15° latitude vs 33.15° predicted. Paper first,
+  code second. Windows and Claudinator's Linux printed identical digits.
+- dipoleTesla() wired into physics.js (AU in, Tesla out, normalized at
+  1 AU; unit bridge still SEC_PER_DAY alone; the magnet rides the Sun by
+  name). dipoleWireLab 6/6 — after draft one FAILED its own W3 at 8.787
+  and taught us: THE GUIDING CENTER IS NOT THE PARTICLE. A grain circles
+  a point one gyro-radius from where you put it, and in a 1/r³ field that
+  offset samples a different grip. Equalize rho/r and the bias cancels in
+  the ratio: 8.0000. The stamp-bias lesson in magnetic clothes.
+- Field-line skeleton (CHEATS #7 — geometry honest, r = L·cos²(lat);
+  shells, longitudes, truncation, glow are stagecraft), HUD field state,
+  qm in the info panel, and Shift+C polar dust (qm 1000, pitch 63°): rides
+  the 0.8 shell, MIRRORS at ±16°, ~160-day shuttle. polarBounceLab 4/4
+  with gravity on: seal 4.1e-7, five shuttles in 400 days, resolution
+  floor never approached.
+
+Live-sky findings (the 44,000-day soak):
+- The eccentricity pump: the field does no work but it torques. Grains
+  keep orbit SIZE and trade SHAPE; perihelia dive; Dust-12's dove below
+  the solar radius and M9 fed it to the Sun — two milestones
+  interoperating unprompted. Verified from the info panel alone: Dust-10
+  at 0.49 AU / 49.9 km/s carries exactly its 0.8 AU birth energy.
+- Earth-lap detector convicted of frame-lock: stamps quantize to
+  timeScale/fps (358.4 = 21x17.07, 375.5 = 22x17.07 at 1024 d/s). M8f
+  disease, second organ. Loose-ended; physics untouched.
+- Honesty floors: DT 0.05 under-resolves gyration inside ~0.27 AU
+  (qm 300) and ~0.41 AU (qm 1000).
+- Polar-1..5 launched field-OFF (the AUDIT parenthetical said so): tilted
+  Kepler orbits until B came on and the dipole caught them mid-flight.
+  Capture cost zero energy — Polar-5's panel reads a = 1.08 AU, its
+  launch energy to within rounding.
+
+Errata & confessions:
+- 0d091ea is the physicsLive.mjs untracking, wearing an empty commit
+  message. History stands; this line is its name. Hook gap logged.
+- Claudinator's .gitignore append produced `distlab/out/` — no trailing
+  newline on the line above. Caught by reading the file back; fixed.
+  Pattern #11: an append is an edit to the line above it until a
+  trailing newline is proven.
+- The lab/out/ ignore was over-broad (it would silently hide future
+  receipt files); narrowed to the one generated artifact.
+
+Next steps:
+- M10d (small, next session's opener): lap-stamp sub-step cure — the
+  M8f medicine for the second organ.
+- M11, the fork (Shambu's call): radiation pressure, LIGHT'S FIRST ENTRY.
+  Shelf alternative: Parker spiral, the honest heliosphere.
+- W29 recap Sunday 07/19 — verify the scheduled task fires.

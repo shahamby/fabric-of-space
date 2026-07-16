@@ -215,3 +215,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 - M10c known limit: DT 0.05 under-samples dipole gyration inside r ≈ 0.27 AU
   for qm 300 (loop < 20 steps). Speed stays exact (Boris theorem); the path
   there does not. Grains pumped inward cross this line before M9 eats them.
+- Commit-msg hook accepts empty subjects (0d091ea escaped nameless; it is
+  the physicsLive untracking). Candidate: reject blank subject lines —
+  second hardening, after the prefix-word bypass.
+  
