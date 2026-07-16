@@ -176,6 +176,13 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   qm in the info panel, and Shift+C polar dust (qm 1000, pitch 63°) that rides
   the 0.8 shell and MIRRORS at ±16° latitude, ~160-day shuttle — receipt
   lab/polarBounceLab.mjs 4/4. Energy seal held through gravity+field+bounce.
+  - **M10d: COMPLETE** — lap stamp rehabilitated: per-step zero-crossing with a
+  straight-line sub-step stamp (the M8f medicine, smaller dose — a crossing
+  has full slope, so two points do what the perihelion's minimum needed three
+  for). Frame-lock gone: steady 365.3 with honest 365.2 wobble at every speed.
+  Invariance receipt: boots at 20 and 2048 d/s (102× spread) replay
+  lap-for-lap to the tenth; transcripts byte-match the 07/16 soak through
+  Perihelion #175. timeScale side channel closed. Zero new cheats.
 
 ## Idea backlog
 
@@ -207,11 +214,9 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   FIXED 07/14: `- A.pos[k]` restored; receipt lab/contactsReceipt.mjs runs
   FAIL-before / PASS-after; the Venus-demo blind spot is documented in
   docs/stamp-bias-verdict.md.
-- Earth-lap detector is frame-locked: at high time scale the stamp quantizes
-  to timeScale/fps (1024 d/s ⇒ 358/375 alternation; 358.4 = 21×17.07,
-  375.5 = 22×17.07 — convicted 07/15). M8f disease, second organ: perihelion
-  got the sub-step cure, the lap stamp never did. Cosmetic; physics untouched.
-  Candidate fix: interpolate the crossing inside the frame batch.
+- ~~Earth-lap detector is frame-locked (358/375 alternation at 1024 d/s)~~ —
+  FIXED 07/16 (M10d): per-step zero-crossing + straight-line sub-step stamp;
+  invariance receipt 20 vs 2048 d/s, lap-for-lap to the tenth.
 - M10c known limit: DT 0.05 under-samples dipole gyration inside r ≈ 0.27 AU
   for qm 300 (loop < 20 steps). Speed stays exact (Boris theorem); the path
   there does not. Grains pumped inward cross this line before M9 eats them.

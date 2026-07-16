@@ -349,6 +349,21 @@ const wrap = a => Math.atan2(Math.sin(a), Math.cos(a)); // fold any angle into [
 const startAngle = heliocentricAngle();
 let prevOffset = 0;
 let lastLapDay = 0;
+// Lap instrument (M10d): per-step zero-crossing with a straight-line
+// sub-step stamp. A perihelion is a MINIMUM (flat bottom — needed the
+// M8f parabola); a lap is a CROSSING (full slope — a line through the
+// two samples that straddle zero lands on it). Same disease, smaller dose.
+function checkLap() {
+  const offset = wrap(heliocentricAngle() - startAngle); // radians past the start line
+  if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
+    const f = prevOffset / (prevOffset - offset);  // fraction of the step where the line hits zero
+    const lapDay = simDays - (1 - f) * DT;         // true crossing time, between the two samples
+    console.log(`The pale blue dot has completed another orbit around the Sun! ` +
+      `${(lapDay - lastLapDay).toFixed(1)} simulated days since the last lap.`);
+    lastLapDay = lapDay;                           // stamp the TRUE time — the M8f lesson
+  }
+  prevOffset = offset;
+}
 
 // Perihelion instrument (M8a): stamp Mercury's Sun-relative bearing at each
 // closest approach. Stamp-to-stamp drift IS the precession we're hunting.
@@ -635,6 +650,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     leapfrogStep(simBodies, DT, G);        // the corroborated integrator. Accept no substitutes.
     simDays += DT;
     checkPerihelion();                     // per-STEP instrument — this line was the missing hook
+    checkLap();                            // per-STEP, same honesty rule
     carry -= DT;
   }
   syncMeshes();                                // simulation space -> screen
@@ -644,12 +660,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
   const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0);
   hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nField: ${BFIELD.on ? 'dipole ON' : 'off'}\nEnergy drift: ${drift.toExponential(2)}\n${periHud}`;
 
-  const offset = wrap(heliocentricAngle() - startAngle);
-  if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
-    console.log(`The pale blue dot has completed another orbit around the Sun! ${(simDays - lastLapDay).toFixed(1)} simulated days since the last lap.`);
-    lastLapDay = simDays;
-  }
-  prevOffset = offset;
+
 
   if (selected) {
     const b = simBodies[bodyMeshes.indexOf(selected)];   // mesh -> its physics twin
