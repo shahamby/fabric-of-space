@@ -504,3 +504,33 @@ Next steps:
 - M11, the fork (Shambu's call): radiation pressure, LIGHT'S FIRST ENTRY.
   Shelf alternative: Parker spiral, the honest heliosphere.
 - W29 recap Sunday 07/19 — verify the scheduled task fires.
+
+## 2026-07-16 — session 02: M10d COMPLETE
+
+Shipped: checkLap() — per-step zero-crossing, straight-line sub-step stamp.
+Old frame-level detector deleted. A crossing needs 2 points; a minimum needed 3.
+
+Receipts:
+- Frame-lock gone: steady 365.3. The 365.2s are real Jupiter wobble sitting
+  on the one-decimal rounding seam.
+- Invariance: boots at 20 and 2048 d/s match lap-for-lap to the tenth, and
+  byte-match the 07/16 soak through Perihelion #175.
+- Perihelion ~-1445"/cy = known Newtonian creep band at DT 0.05. Not a bug.
+  Einstein's +42.8 only shows in the two-boot differential (M8c).
+
+Non-milestone findings:
+- 'q' typed in the Vite terminal QUITS the dev server — same signature as the
+  soak drops. OneDrive ruled out. Ceremony reloads are now F5 in the browser.
+- timeScale boots at 20: doubling gives 40..1280, then clamps to 2048. 64 and
+  1024 are only reachable after touching a clamp. Arithmetic exact, physics
+  blind to it. Parked option: boot at 16 (one-line change, own micro-commit).
+- Pattern #12 (candidate): an unnamed key gets improvised — name every key.
+
+M11 fork resolved by delegation to Claudester, 07/16: RADIATION PRESSURE.
+Parker spiral stays on the shelf.
+
+Next: lab/radiationLab.mjs — 4 pre-registered checks. W1 push/pull ratio
+identical at 0.5 / 1 / 2 AU. W2 beta=0.5 circular orbit, predicted period
+516.5 days. W3 blowout knife-edge: beta=0.49 bound (apoapsis 50 AU),
+beta=0.51 escapes. W4 = Shambu's check: beta=1 straight-line coast.
+W29 recap due Sunday 07/19.
