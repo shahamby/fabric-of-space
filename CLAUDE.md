@@ -202,3 +202,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   FIXED 07/14: `- A.pos[k]` restored; receipt lab/contactsReceipt.mjs runs
   FAIL-before / PASS-after; the Venus-demo blind spot is documented in
   docs/stamp-bias-verdict.md.
+- Earth-lap detector is frame-locked: at high time scale the stamp quantizes
+  to timeScale/fps (1024 d/s ⇒ 358/375 alternation; 358.4 = 21×17.07,
+  375.5 = 22×17.07 — convicted 07/15). M8f disease, second organ: perihelion
+  got the sub-step cure, the lap stamp never did. Cosmetic; physics untouched.
+  Candidate fix: interpolate the crossing inside the frame batch.
+- M10c known limit: DT 0.05 under-samples dipole gyration inside r ≈ 0.27 AU
+  for qm 300 (loop < 20 steps). Speed stays exact (Boris theorem); the path
+  there does not. Grains pumped inward cross this line before M9 eats them.

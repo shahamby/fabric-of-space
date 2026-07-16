@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric } from './fabric.js';
-import { computeAccelerations, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD } from './physics.js';
+import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD } from './physics.js';
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -120,7 +120,7 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.key.toLowerCase() === 'b') {
     BFIELD.on = !BFIELD.on;
-    console.log(`AUDIT field: uniform 5 nT ${BFIELD.on ? 'ON' : 'OFF'}`);
+    console.log(`AUDIT field: ideal solar dipole ${BFIELD.on ? 'ON' : 'OFF'} — 5 nT at the 1 AU equator, 1/r³ falloff, moment ecliptic-south. MODEL dial, not the real Parker-spiral heliosphere.`);
     return;
   }
   if (event.code === 'Space') { paused = !paused; return; }   // .code, not .key — the key for
@@ -223,7 +223,8 @@ function spawnRogue() {
 let dustCount = 0;
 function spawnDust() {
   dustCount++;
-  const r = 3;                                // AU — close in, where the loops are visible
+  const r = 0.8;                              // AU — the dipole made "close in" literal:
+                                              // |B| here ≈ 9.8 nT → ~25-day curls you can see
   const theta = Math.random() * Math.PI * 2;  // random bearing on the ecliptic
 
   // Circular-orbit speed: sqrt(G·M/r) is the entire secret of orbiting —
@@ -254,6 +255,11 @@ function spawnDust() {
   scene.add(mesh);
   console.log(`AUDIT: dust spawn — ${body.name} injected at day ${simDays.toFixed(1)} ` +
     `(${body.mass_msun.toExponential(3)} Msun, ${body.radius_km} km, qm ${body.qm} C/kg)`);
+      const Bloc = dipoleTesla(body.position_au, sunSim.pos);   // instrument beats memory:
+      const Bmag = Math.hypot(Bloc[0], Bloc[1], Bloc[2]);       // the LOCAL grip, in Tesla
+      console.log(`AUDIT dust field: local |B| ${(Bmag * 1e9).toFixed(2)} nT → ` +
+        `predicted loop ${(2 * Math.PI / (body.qm * Bmag * 86400)).toFixed(1)} days ` +
+        `(field ${BFIELD.on ? 'ON' : 'OFF'})`);
 
   computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
   E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
