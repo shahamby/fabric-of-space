@@ -534,3 +534,73 @@ identical at 0.5 / 1 / 2 AU. W2 beta=0.5 circular orbit, predicted period
 516.5 days. W3 blowout knife-edge: beta=0.49 bound (apoapsis 50 AU),
 beta=0.51 escapes. W4 = Shambu's check: beta=1 straight-line coast.
 W29 recap due Sunday 07/19.
+
+## 2026-07-17 — session 03: M11 COMPLETE — light entered; course reset to the fabric
+
+Lab receipts (lab/radiationLab.mjs, SI first principles, 4/4 PASS):
+- W1: beta 0.3827 at 0.5 / 1 / 2 AU — one number everywhere.
+- W2: beta-0.5 year — predicted 516.50 d, measured 516.50 d (M10d stamp).
+- W3: knife-edge at beta = 1/2 — 0.49 BOUND, apoapsis 50.00 AU (paper 50.00);
+  0.51 ESCAPING, 65.5 AU at day 16000.
+- W4 (Shambu): beta-1 coast — Worst 0, Speed Drift 0. Exact zeros are real:
+  the push-pull float mismatch sits below double precision beside AU-scale
+  numbers. Falsifier: beta 0.999 FAILs loudly.
+
+Engine + browser: applyRadiation() post-pair hook in physics.js; x / Shift+X
+spawn Smoke (beta 0.49 / 0.51) from Earth; panel shows beta; sub-km/s speeds
+now read in m/s (Sun ~13 m/s — Jupiter's reflex wobble, the exoplanet
+radial-velocity signal). Non-interference receipt: perihelion checkpoints
+byte-match the pre-M11 soak with smoke alive. Honesty notes: photons carry
+the momentum (no Sun reaction); totalEnergy stays Newtonian (drift held
+e-9-class); merged smoke loses beta (v1). Zero new cheats. Stray VS Code
+auto-import (three/tsl) caught in the lab file and removed.
+
+Bookkeeping:
+- 07/16 soak drops CONFIRMED as Shambu's 'q' presses (first round). Closed.
+- M10d landed as TWO commits, same message: df31c79 (code + status, 15:30)
+  and e83904c (HANDOFF + cleanup, 16:16). Benign split, named here; pushed
+  history stands. M11 = 1abc988.
+- Boot timeScale stays 20 (Shambu's call).
+
+COURSE CORRECTION (Shambu, 07/17): the goal is the title — visualize
+gravitational effects. The fabric is the instrument, not the decoration.
+Every milestone now passes one test: does it make a gravitational effect
+visible on screen. Side-quest physics tiers (PR drag, sail, Parker spiral)
+are shelved indefinitely. Road: the galaxy tier.
+
+Next: M12a — lab/galaxyLab.mjs, the Milky Way's gravity measured before
+rendered. W29 recap Sunday 07/19.
+
+
+## 2026-07-17 — session 03: M11 COMPLETE — light's first entry, Tier 3 open
+
+Lab first: lab/radiationLab.mjs, SI from first principles, 4/4 PASS.
+- W1: beta 0.3827 at 0.5 / 1 / 2 AU — one number everywhere.
+- W2: beta-0.5 circular year — predicted 516.50 d, measured 516.50 d,
+  measured with the M10d sub-step lap stamp.
+- W3: knife-edge at beta = 1/2 — 0.49 BOUND, apoapsis 50.00 AU (paper 50.00);
+  0.51 ESCAPING, 65.5 AU at day 16000.
+- W4 (Shambu): beta 1 — Worst 0, Speed Drift 0. Exact zeros are real: the
+  push-pull float mismatch is below double precision next to AU-scale
+  numbers, so it absorbs. Falsifier: beta 0.999 FAILs loudly.
+
+Engine: applyRadiation() in physics.js — post-pair hook beside 1PN. Outward
+term on beta bodies only. Photons carry the momentum: no reaction on the
+Sun — honest, not a cheat. Known limits: totalEnergy stays Newtonian
+(drift held e-9-class with smoke alive); merged smoke loses beta (v1).
+
+Browser: x = Smoke beta 0.49 from Earth (apoapsis ~50 AU, ~180-yr round
+trip); Shift+X = beta 0.51, never returns. Smoke carries no qm — the dipole
+cannot grip it; only light pushes. Panel shows beta. Non-interference
+receipt: perihelion checkpoints byte-match the pre-M11 soak with smoke
+alive — a 1e-12 Msun grain moves nothing at display precision.
+Panel fix: sub-km/s speeds read in m/s — the Sun shows ~13 m/s, Jupiter's
+reflex wobble, the radial-velocity exoplanet signal. Zero new cheats.
+
+Bookkeeping: 07/16 soak drops CONFIRMED as Shambu's 'q' presses in the Vite
+terminal — loose end closed. Boot timeScale stays 20 (Shambu's call).
+Stray VS Code auto-import (three/tsl Loop) caught in the lab file and
+removed — labs stay dependency-free.
+
+Shelf: Parker spiral; Poynting-Robertson drag (light that does WORK — the
+field never does); steerable-beta sail (LightSail 2). Next fork: Shambu's.
