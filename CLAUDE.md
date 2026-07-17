@@ -180,6 +180,14 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   sub-step stamp (M8f medicine, 2-point dose). Frame-lock gone. Invariance
   receipt: boots at 20 and 2048 d/s match lap-for-lap to the tenth; transcripts
   byte-match the 07/16 soak through Perihelion #175. Zero new cheats.
+- **M11: COMPLETE** — light enters (Tier 3 open): radiation pressure as
+  dimensionless beta (push/pull, both 1/r² — no unit bridge). Lab 4/4:
+  W1 beta identical at 0.5/1/2 AU; W2 beta-0.5 year 516.50 d predicted =
+  measured; W3 knife-edge at beta = 1/2 (0.49 bound, apoapsis 50.00 AU;
+  0.51 escapes); W4 (Shambu) beta-1 coast, drift exactly 0. Browser:
+  x / Shift+X spawn Smoke (beta 0.49 / 0.51) from Earth; panel shows beta;
+  sub-km/s speeds now read in m/s (Sun ≈ 13 m/s — Jupiter's reflex wobble).
+  Planets' ledger unmoved with smoke alive. Zero new cheats.
 
 ## Idea backlog
 

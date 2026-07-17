@@ -35,6 +35,7 @@ export function computeAccelerations(bodies, G, vLead = 0) {
     }
   }
   if (PN1.on) apply1PN(bodies, G, vLead);   // Einstein rides ONCE per re-aim, roster-wide
+  applyRadiation(bodies, G);                // M11: light pushes ONCE per re-aim
 }
 
 // ---------- The integrator: leapfrog (kick-drift-kick) ----------
@@ -231,5 +232,23 @@ function borisTurn(bodies, dt) {
     if (Math.abs(hashAfter - hashBefore) / hashBefore > 1e-12) {
       console.warn(`AUDIT boris: speed hash broke on ${b.name} — integrator tampering`);
     }
+  }
+}
+// ---------- M11: radiation pressure ----------
+// A grain with beta feels light's push as a pure fraction of the Sun's pull.
+// Both fall off as 1/r², so beta is dimensionless and distance-free — the
+// lab distilled it in SI, the engine spends it as-is. No unit bridge at all.
+// Photons carry the momentum: no reaction on the Sun. Honest, logged.
+function applyRadiation(bodies, G) {
+  const sun = bodies.find(b => b.name === 'Sun');
+  if (!sun) return;
+  for (const b of bodies) {
+    if (!b.beta) continue;
+    const dx = b.pos[0] - sun.pos[0];
+    const dy = b.pos[1] - sun.pos[1];
+    const dz = b.pos[2] - sun.pos[2];
+    const r2 = dx*dx + dy*dy + dz*dz;
+    const s  = b.beta * G * sun.mass / (r2 * Math.sqrt(r2));  // + = outward
+    b.acc[0] += s * dx;  b.acc[1] += s * dy;  b.acc[2] += s * dz;
   }
 }

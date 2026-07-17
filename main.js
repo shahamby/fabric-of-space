@@ -138,6 +138,8 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.key.toLowerCase() === 'n') { spawnRogue(); return; }
   if (event.key === 'C') { spawnPolarDust(); return; }   // capital C: Shift held — the bouncers
+  if (event.key === 'x') { spawnSmoke(0.49); return; }   // smoke: bound — ~50 AU and back
+  if (event.key === 'X') { spawnSmoke(0.51); return; }   // Shift: past the knife-edge — gone
   if (event.key.toLowerCase() === 'c') { spawnDust(); return; }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
@@ -335,6 +337,39 @@ function spawnPolarDust() {
     `pitch 63° (climb = vCirc/2). Local |B| ${(Bmag * 1e9).toFixed(2)} nT, ` +
     `gyro-loop ${(2 * Math.PI / (body.qm * Bmag * 86400)).toFixed(1)} d. ` +
     `Watch the bounce: ±16° latitude, ~160-day shuttle (field ${BFIELD.on ? 'ON' : 'OFF'}).`);
+
+  computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
+  E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
+}
+
+// Smoke (M11) — dust born from Earth at Earth's speed: W3's exact setup, live.
+// beta 0.49 climbs to ~50 AU and falls back; beta 0.51 never returns.
+// No qm: the dipole cannot grip it — only light pushes. (Diagram-1 lesson.)
+let smokeCount = 0;
+function spawnSmoke(beta) {
+  smokeCount++;
+  const body = {
+    name: `Smoke-${smokeCount}`,
+    mass_msun: 1e-12,                         // a speck — the roster barely feels it
+    radius_km: 3000,                          // asteroid-sized, so the dot stays visible
+    beta,                                     // push/pull ratio — THE line M11 hangs on
+    color: '#ffd24f',                         // sunlit gold: the pushed ones
+    position_au: [ earthSim.pos[0], earthSim.pos[1], earthSim.pos[2] + 0.02 ],
+    velocity_au_day: [ ...earthSim.vel ],     // the parent's speed
+  };
+
+  simBodies.push({ name: body.name, mass: body.mass_msun, radius_km: body.radius_km,
+    beta: body.beta,
+    pos: [...body.position_au], vel: [...body.velocity_au_day], acc: [0, 0, 0] });
+  const mesh = makeBodyMesh(body);
+  bodyMeshes.push(mesh);
+  scene.add(mesh);
+
+  const a = (1 - beta) / (1 - 2 * beta);      // semi-major axis if bound (release near 1 AU)
+  console.log(`AUDIT: smoke spawn — ${body.name} at day ${simDays.toFixed(1)}, beta ${beta}. ` +
+    (beta < 0.5
+      ? `Bound: apoapsis ~${(2 * a - 1).toFixed(0)} AU, round trip ~${Math.round(365.25 * Math.sqrt(a ** 3 / (1 - beta)))} days.`
+      : `Past the knife-edge (beta >= 1/2): escaping — it never comes back.`));
 
   computeAccelerations(simBodies, G);  // everyone re-aims, newcomer included
   E0 = totalEnergy(simBodies, G);      // new member -> new ledger baseline
@@ -669,9 +704,10 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     panel.textContent = `${b.name}\n` +
       `mass: ${b.mass.toExponential(2)} M☉  (≈ ${(b.mass * 1.989e30).toExponential(2)} kg)\n` +
       `from Sun: ${rSun.toFixed(2)} AU\n` +
-      `speed: ${v.toFixed(1)} km/s\n` +
+      `speed: ${v >= 1 ? v.toFixed(1) + ' km/s' : (v * 1000).toFixed(1) + ' m/s'}\n` +
       `r_s: ${schwarzschildRadiusKm(b.mass).toFixed(4)} km` +
       (b.qm ? `\nqm: ${b.qm} C/kg — charged` : '') +
+      (b.beta ? `\nbeta: ${b.beta} — sunlit` : '') +
       (b.collapsed ? '  — COLLAPSED' : '');
     panel.style.display = 'block';
   } else {
