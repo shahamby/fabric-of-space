@@ -570,3 +570,28 @@ are shelved indefinitely. Road: the galaxy tier.
 
 Next: M12a — lab/galaxyLab.mjs, the Milky Way's gravity measured before
 rendered. W29 recap Sunday 07/19.
+
+## 2026-07-18 — session 04: M12a COMPLETE — the galaxy measured before rendered
+
+lab/galaxyLab.mjs, 5/5 PASS (galaxy units audited against SI in W0):
+- Rotation curve, halo ON: 217, 239, 232, 222, 214, 205 km/s from 2 to
+  24.6 kpc — the flat line. OFF: 200, 212, 185, 161, 141, 117 — the fall.
+- R1: Sun's speed 232.1 km/s at 8.2 kpc (target 230 ± 5).
+- R2: ON drops 11.7% out to 24.6 kpc; OFF drops 37.0%.
+- R3: dark-matter gap at 24.6 kpc = 88.4 km/s.
+- R4 (Shambu's hand): Kepler fingerprint v²·R — ratioOff 1.006 (visible
+  galaxy: Kepler holds), ratioOn 1.563 (halo: Kepler breaks). Vera Rubin's
+  discovery, reproduced at the desk. His PASS/FAIL line used
+  ["FAIL","PASS"][+cond] — unprompted idiomatic JS. The student now writes
+  his own instruments.
+- Every number matched pre-registration to the printed digit.
+
+Bookkeeping: session-03 twin removed, dedupe a502b4d verified on GitHub —
+one copy stands.
+
+Next: M12b — the curve lands on the fabric. Galaxy mode in the browser:
+'g' swaps the scene, the mesh becomes the Milky Way's well (bulge + disk +
+halo potential from this lab), the Sun's dot rides at 8.2 kpc, Sgr A*
+anchors the center, and the halo toggle re-shapes the well LIVE — dark
+matter's effect on the fabric itself. The mission test made literal.
+W29 recap Sunday 07/19 — verify it fires.

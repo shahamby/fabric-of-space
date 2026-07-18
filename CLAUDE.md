@@ -188,7 +188,13 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   x / Shift+X spawn Smoke (beta 0.49 / 0.51) from Earth; panel shows beta;
   sub-km/s speeds now read in m/s (Sun ≈ 13 m/s — Jupiter's reflex wobble).
   Planets' ledger unmoved with smoke alive. Zero new cheats.
-
+- **M12a: COMPLETE** — galaxy tier opens on the mission test: the Milky Way's
+  rotation curve measured in lab/galaxyLab.mjs (bulge + disk + NFW dark halo,
+  G rebuilt from SI). 5/5: W0 unit bridge; R1 Sun 232.1 km/s at 8.2 kpc;
+  R2 flat vs falling (11.7% vs 37.0% drop out to 24.6 kpc); R3 dark-matter
+  gap 88.4 km/s; R4 (Shambu) Kepler fingerprint — v²·R ratio 1.006 without
+  the halo, 1.563 with it. Dark matter as a measured gravitational effect.
+  
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,
