@@ -194,6 +194,11 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   R2 flat vs falling (11.7% vs 37.0% drop out to 24.6 kpc); R3 dark-matter
   gap 88.4 km/s; R4 (Shambu) Kepler fingerprint — v²·R ratio 1.006 without
   the halo, 1.563 with it. Dark matter as a measured gravitational effect.
+- **M12b: COMPLETE** — the measured well on screen. 'g' swaps to galaxy mode
+  (1 unit = 1 kpc): fabric renders galaxyPhi() — bulge + disk + halo from
+  M12a — Sgr A* and the Sun's seat marked (CHEATS #8). 'h' toggles the dark
+  halo LIVE: rim sag ~5.6 -> ~1.6 units, center nearly unmoved — dark
+  matter's effect on the fabric itself. Solar sim untouched underneath.
   
 ## Idea backlog
 

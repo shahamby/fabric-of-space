@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
-import { makeFabric, updateFabric } from './fabric.js';
-import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD } from './physics.js';
+import { makeFabric, updateFabric, updateGalaxyFabric } from './fabric.js';
+import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi } from './physics.js';
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -141,6 +141,22 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'x') { spawnSmoke(0.49); return; }   // smoke: bound — ~50 AU and back
   if (event.key === 'X') { spawnSmoke(0.51); return; }   // Shift: past the knife-edge — gone
   if (event.key.toLowerCase() === 'c') { spawnDust(); return; }
+  if (event.key.toLowerCase() === 'g') {              // M12b: the galaxy fabric
+    GALAXY.on = !GALAXY.on;
+    for (const m of bodyMeshes) m.visible = !GALAXY.on;
+    fieldLines.visible = GALAXY.on ? false : BFIELD.on;
+    sgrA.visible = sunSeat.visible = GALAXY.on;
+    console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
+      `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
+      `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'h') {              // M12b: dark matter, live
+    GALAXY.haloOn = !GALAXY.haloOn;
+    console.log(`AUDIT: dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'} — ` +
+      `phi(24.6 kpc) = ${galaxyPhi(24.6).toFixed(0)} (km/s)^2. Watch the outskirts.`);
+    return;
+  }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
   if (event.code === 'BracketRight') timeScale = Math.min(2048, timeScale * 2);  // invisible ' '
   if (event.code === 'KeyL') fetchAllBodies(); // JPL data from Horizons
@@ -216,6 +232,16 @@ function makeFieldLines() {
 }
 const fieldLines = makeFieldLines();
 scene.add(fieldLines);
+
+// Galaxy markers (M12b): Sgr A* at the center, the Sun's seat at 8.2 kpc.
+// Sizes are display cheats (CHEATS #8) — at true scale both are sub-pixel.
+const sgrA = new THREE.Mesh(new THREE.SphereGeometry(0.8, 24, 24), BLACK_HOLE_MAT);
+sgrA.add(makeHorizonRing());
+const sunSeat = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16),
+  new THREE.MeshBasicMaterial({ color: 0xffd24f }));
+sunSeat.position.set(8.2, 0, 0);
+sgrA.visible = sunSeat.visible = false;
+scene.add(sgrA, sunSeat);
 
 function spawnRogue() {
   rogueCount++;
@@ -644,7 +670,7 @@ async function fetchAllBodies() {
     });
     progressFill.style.width = `${((i + 1) / 9) * 100}%`;
   }
-  progressLabel.textContent = 'All your base belong to us! √';
+  progressLabel.textContent = 'NASA JPL was synchronized √';
   console.log('Live Horizons Data:', results);
   sessionProvenance = {
     source: 'NASA/JPL Horizons API via local Vite proxy',
@@ -693,7 +719,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
   fieldLines.position.copy(sunMesh.position);  // the field lines ride the magnet
 
   const drift = (totalEnergy(simBodies, G) - E0) / Math.abs(E0);
-  hud.textContent = `Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nField: ${BFIELD.on ? 'dipole ON' : 'off'}\nEnergy drift: ${drift.toExponential(2)}\n${periHud}`;
+  hud.textContent = `${GALAXY.on ? `GALAXY — 1 unit = 1 kpc — dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}\n` : ''}Day ${Math.floor(simDays)} — ${timeScale} d/s${paused ? '  [paused]' : ''}\nField: ${BFIELD.on ? 'dipole ON' : 'off'}\nEnergy drift: ${drift.toExponential(2)}\n${periHud}`;
 
 
 
@@ -714,7 +740,8 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     panel.style.display = 'none';
   }
 
-  updateFabric(fabric, simBodies, G, trueScale);
+  if (GALAXY.on) updateGalaxyFabric(fabric);
+  else updateFabric(fabric, simBodies, G, trueScale);
   controls.update();
   renderer.render(scene, camera);
 }

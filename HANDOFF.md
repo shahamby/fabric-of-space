@@ -595,3 +595,26 @@ halo potential from this lab), the Sun's dot rides at 8.2 kpc, Sgr A*
 anchors the center, and the halo toggle re-shapes the well LIVE — dark
 matter's effect on the fabric itself. The mission test made literal.
 W29 recap Sunday 07/19 — verify it fires.
+
+## 2026-07-18 — session 04 addendum: M12b COMPLETE — the well on screen
+
+'g' = galaxy mode: the sheet becomes the Milky Way's potential (1 unit =
+1 kpc), every vertex asking galaxyPhi() — the exact function the lab
+measured 5/5. Sgr A* (black + amber ring, the M7 language) at center; the
+Sun's gold seat at 8.2 kpc. 'h' = dark halo, live: rim sag 5.6 -> 1.6
+scene units while the center funnel barely moves (9.2 -> 8.0) — dark
+matter reshapes the OUTSKIRTS, exactly where the curve refused to fall.
+AUDIT receipts: phi(8.2) = -147556, phi(24.6) = -95236 ON / -13834 OFF.
+(Claudester's hand-log predictions ran 29 and 15 high; the log-free values
+matched to the digit — the hand was convicted, the code exonerated.)
+CHEATS #8 confessed (depth dials + marker inflation; shape honest; physics
+reads neither mesh). Solar sim runs untouched underneath; toggling back
+heals the sheet next frame.
+
+Working agreement amended (2026-07-18): Shambu authors code only in
+lab/*.mjs; all core-file changes arrive as complete snippets with exact
+anchors. Codified in CLAUDE.md and the Claude Project instructions.
+
+Next (Shambu's call): M12c — stars on the sheet: a real-catalog sample
+(HYG) riding the measured curve on the galactic fabric — the well not just
+shaped but ORBITED. W29 recap Sunday 07/19 — verify it fires.

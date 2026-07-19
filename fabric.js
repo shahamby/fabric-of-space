@@ -3,6 +3,7 @@
 // The question asked at the vertex is, " How deep is the gravity well here?"
 // Same per-unit-mass math as the potential energy of a ball on a trampoline, but the "ball" is a planet and the "trampoline" is the fabric of space itself.-
 import * as THREE from 'three';
+import { galaxyPhi } from './physics.js';   // M12b: the measured well
 
 // Honest physics contstants
 const SIZE = 80; // Sheet spans plus (+) and minus (-) 40 AU; Neptune's orbit is -30 AU, so the sheet is big enough to see the whole solar system.
@@ -17,6 +18,9 @@ const PLANET_GAIN = 100; // display-only planet mass boost to exaggerate the dep
 const HOLE_DEPTH = 12;   // Cheat #5: tear floor, scene units — deeper than any honest funnel (~8 max)
 const HOLE_GAIN = 1500;  // Cheat #5: display gain on the horizon radius so the rip is visible
 const KM_PER_AU = 149597870.7;
+// M12b galaxy-mode display dials (cheat #8): shape honest, depth costumed
+const GAL_DEPTH = 6;      // scene units at full log compression
+const GAL_PHI_REF = 1e4;  // (km/s)² "sea level" for the galactic sheet
 
 export function makeFabric() {
   const geometry = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
@@ -65,4 +69,18 @@ export function updateFabric(fabric, simBodies, G, trueMode = false) {
     pos.setY(i, y);
   }
   pos.needsUpdate = true;  // flag the buffer so the GPU re-uploads it this frame
+}
+// M12b: the galactic sheet. One unit = 1 kpc in galaxy mode. Every vertex
+// asks galaxyPhi() — the exact potential the rotation-curve lab measured.
+// Same remap and same log-compression pattern as the solar sheet above.
+export function updateGalaxyFabric(fabric) {
+  const pos = fabric.geometry.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);        // scene X = galactic x, in kpc
+    const yGal = -pos.getZ(i);    // undo the render remap, as ever
+    const R = Math.hypot(x, yGal);
+    const depth = GAL_DEPTH * Math.log10(1 + Math.abs(galaxyPhi(R)) / GAL_PHI_REF);
+    pos.setY(i, -depth);
+  }
+  pos.needsUpdate = true;
 }

@@ -252,3 +252,21 @@ function applyRadiation(bodies, G) {
     b.acc[0] += s * dx;  b.acc[1] += s * dy;  b.acc[2] += s * dz;
   }
 }
+
+// ---------- M12b: the Milky Way's well (galaxy units: kpc, km/s, Msun) ----------
+// The SAME three parts the lab measured (lab/galaxyLab.mjs, 5/5). The fabric
+// reads THIS function — the rendered well is the measured object.
+export const GALAXY = {
+  on: false, haloOn: true,
+  G: 4.301e-6,                       // kpc·(km/s)²/Msun — audited in W0
+  MB: 1.5e10, AB: 0.5,               // bulge
+  MD: 6.5e10, AD: 3.0, BD: 0.3,      // disk
+  MS: 5.0e11, RS: 16,                // dark halo
+};
+export function galaxyPhi(R) {       // potential at planar radius R kpc, (km/s)²
+  const g = GALAXY, r = Math.max(R, 0.05);   // clamp: Sgr A*'s zone, not resolved here
+  let phi = -g.G * g.MB / (r + g.AB)
+          - g.G * g.MD / Math.sqrt(r * r + (g.AD + g.BD) ** 2);
+  if (g.haloOn) phi -= g.G * g.MS * Math.log(1 + r / g.RS) / r;
+  return phi;
+}

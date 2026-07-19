@@ -73,3 +73,15 @@ out of infinity, lines truncated at 0.3 AU so they appear to enter the drawn
 Sun's poles (the Sun's size being itself a confessed cheat), and an opacity
 chosen for contemplation. The field exists everywhere; we draw a skeleton.
 Physics never reads a single vertex of it.
+
+## 8. The galaxy in costume (M12b)
+
+**Where:** `fabric.js` GAL_DEPTH / GAL_PHI_REF; `main.js` galaxy markers.
+
+The well's SHAPE is honest — every vertex asks galaxyPhi(), the same three-
+part potential the rotation-curve lab measured (5/5 receipts) — but the
+depth is log-compressed on its own dials (GAL_DEPTH 6, GAL_PHI_REF 1e4),
+and the two markers are enormously inflated: Sgr A* draws at 0.8 kpc
+against a true horizon near 4e-10 kpc, the Sun's seat at 0.5 kpc against
+~2.3e-11 kpc. At true scale both are sub-pixel. The physics reads neither
+mesh; the solar sim runs untouched underneath galaxy mode.
