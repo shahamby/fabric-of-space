@@ -655,3 +655,43 @@ Next (Shambu's call): M12d candidates — (a) a bigger real catalog with a
 loader, (b) Sgr A* given actual mass in the potential so the inner curve
 turns Keplerian, (c) vertical structure: the disk gets thickness and stars
 bob through the plane.
+
+## 2026-07-20 — session 06: M12d COMPLETE — the halo, measured and clickable
+
+Chose the Harris globular cluster catalogue over a bigger HYG load. Tested
+both: HYG at full size is still a 1 kpc freckle, more dots on the same
+postage stamp. The globulars span 0.6 to 120.5 kpc and carry MEASURED
+velocities — which let the lab ask a question HYG never could.
+
+lab/clusterLab.mjs, every figure matching pre-registration:
+C0 HTTP 200 / 12995 bytes | C1 145 clusters | C2 0.032 kpc | C2b 0.116 kpc |
+C3 0.6-120.5 kpc, 138 on the sheet | C4 escape speeds |
+C5 (Shambu's hand) 10 unbound of 126 without the halo, 0 with it.
+C5 was negative-tested unprompted — the FAIL branch fired, then back to PASS.
+
+C2 is the receipt that matters most: our frame conversion reproduces the
+catalogue's own published Rgc column to 0.032 kpc. The coordinate pipeline
+is checked against a published source, not against itself.
+
+Browser: 'k' loads through the VizieR proxy, falls back to the shipped
+snapshot. NGC 3201 at 8.9 kpc moves at a measured 481.9 km/s. Baryons-only
+escape speed there is 269.5 — it is leaving. Turn the halo on and escape
+rises to 543.2 — it is held. One real object, one measured speed, and dark
+matter is the only thing between 'bound' and 'gone'.
+
+TWO ERRORS OF MINE, both caught by Shambu's screenshot:
+- The D4 receipt quoted 279.4 km/s (the 8.2 kpc value) where NGC 3201 needs
+  the 8.9 kpc value, 269.5. The code was right; my table was wrong.
+- I built clusterProvenance, logged it to console, and never wired it to the
+  P panel or the D download — bug pattern #2, committed inside the very
+  milestone that added it. Worse, the panel printed "No live data this
+  session" AFTER a successful live catalogue fetch. Both fixed: the panel
+  and the download now carry both datasets, with nulls where a source was
+  never touched. The Horizons progress bar also never stood down; it does now.
+
+Ledger patterns confirmed this session: #2 (silent instrument) and #11
+(invisible does not mean unpickable, from M12c).
+
+Next (Shambu's call): M12e candidates — (a) proper motions from Gaia DR3 so
+the clusters get real 3D velocities and real orbits, (b) Sgr A* given actual
+mass in the potential, (c) 3D tracers so the disk gains thickness.

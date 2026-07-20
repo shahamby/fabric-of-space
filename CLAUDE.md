@@ -208,6 +208,13 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   outskirts lag harder. Picking bug fixed — Three.js raycasts invisible
   meshes, so the hidden Sun mesh inside Sgr A* was answering clicks.
   Markers now report kpc/km/s/Myr. CHEATS #9.
+- **M12d: COMPLETE** — the real halo. Harris catalogue (VizieR VII/202,
+  147 rows) fetched live through the proxy: 145 parsed to galactocentric
+  seats, 126 carrying Vlsr; provenance sha'd beside the Horizons ledger.
+  Runaway census (lab/clusterLab.mjs C0–C5, C5 Shambu's hand): halo OFF
+  frees ten clusters on line-of-sight speed alone — a lower bound, since
+  Vlsr is only the sight-line slice of each velocity. Halo ON frees none.
+  Browser: clusters live on the galaxy fabric. Zero new physics cheats.
   
 ## Idea backlog
 

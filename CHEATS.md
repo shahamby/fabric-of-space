@@ -116,3 +116,32 @@ Picking bug fixed in the same milestone: Three.js raycasts invisible meshes
 (it tests layers, not .visible), so the hidden Sun mesh inside Sgr A*'s
 drawn sphere was answering clicks. The picker now filters by visibility and
 swaps target lists by mode.
+
+## 10. The cluster halo (M12d)
+
+**Where:** `main.js` CLUSTERS / clusterCloud / colourClusters.
+
+Positions are MEASURED — Harris (1996, 2010 ed.) via VizieR, and the frame
+conversion is checked against the catalogue's own Rgc column to 0.032 kpc
+(clusterLab C2), which is published rounding and nothing else. Five things
+are not measured:
+
+1. THE VERTICAL AXIS DOES DOUBLE DUTY. The sheet uses scene-y for potential
+   DEPTH. The clusters use the same scene-y for real galactic HEIGHT. Two
+   meanings on one axis. A cluster floating above the sheet is not "less
+   deep in the well" — it is physically above the disk.
+2. THE CLUSTERS DO NOT MOVE. The catalogue gives line-of-sight velocity
+   only. Without proper motions there is no orbit to integrate, and seeding
+   them at circular speed would be a lie — C5 proves these things are not
+   on circular orbits. So they sit still, honestly.
+3. POINT SIZE IS PIXELS. 5 px, sizeAttenuation off. A globular cluster is
+   ~0.05 kpc across; at true scale every one is sub-pixel.
+4. THE COLOUR IS COMPUTED, NOT OBSERVED. Red means a MEASURED speed exceeds
+   the escape speed of OUR MODEL at that radius. Change the halo mass and
+   the colours change; the catalogue does not.
+5. Vlsr IS LINE-OF-SIGHT ONLY. True speeds are equal or greater. The count
+   of ten runaways is a FLOOR, not a ceiling.
+
+The halo parameters were fit to disk kinematics inside 25 kpc and were never
+shown these clusters. That they then bind tracers out to 120 kpc is a
+consistency check, not circular reasoning.
