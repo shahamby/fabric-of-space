@@ -695,3 +695,44 @@ Ledger patterns confirmed this session: #2 (silent instrument) and #11
 Next (Shambu's call): M12e candidates — (a) proper motions from Gaia DR3 so
 the clusters get real 3D velocities and real orbits, (b) Sgr A* given actual
 mass in the potential, (c) 3D tracers so the disk gains thickness.
+
+---- W29 RECAP (2026-07-13 -> 07-19) ----------------------------------
+
+The week Einstein was receipted and the galaxy opened.
+
+1. M8 CLOSED (07/13-14). TOCTOU diff flat to +/-0.05"; LRL witness
+   mounted; two-boot ceremony clean: stamp +42.8"/cy, LRL +42.9"/cy vs
+   GR's 42.98. M8f verdict: 1PN retimes every perihelion +1.140 s/lap;
+   the grid-locked stamp read that slide as fake retrograde. Cure:
+   parabolic sub-step stamping. docs/stamp-bias-verdict.md.
+2. M9 loose end fixed (07/14): findContacts measured from the
+   barycenter, not from A. FAIL-before/PASS-after in
+   lab/contactsReceipt.mjs.
+3. M10a-c: Boris proven in the lab (CHECK 4 Shambu's hand), married
+   into leapfrogStep as the half-turn bracket (DT^2 law restored,
+   x3.83 on halving), dipole skeleton drawn (CHEATS #7), Shift+C polar
+   dust mirrors at +/-16 deg on a ~160-day shuttle.
+4. M10d (07/16 soak): lap stamp cured with the M8f medicine, 2-point
+   dose. Boots at 20 and 2048 d/s match lap-for-lap to the tenth.
+5. M11: light enters. Beta = push/pull, both 1/r^2, no unit bridge.
+   Lab 4/4 with W4 (Shambu) beta-1 coast drifting exactly 0.
+   Knife-edge 0.49/0.51 live from Earth on x / Shift+X.
+6. M12a: galaxy tier opens on the mission test — rotation curve 5/5,
+   R4 (Shambu) Kepler fingerprint 1.006 off / 1.563 on. Dark matter
+   measured: 88.4 km/s.
+7. M12b: the measured well rendered. 'g' galaxy mode, 'h' live halo
+   toggle, rim sag 5.6 -> 1.6. CHEATS #8.
+8. M12c: the well orbited. starsLab 7/7, S4 (Shambu) shear clock with
+   a negative test. Spokes wind into arms; 24 real HYG stars ride
+   along. Bug pattern #11 (raycast ignores .visible) found and fixed.
+   CHEATS #9.
+9. clusterLab landed: 147-row Harris catalogue fetched live, 145
+   parsed, C5 (Shambu) runaway census staged for the fabric.
+10. Ops: commit-msg hook regex tightened to word-boundary M<number>,
+    negative-tested live (07/13).
+
+Shambu's hands this week: CHECK4, W4, R4, S4 (+negative test), C5.
+Cheats filed: #7, #8, #9. New bug pattern: #11.
+Carried into W30: M12d browser wiring + milestone push (07/20), then
+M12e — Gaia proper motions, real 3D velocities, real orbits.
+-----------------------------------------------------------------------
