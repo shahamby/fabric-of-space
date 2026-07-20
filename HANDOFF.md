@@ -618,3 +618,40 @@ anchors. Codified in CLAUDE.md and the Claude Project instructions.
 Next (Shambu's call): M12c — stars on the sheet: a real-catalog sample
 (HYG) riding the measured curve on the galactic fabric — the well not just
 shaped but ORBITED. W29 recap Sunday 07/19 — verify it fires.
+
+## 2026-07-20 — session 05: M12c COMPLETE — the well is orbited
+
+lab/starsLab.mjs 7/7, every digit matching pre-registration:
+W0 1.0227e-3 | S1 232.1 km/s | S2 88.4 km/s | S3 217.1 Myr |
+S3b 6.91e-7 | S3c 1.97e-13 | S4 ratioOn 3.40 / ratioOff 4.76.
+S4 was Shambu's hand. He also ran a NEGATIVE test (threshold moved to
++2.0) and confirmed the FAIL branch fires — the fail-silent shape I
+flagged from the first draft is now closed, and the else stays.
+
+Browser receipt: 'g' then 'j'. Console 'Sun's lap at 8.2 kpc = 217.1 Myr'
+— the lab's S3 number, reproduced by browser-bound code. At 59 Myr with
+the halo ON the four spokes were visibly wound into arms; at 102 Myr with
+the halo OFF the outer arms were still near-radial while the inner knotted
+up — lagging harder at nearly twice the elapsed time. Dark matter's grip
+on the outskirts, drawn as winding. Energy drift -6.05e-10 throughout.
+
+BUG FOUND AND FIXED IN THE SAME MILESTONE (pattern #11, new): Three.js
+raycasts INVISIBLE meshes — intersectObjects tests layers, not .visible.
+In galaxy mode every body mesh is hidden but still pickable, and the Sun's
+0.279-unit display sphere sits INSIDE Sgr A*'s 0.8-unit drawn sphere at the
+origin. Clicking the black hole reported 'Sun'; the stale panel then rode
+the mode switch showing AU and m/s in a kpc scene. Cure: filter targets by
+.visible, swap target lists by mode, clear selection on 'g'. The markers
+now answer for themselves — click the Sun's seat and read 232.1 km/s /
+217.1 Myr with the halo ON, 185.0 km/s / 272.4 Myr with it OFF. Same seat,
+same distance, 47 km/s of dark matter, one click.
+
+CHEATS #9 filed: tracer positions invented, two clocks at once, real stars
+given assumed circular velocities, point sizes in pixels + 0.15 lift, and
+the Sgr A* panel quoting a real mass this potential does not contain (said
+on its own face, with Φ at the 0.05 kpc clamp printed beside it).
+
+Next (Shambu's call): M12d candidates — (a) a bigger real catalog with a
+loader, (b) Sgr A* given actual mass in the potential so the inner curve
+turns Keplerian, (c) vertical structure: the disk gets thickness and stars
+bob through the plane.
