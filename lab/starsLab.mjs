@@ -116,3 +116,6 @@ console.log(`Halo OFF ratio: ${ratioOff.toFixed(2)}`);
 if (ratioOff > ratioOn + 1.0) {
     console.log("PASS: The outskirts fall behind HARDER. The halo tames the shear.");
 }
+else { 
+    console.log("FAIL: TRY AGAIN SUCKA."); 
+}

@@ -270,3 +270,67 @@ export function galaxyPhi(R) {       // potential at planar radius R kpc, (km/s)
   if (g.haloOn) phi -= g.G * g.MS * Math.log(1 + r / g.RS) / r;
   return phi;
 }
+// ---------- M12c: stars that RIDE the well (kpc, Myr) ----------
+// Same potential, same kick-drift-kick shape as the house integrator.
+// Receipted in lab/starsLab.mjs (7/7) before any of it reached the browser.
+export const KMS_TO_KPC_MYR = 3.1557e13 / 3.0857e16;   // W0 bridge: 1.0227e-3
+
+export function galaxyVCirc(R) {          // circular speed, km/s, read off Phi
+  const h = 1e-4;
+  return Math.sqrt(R * (galaxyPhi(R + h) - galaxyPhi(R - h)) / (2 * h));
+}
+
+function galaxyAccel(x, y) {              // kpc/Myr^2, inward along r-hat
+  const R = Math.max(Math.hypot(x, y), 0.05), h = 1e-4;
+  const dPhi = (galaxyPhi(R + h) - galaxyPhi(R - h)) / (2 * h);
+  const a = -dPhi * KMS_TO_KPC_MYR * KMS_TO_KPC_MYR / R;
+  return [a * x, a * y];
+}
+
+export const GAL_STARS = {
+  on: false, myr: 0, carry: 0,
+  DT: 0.2,            // Myr per fixed step — 500+ steps per inner orbit
+  MYR_PER_SEC: 8,     // playback rate; the Sun laps in ~27 s (CHEATS #9)
+  tracers: [],        // synthetic disk sample: shape invented, motion real
+  real: [],           // HYG sample at true positions
+};
+
+function seatStar(name, x, y, z) {        // give it the well's own circular speed
+  const R = Math.hypot(x, y), v = galaxyVCirc(R) * KMS_TO_KPC_MYR;
+  return { name, x, y, z, vx: v * y / R, vy: -v * x / R, R0: R };
+}
+
+// Four straight spokes, 4 -> 25 kpc. They wind because the inner orbits
+// are faster. Differential rotation, drawn.
+export function seedGalaxyStars(hygSample, n = 240) {
+  GAL_STARS.tracers = [];
+  for (let i = 0; i < n; i++) {
+    const arm = i % 4, k = Math.floor(i / 4);
+    const R = 4 + 21 * (k / (n / 4 - 1)), th = arm * Math.PI / 2;
+    GAL_STARS.tracers.push(seatStar(`T${i}`, R * Math.cos(th), R * Math.sin(th), 0));
+  }
+  GAL_STARS.real = hygSample.map(([name, x, y, z]) => seatStar(name, x, y, z));
+  GAL_STARS.myr = 0;
+  GAL_STARS.carry = 0;
+}
+
+function kdk(s, dt) {                     // kick - drift - kick, the house shape
+  let [ax, ay] = galaxyAccel(s.x, s.y);
+  s.vx += 0.5 * dt * ax; s.vy += 0.5 * dt * ay;
+  s.x  += dt * s.vx;     s.y  += dt * s.vy;
+  [ax, ay] = galaxyAccel(s.x, s.y);
+  s.vx += 0.5 * dt * ax; s.vy += 0.5 * dt * ay;
+}
+
+// Fixed-step accumulator — same discipline as the solar loop, own clock.
+export function stepGalaxyStars(realSeconds) {
+  GAL_STARS.carry += realSeconds * GAL_STARS.MYR_PER_SEC;
+  let steps = 0;
+  while (GAL_STARS.carry >= GAL_STARS.DT && steps < 200) {
+    for (const s of GAL_STARS.tracers) kdk(s, GAL_STARS.DT);
+    for (const s of GAL_STARS.real)    kdk(s, GAL_STARS.DT);
+    GAL_STARS.myr += GAL_STARS.DT;
+    GAL_STARS.carry -= GAL_STARS.DT;
+    steps++;
+  }
+}

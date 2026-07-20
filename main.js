@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
-import { makeFabric, updateFabric, updateGalaxyFabric } from './fabric.js';
-import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi } from './physics.js';
+import { makeFabric, updateFabric, updateGalaxyFabric, galaxyDepth } from './fabric.js';
+import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR } from './physics.js';
+import { HYG_SAMPLE } from './hygSample.js';
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -146,8 +147,20 @@ window.addEventListener('keydown', (event) => {
     for (const m of bodyMeshes) m.visible = !GALAXY.on;
     fieldLines.visible = GALAXY.on ? false : BFIELD.on;
     sgrA.visible = sunSeat.visible = GALAXY.on;
+    if (!GALAXY.on) { GAL_STARS.on = false; tracerCloud.visible = realCloud.visible = false; }
+    selected = null; galaxyPick = null; panel.style.display = 'none';   // M12c: no stale readout across the mode switch
     console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
       `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
+      `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'j') {              // M12c: stars on the sheet
+    if (!GALAXY.on) { console.log('AUDIT: press g first — stars ride the galactic sheet.'); return; }
+    GAL_STARS.on = !GAL_STARS.on;
+    if (GAL_STARS.on) { seedGalaxyStars(HYG_SAMPLE); syncGalaxyStars(); }  // every switch-on re-straightens the spokes at t=0
+    tracerCloud.visible = realCloud.visible = GAL_STARS.on;
+    console.log(`AUDIT: galaxy stars ${GAL_STARS.on ? `ON — 4 spokes straight at t=0, 240 tracers + ${HYG_SAMPLE.length} real` : 'OFF'}. ` +
+      `Sun's lap at 8.2 kpc = ${(2 * Math.PI * 8.2 / (galaxyVCirc(8.2) * KMS_TO_KPC_MYR)).toFixed(1)} Myr, ` +
       `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
     return;
   }
@@ -172,6 +185,7 @@ window.addEventListener('keydown', (event) => {
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 let selected = null;
+let galaxyPick = null;            // M12c: sgrA / sunSeat, galaxy mode only
 let downX = 0, downY = 0;
 
 window.addEventListener('pointerdown', (e) => { downX = e.clientX; downY = e.clientY; });
@@ -184,10 +198,19 @@ window.addEventListener('pointerup', (e) => {
   // your third coordinate flip (eclToScene, the plane rotation, now this).
   pointer.x =  (e.clientX / window.innerWidth)  * 2 - 1;
   pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
   raycaster.setFromCamera(pointer, camera);            // aim the ray
-  const hits = raycaster.intersectObjects(bodyMeshes); // everything skewered, nearest first
-  selected = hits.length > 0 ? hits[0].object : null;  // first hit wins; empty space deselects
+
+  // M12c FIX: Three.js raycasts INVISIBLE meshes — it tests layers, not
+  // .visible. In galaxy mode every body mesh is hidden but still skewerable,
+  // and the Sun's 0.279-unit sphere sits INSIDE Sgr A*'s 0.8-unit sphere at
+  // the origin. That is why clicking the black hole reported 'Sun'.
+  // Two rules now: filter by visibility, and swap the target list by mode.
+  const targets = GALAXY.on ? galaxyMarkers : bodyMeshes.filter((m) => m.visible);
+  const hits = raycaster.intersectObjects(targets, false);
+  const hit = hits.length > 0 ? hits[0].object : null;
+
+  if (GALAXY.on) { galaxyPick = hit; selected = null; }   // markers answer here
+  else           { selected = hit; galaxyPick = null; }   // bodies answer there
 
   // Soft glow on the chosen one. The Sun's material has no emissive, hence the guards — it self-selects by glowing anyway.
   for (const m of bodyMeshes) if (m.material.emissive) m.material.emissive.set(0x000000);
@@ -242,6 +265,35 @@ const sunSeat = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16),
 sunSeat.position.set(8.2, 0, 0);
 sgrA.visible = sunSeat.visible = false;
 scene.add(sgrA, sunSeat);
+const galaxyMarkers = [sgrA, sunSeat];   // M12c: the only pickable things in galaxy mode
+// M12c: two star clouds riding the well. Tracers = synthetic disk sample
+// (positions invented, motion real physics). Real = HYG sample at true
+// galactocentric positions. Both confessed in CHEATS #9.
+function makeStarCloud(count, color, size) {
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({
+    color, size, sizeAttenuation: false, transparent: true, opacity: 0.9 }));
+  p.visible = false;
+  return p;
+}
+const tracerCloud = makeStarCloud(240, 0x9fc4ff, 3);
+const realCloud   = makeStarCloud(HYG_SAMPLE.length, 0xffd24f, 6);
+scene.add(tracerCloud, realCloud);
+
+// Lift 0.15 units so the dots clear the wireframe instead of z-fighting it.
+function syncGalaxyStars() {
+  const put = (cloud, list) => {
+    const a = cloud.geometry.attributes.position;
+    for (let i = 0; i < list.length; i++) {
+      const s = list[i];
+      a.setXYZ(i, s.x, galaxyDepth(Math.hypot(s.x, s.y)) + 0.15, -s.y);
+    }
+    a.needsUpdate = true;
+  };
+  put(tracerCloud, GAL_STARS.tracers);
+  put(realCloud, GAL_STARS.real);
+}
 
 function spawnRogue() {
   rogueCount++;
@@ -739,7 +791,30 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
   } else {
     panel.style.display = 'none';
   }
-
+// M12c: the markers answer for themselves, in the galaxy's own units —
+  // no AU, no days. Clicking the Sun's seat reports what the well DEMANDS
+  // of anything sitting there; press h and the same click reads different.
+  if (galaxyPick === sgrA) {
+    panel.textContent = `Sgr A* — the galactic center\n` +
+      `real mass: 4.30e+6 M☉  (NOT in this potential)\n` +
+      `r_s: ${schwarzschildRadiusKm(4.30e6).toExponential(3)} km\n` +
+      `Φ at the 0.05 kpc clamp: ${galaxyPhi(0.05).toFixed(0)} (km/s)²\n` +
+      `drawn at 0.8 kpc — CHEATS #8`;
+    panel.style.display = 'block';
+  } else if (galaxyPick === sunSeat) {
+    const vc = galaxyVCirc(8.2);
+    panel.textContent = `The Sun's seat\n` +
+      `R: 8.20 kpc from Sgr A*\n` +
+      `circular speed: ${vc.toFixed(1)} km/s\n` +
+      `lap: ${(2 * Math.PI * 8.2 / (vc * KMS_TO_KPC_MYR)).toFixed(1)} Myr\n` +
+      `dark halo: ${GALAXY.haloOn ? 'ON' : 'OFF'}`;
+    panel.style.display = 'block';
+  } 
+if (GALAXY.on && GAL_STARS.on) {                    // M12c: the disk turns
+    if (!paused) stepGalaxyStars(real);
+    syncGalaxyStars();
+    hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap 217.1 Myr`;
+  }
   if (GALAXY.on) updateGalaxyFabric(fabric);
   else updateFabric(fabric, simBodies, G, trueScale);
   controls.update();

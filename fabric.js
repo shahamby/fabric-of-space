@@ -79,8 +79,12 @@ export function updateGalaxyFabric(fabric) {
     const x = pos.getX(i);        // scene X = galactic x, in kpc
     const yGal = -pos.getZ(i);    // undo the render remap, as ever
     const R = Math.hypot(x, yGal);
-    const depth = GAL_DEPTH * Math.log10(1 + Math.abs(galaxyPhi(R)) / GAL_PHI_REF);
-    pos.setY(i, -depth);
+    pos.setY(i, galaxyDepth(R));
   }
   pos.needsUpdate = true;
+}
+// M12c: the sheet's own height at radius R. One source of truth, so a star
+// placed on the fabric sits ON the fabric — never above it, never through it.
+export function galaxyDepth(R) {
+  return -GAL_DEPTH * Math.log10(1 + Math.abs(galaxyPhi(R)) / GAL_PHI_REF);
 }

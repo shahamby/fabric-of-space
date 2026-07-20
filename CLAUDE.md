@@ -199,6 +199,15 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   M12a — Sgr A* and the Sun's seat marked (CHEATS #8). 'h' toggles the dark
   halo LIVE: rim sag ~5.6 -> ~1.6 units, center nearly unmoved — dark
   matter's effect on the fabric itself. Solar sim untouched underneath.
+- **M12c: COMPLETE** — the well is ORBITED. lab/starsLab.mjs 7/7 (W0 bridge;
+  S1 232.1 km/s; S2 gap 88.4; S3 lap 217.1 Myr; S3b drift 6.9e-7; S3c dE/E
+  2.0e-13; S4 (Shambu) shear clock 3.40 ON vs 4.76 OFF, with a negative test
+  proving the FAIL branch fires). Browser: 'j' seeds 4 straight spokes
+  (240 tracers, 4-25 kpc) + 24 real HYG stars at true positions, all
+  leapfrogged in galaxyPhi. Spokes wind into arms; halo OFF makes the
+  outskirts lag harder. Picking bug fixed — Three.js raycasts invisible
+  meshes, so the hidden Sun mesh inside Sgr A* was answering clicks.
+  Markers now report kpc/km/s/Myr. CHEATS #9.
   
 ## Idea backlog
 
