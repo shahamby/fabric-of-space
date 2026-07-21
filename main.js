@@ -3,9 +3,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric, updateGalaxyFabric, galaxyDepth } from './fabric.js';
-import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR } from './physics.js';
+import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR, GAL_CLUSTERS, seedClusterVelocities, clusterOrbit } from './physics.js';
 import { HYG_SAMPLE } from './hygSample.js';
-import harrisSnapshot from './data/harris_gc.tsv?raw';   // M12d: the shipped fallback
+import harrisVrSnapshot from './data/harris_vr.tsv?raw';  // M12e: Harris incl. heliocentric Vr
+import gaiaSnapshot from './data/gaia_pm.tsv?raw';        // M12e: Gaia EDR3 proper motions
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -150,7 +151,7 @@ window.addEventListener('keydown', (event) => {
     sgrA.visible = sunSeat.visible = GALAXY.on;
     if (!GALAXY.on) { GAL_STARS.on = false; tracerCloud.visible = realCloud.visible = false; }
     selected = null; galaxyPick = null; panel.style.display = 'none';   // M12c: no stale readout across the mode switch
-    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; }   // M12d
+    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; }   // M12d/M12e
     console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
       `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
       `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
@@ -170,6 +171,7 @@ window.addEventListener('keydown', (event) => {
     if (!GALAXY.on) { console.log('AUDIT: press g first — clusters live at galactic scale.'); return; }
     if (!CLUSTERS.loaded) { loadClusters(); return; }
     clusterCloud.visible = !clusterCloud.visible;
+    if (!clusterCloud.visible) { clusterPick = null; refreshClusterTrail(); }
     console.log(`AUDIT: globular clusters ${clusterCloud.visible ? 'shown' : 'hidden'} ` +
       `(${CLUSTERS.list.length} loaded from ${CLUSTERS.source}).`);
     return;
@@ -178,7 +180,10 @@ window.addEventListener('keydown', (event) => {
     GALAXY.haloOn = !GALAXY.haloOn;
     console.log(`AUDIT: dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'} — ` +
       `phi(24.6 kpc) = ${galaxyPhi(24.6).toFixed(0)} (km/s)^2. Watch the outskirts.`);
-    if (CLUSTERS.loaded) console.log(`AUDIT: ${colourClusters()} of 126 measured clusters now exceed escape speed.`);
+    if (CLUSTERS.loaded) {
+      console.log(`AUDIT: ${colourClusters()} clusters now unbound — futures changed mid-flight.`);
+      if (clusterPick !== null) refreshClusterTrail();   // same cluster, new fate
+    }
     return;
   }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
@@ -229,7 +234,8 @@ window.addEventListener('pointerup', (e) => {
     const cHits = raycaster.intersectObject(clusterCloud, false);
     clusterPick = cHits.length > 0 ? cHits[0].index : null;
     if (clusterPick !== null) galaxyPick = null;
-  } else { clusterPick = null; }
+    refreshClusterTrail();
+  } else { clusterPick = null; clusterTrail.visible = false; }
 
   // Soft glow on the chosen one. The Sun's material has no emissive, hence the guards — it self-selects by glowing anyway.
   for (const m of bodyMeshes) if (m.material.emissive) m.material.emissive.set(0x000000);
@@ -290,33 +296,50 @@ const galaxyMarkers = [sgrA, sunSeat];   // M12c: the only pickable things in ga
 // validated against the catalogue's own Rgc column in clusterLab C2).
 // COLOUR IS COMPUTED: red means this cluster's measured speed is greater
 // than the escape speed of the galaxy AS CURRENTLY CONFIGURED. Press h and
-// ten real objects change their mind about whether they are leaving.
+// twenty-one real objects change their fate mid-flight (M12e).
 const CLUSTERS = { loaded: false, list: [], source: null };
 let clusterProvenance = null;
 let clusterPick = null;
 
 function parseHarrisTSV(text) {
   // VizieR TSV: '#' comments, then header / units / dashes, then rows.
+  // M12e columns: ID,Name,Rsun,Rgc,X,Y,Z,Vr,Vlsr — same layout as the lab
+  // snapshot data/harris_vr.tsv, so live and fallback parse identically.
   const lines = text.split('\n').filter((l) => l && !l.startsWith('#')).slice(3);
   const out = [];
   for (const line of lines) {
     const f = line.split('\t').map((s) => s.trim());
-    const [id, name, glon, glat, rsun, rgc, X, Y, Z, vlsr] = f;
-    if (!X || !Y || !Z || !rgc) continue;      // a few rows carry no position
+    const [id, name, rsun, rgc, X, Y, Z, vr, vlsr] = f;
+    if (!rsun || !rgc || !X || !Y || !Z) continue;   // a few rows carry no position
     // Harris X/Y/Z are HELIOCENTRIC: X to the galactic centre, Y to
     // rotation, Z to the north pole. Our frame puts Sgr A* at the origin
-    // and the Sun at +8.2 on X — a 180-degree turn about Z, handedness
-    // intact. Receipted in lab/clusterLab.mjs C2 (0.032 kpc, rounding only).
+    // and the Sun at +8.2 on X — receipted in clusterLab C2 (0.032 kpc).
     out.push({
       id: id || name,
       x: 8.2 - (+X), y: -(+Y), z: +Z,
-      R: +rgc,
-      v: vlsr === '' ? null : Math.abs(+vlsr),   // line-of-sight ONLY (CHEATS #10)
+      R: +rgc, rsun: +rsun,
+      v: vlsr === '' ? null : Math.abs(+vlsr),   // line-of-sight, LSR frame (legacy)
+      vr: vr === '' ? null : +vr,                // HELIOCENTRIC — the vector math's fuel
     });
   }
   return out;
 }
-
+// M12e: Gaia EDR3 mean proper motions, keyed by normalized name AND
+// alternate name. pmRA already carries the cos(Dec) — gaiaLab G0 checked.
+let gaiaProvenance = null;
+const normName = (s) => (s || '').toUpperCase().replace(/\s+/g, '');
+function parseGaiaPM(text) {
+  const lines = text.split('\n').filter((l) => l && !l.startsWith('#')).slice(3);
+  const map = new Map();
+  for (const line of lines) {
+    const [name, oname, ra, de, pmra, pmde] = line.split('\t').map((s) => s.trim());
+    if (!ra || !de || !pmra || !pmde) continue;
+    const rec = { ra: +ra, de: +de, pmra: +pmra, pmde: +pmde };
+    map.set(normName(name), rec);
+    if (oname) map.set(normName(oname), rec);
+  }
+  return map;
+}
 // The speed at which kinetic energy equals the depth of the well. This
 // reads GALAXY.haloOn through galaxyPhi, so it re-answers when you press h.
 function escapeSpeed(R) { return Math.sqrt(2 * Math.abs(galaxyPhi(R))); }
@@ -327,6 +350,26 @@ const clusterCloud = new THREE.Points(
     vertexColors: true, transparent: true, opacity: 0.95 }));
 clusterCloud.visible = false;
 scene.add(clusterCloud);
+// M12e: the picked cluster's FUTURE, drawn — integrated live in the current
+// halo. Bound = a closed rosette. Halo off = a straight goodbye.
+const clusterTrail = new THREE.Line(
+  new THREE.BufferGeometry(),
+  new THREE.LineBasicMaterial({ color: 0x66e0d0, transparent: true, opacity: 0.85 }));
+clusterTrail.visible = false;
+scene.add(clusterTrail);
+let clusterOrbitInfo = null;
+
+function refreshClusterTrail() {
+  const c = clusterPick !== null ? CLUSTERS.list[clusterPick] : null;
+  if (!c || c.vx === undefined || !clusterCloud.visible) {
+    clusterTrail.visible = false; clusterOrbitInfo = null; return;
+  }
+  clusterOrbitInfo = clusterOrbit(c);            // 6 Gyr, or first exit past 250 kpc
+  const pts = clusterOrbitInfo.pts.map(([x, y, z]) => new THREE.Vector3(x, z, -y));
+  clusterTrail.geometry.dispose();
+  clusterTrail.geometry = new THREE.BufferGeometry().setFromPoints(pts);
+  clusterTrail.visible = true;
+}
 
 // Scene axes: X = galactic X, Z = -galactic Y, Y = real galactic height.
 // The sheet uses that same Y for potential DEPTH. Two meanings, one axis —
@@ -344,65 +387,111 @@ function buildClusterCloud() {
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
   g.computeBoundingSphere();
 }
+// M12e: clusters MOVE now — positions repainted every frame. Same scene
+// mapping as buildClusterCloud: X = sim x, Y(up) = real height z, Z = -sim y.
+function syncClusterCloud() {
+  const a = clusterCloud.geometry.attributes.position;
+  if (!a) return;
+  for (let i = 0; i < CLUSTERS.list.length; i++) {
+    const c = CLUSTERS.list[i];
+    a.setXYZ(i, c.x, c.z, -c.y);
+  }
+  a.needsUpdate = true;
+}
 
 function colourClusters() {
   const col = clusterCloud.geometry.attributes.color;
   if (!col) return 0;
-  let runaways = 0;
+  let unbound = 0;
   for (let i = 0; i < CLUSTERS.list.length; i++) {
     const c = CLUSTERS.list[i];
-    if (c.v === null)              col.setXYZ(i, 0.45, 0.45, 0.50);  // no speed measured
-    else if (c.v > escapeSpeed(c.R)) { col.setXYZ(i, 1.00, 0.25, 0.20); runaways++; }
-    else                           col.setXYZ(i, 0.62, 0.78, 1.00);  // held
+    if (c.vx !== undefined) {
+      // Movers get the honest verdict: total energy in the CURRENT halo.
+      // E = v^2/2 + phi(r) < 0 means held — same test as escape speed.
+      const vk = Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR;   // km/s
+      const r = Math.hypot(c.x, c.y, c.z);
+      if (0.5 * vk * vk + galaxyPhi(r) < 0) col.setXYZ(i, 0.62, 0.78, 1.00);
+      else { col.setXYZ(i, 1.00, 0.25, 0.20); unbound++; }
+    } else if (c.v !== null) {
+      // No proper motion: line-of-sight only. One slice cannot convict or
+      // acquit (the M12e frame lesson) — muted colours say so.
+      if (c.v > escapeSpeed(c.R)) col.setXYZ(i, 1.00, 0.55, 0.20);
+      else col.setXYZ(i, 0.50, 0.62, 0.80);
+    } else col.setXYZ(i, 0.45, 0.45, 0.50);      // no speed measured at all
   }
   col.needsUpdate = true;
-  return runaways;
+  return unbound;
 }
-
 async function loadClusters() {
-  const params = '?-source=VII/202/catalog'
-    + '&-out=ID,Name,GLON,GLAT,Rsun,Rgc,X,Y,Z,Vlsr&-out.max=200';
-  let text, source;
+  const harrisQ = '?-source=VII/202/catalog'
+    + '&-out=ID,Name,Rsun,Rgc,X,Y,Z,Vr,Vlsr&-out.max=200';
+  const gaiaQ = '?-source=J/MNRAS/505/5978/tablea1'
+    + '&-out=Name,OName,RAJ2000,DEJ2000,pmRA,pmDE&-out.max=300';
   progressBox.style.display = 'block';
   progressLabel.textContent = 'Collecting globular clusters » VizieR';
-  progressFill.style.width = '40%';
-  try {
-    const res = await fetch('/api/vizier' + params);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    text = await res.text();
-    if (text.length < 5000) throw new Error(`short body, ${text.length} bytes`);
-    source = 'VizieR live';
-  } catch (err) {
-    console.log(`AUDIT: VizieR fetch failed (${err.message}) — using the shipped snapshot.`);
-    text = harrisSnapshot;
-    source = 'shipped snapshot data/harris_gc.tsv';
+  progressFill.style.width = '25%';
+
+  async function grab(q, fallback, minBytes, label) {
+    try {
+      const res = await fetch('/api/vizier' + q);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      if (text.length < minBytes) throw new Error(`short body, ${text.length} bytes`);
+      return { text, source: 'VizieR live' };
+    } catch (err) {
+      console.log(`AUDIT: ${label} fetch failed (${err.message}) — using the shipped snapshot.`);
+      return { text: fallback, source: 'shipped snapshot' };
+    }
   }
-  CLUSTERS.list = parseHarrisTSV(text);
-  CLUSTERS.source = source;
+  const harris = await grab(harrisQ, harrisVrSnapshot, 5000, 'Harris');
+  progressFill.style.width = '55%';
+  const gaia = await grab(gaiaQ, gaiaSnapshot, 8000, 'Gaia PM');
+  progressFill.style.width = '80%';
+
+  CLUSTERS.list = parseHarrisTSV(harris.text);
+  CLUSTERS.source = harris.source;
+  const pmMap = parseGaiaPM(gaia.text);
+  let matched = 0;
+  for (const c of CLUSTERS.list) {
+    const pm = pmMap.get(normName(c.id));
+    if (pm) { Object.assign(c, pm); matched++; }
+  }
+  const seeded = seedClusterVelocities(CLUSTERS.list);  // gaiaLab's pipeline, receipted
+  GAL_CLUSTERS.list = CLUSTERS.list;
+  GAL_CLUSTERS.on = seeded > 0;
   CLUSTERS.loaded = true;
   buildClusterCloud();
-  const runaways = colourClusters();
+  const unbound = colourClusters();
   clusterCloud.visible = true;
   progressFill.style.width = '100%';
-  progressLabel.textContent = `${CLUSTERS.list.length} globular clusters loaded √`;
+  progressLabel.textContent = `${CLUSTERS.list.length} clusters — ${seeded} in flight √`;
   setTimeout(() => { progressBox.style.display = 'none'; }, 1500);
 
-  const withV = CLUSTERS.list.filter((c) => c.v !== null).length;
   clusterProvenance = {
-    source: `Harris catalogue of Milky Way globular clusters (1996, 2010 ed.) — ${source}`,
+    source: `Harris catalogue (1996, 2010 ed.) — ${harris.source}`,
     endpoint: 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=VII/202/catalog',
     frame: 'galactocentric; Sgr A* at origin, Sun at +8.2 kpc on X',
-    units: 'kpc, km/s (Vlsr is line-of-sight only)',
+    units: 'kpc, km/s (Vr heliocentric feeds the 3D pipeline; Vlsr kept for the record)',
     session: new Date().toISOString(),
     clusters: CLUSTERS.list.length,
-    withVelocity: withV,
-    bytes: text.length,
-    sha256: await sha256Hex(text),
+    withVelocity: CLUSTERS.list.filter((c) => c.v !== null).length,
+    bytes: harris.text.length,
+    sha256: await sha256Hex(harris.text),
+  };
+  gaiaProvenance = {
+    source: `Gaia EDR3 cluster proper motions (Vasiliev & Baumgardt 2021) — ${gaia.source}`,
+    endpoint: 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=J/MNRAS/505/5978/tablea1',
+    pipeline: 'lab/gaiaLab.mjs G0-G5b: bridge 4.7405, round trip 6e-9, dt-halving 4.00',
+    session: new Date().toISOString(),
+    matched, seeded,
+    bytes: gaia.text.length,
+    sha256: await sha256Hex(gaia.text),
   };
   console.log('Cluster provenance:', clusterProvenance);
-  console.log(`AUDIT: ${CLUSTERS.list.length} globular clusters, ${withV} with measured speeds. ` +
-    `${runaways} exceed escape speed with the dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}. ` +
-    `Rgc spans 0.6 to 120.5 kpc — zoom out to see the halo.`);
+  console.log('Gaia provenance:', gaiaProvenance);
+  console.log(`AUDIT: ${CLUSTERS.list.length} clusters, ${matched} matched to Gaia, ` +
+    `${seeded} carrying full 3D velocities — IN FLIGHT on the galaxy clock. ` +
+    `${unbound} unbound with the dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}. Click one for its future.`);
 }
 // M12c: two star clouds riding the well. Tracers = synthetic disk sample
 // (positions invented, motion real physics). Real = HYG sample at true
@@ -806,6 +895,19 @@ function renderProvenance() {
   } else {
     blocks.push('SOLAR    no live fetch this session — shipped snapshot (bodies.json).');
   }
+  // M12e: the THIRD dataset — Gaia proper motions. Same rule as M12d: an
+  // absent record is itself a fact worth writing down.
+  if (gaiaProvenance) {
+    blocks.push(
+      `SOURCE   ${gaiaProvenance.source}\n` +
+      `PIPELINE ${gaiaProvenance.pipeline}\n` +
+      `SESSION  ${gaiaProvenance.session}\n\n` +
+      `matched  ${gaiaProvenance.matched} of 145, ${gaiaProvenance.seeded} seeded with 3D velocity\n` +
+      `bytes    ${gaiaProvenance.bytes}\n` +
+      `sha256=${gaiaProvenance.sha256.slice(0, 12)}…  OK`);
+  } else {
+    blocks.push('GAIA PMs not loaded this session — press k in galaxy mode.');
+  }
 
   // M12d: the catalogue is a SECOND dataset and gets its own block. The old
   // panel knew only about Horizons, so loading clusters live still printed
@@ -907,6 +1009,7 @@ function downloadProvenance() {
     generated: new Date().toISOString(),
     solarSystem: sessionProvenance,
     globularClusters: clusterProvenance,
+    gaiaProperMotions: gaiaProvenance,
   };
   const blob = new Blob([JSON.stringify(bundle, null, 2)],
                         { type: 'application/json' });
@@ -978,24 +1081,41 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
       `dark halo: ${GALAXY.haloOn ? 'ON' : 'OFF'}`;
     panel.style.display = 'block';
   }
-// M12d: a real object gives its own verdict. Measured speed on one line,
-  // this galaxy's escape speed on the next. Press h and the verdict flips.
+// M12e: a real object gives its own verdict — now with its whole future.
+  // Press h: the SAME cluster re-answers with a new fate.
   if (clusterPick !== null && CLUSTERS.list[clusterPick]) {
     const c = CLUSTERS.list[clusterPick];
-    const esc = escapeSpeed(c.R);
-    panel.textContent = `${c.id} — globular cluster\n` +
-      `Rgc: ${c.R.toFixed(1)} kpc    height z: ${c.z.toFixed(1)} kpc\n` +
-      (c.v === null ? `line-of-sight speed: not measured\n`
-                    : `measured |Vlsr|: ${c.v.toFixed(1)} km/s\n`) +
-      `escape speed here: ${esc.toFixed(1)} km/s  (halo ${GALAXY.haloOn ? 'ON' : 'OFF'})\n` +
-      (c.v === null ? `verdict: unknown — no velocity in the catalogue`
-       : c.v > esc  ? `verdict: UNBOUND — this one is leaving`
-                    : `verdict: bound`);
-    panel.style.display = 'block';
+    if (c.vx !== undefined) {
+      const r = Math.hypot(c.x, c.y, c.z);
+      const vk = Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR;
+      const bound = 0.5 * vk * vk + galaxyPhi(r) < 0;
+      const o = clusterOrbitInfo;
+      panel.textContent = `${c.id} — globular cluster, IN FLIGHT\n` +
+        `r: ${r.toFixed(1)} kpc    height z: ${c.z.toFixed(1)} kpc\n` +
+        `speed |v3D|: ${vk.toFixed(1)} km/s  (Gaia + Harris, receipted)\n` +
+        `escape here: ${escapeSpeed(r).toFixed(1)} km/s  (halo ${GALAXY.haloOn ? 'ON' : 'OFF'})\n` +
+        `verdict: ${bound ? 'bound' : 'UNBOUND — this one is leaving'}\n` +
+        (o ? (o.left ? `future: crosses 250 kpc — no return`
+                     : `future: peri ${o.rmin.toFixed(1)} / apo ${o.rmax.toFixed(1)} kpc — the trail`)
+           : '');
+      panel.style.display = 'block';
+    } else {
+      const esc = escapeSpeed(c.R);
+      panel.textContent = `${c.id} — globular cluster\n` +
+        `Rgc: ${c.R.toFixed(1)} kpc    height z: ${c.z.toFixed(1)} kpc\n` +
+        (c.v === null ? `line-of-sight speed: not measured\n`
+                      : `measured |Vlsr|: ${c.v.toFixed(1)} km/s (no proper motion — sits still, honestly)\n`) +
+        `escape speed here: ${esc.toFixed(1)} km/s  (halo ${GALAXY.haloOn ? 'ON' : 'OFF'})\n` +
+        (c.v === null ? `verdict: unknown — no velocity in the catalogue`
+         : c.v > esc  ? `verdict: line-of-sight already exceeds escape`
+                      : `verdict: not decidable from one slice`);
+      panel.style.display = 'block';
+    }
   }
-if (GALAXY.on && GAL_STARS.on) {                    // M12c: the disk turns
+if (GALAXY.on && (GAL_STARS.on || GAL_CLUSTERS.on)) {   // M12c: the disk turns; M12e: the halo flies
     if (!paused) stepGalaxyStars(real);
-    syncGalaxyStars();
+    if (GAL_STARS.on) syncGalaxyStars();
+    if (GAL_CLUSTERS.on && clusterCloud.visible) { syncClusterCloud(); colourClusters(); }
     hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap 217.1 Myr`;
   }
   if (GALAXY.on) updateGalaxyFabric(fabric);

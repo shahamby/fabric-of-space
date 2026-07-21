@@ -134,6 +134,9 @@ are not measured:
    only. Without proper motions there is no orbit to integrate, and seeding
    them at circular speed would be a lie — C5 proves these things are not
    on circular orbits. So they sit still, honestly.
+   [AMENDED 2026-07-21, M12e: cured. 126 of 145 now carry Gaia+Harris 3D
+   velocities and leapfrog live in galaxyPhi. The 19 without proper
+   motions still sit still, honestly.]
 3. POINT SIZE IS PIXELS. 5 px, sizeAttenuation off. A globular cluster is
    ~0.05 kpc across; at true scale every one is sub-pixel.
 4. THE COLOUR IS COMPUTED, NOT OBSERVED. Red means a MEASURED speed exceeds
@@ -141,7 +144,38 @@ are not measured:
    the colours change; the catalogue does not.
 5. Vlsr IS LINE-OF-SIGHT ONLY. True speeds are equal or greater. The count
    of ten runaways is a FLOOR, not a ceiling.
+   [AMENDED 2026-07-21, M12e: the floor claim was WRONG. Vlsr still rides
+   the Sun's ~232 km/s rotation (LSR removes only the ~13 km/s peculiar
+   drift), so it can EXCEED the true galactocentric speed — NGC 3201 reads
+   481.9 along the sight line but 367.6 through space. The honest census
+   uses |v3D|: 21 leave the baryons-only galaxy, 0 leave with the halo.]
 
 The halo parameters were fit to disk kinematics inside 25 kpc and were never
 shown these clusters. That they then bind tracers out to 120 kpc is a
 consistency check, not circular reasoning.
+
+## 11. The flying halo (M12e)
+
+**Where:** `physics.js` GAL_CLUSTERS / seedClusterVelocities / clusterOrbit;
+`main.js` clusterTrail / syncClusterCloud / colourClusters.
+
+The velocities are MEASURED — Gaia EDR3 proper motions (Vasiliev &
+Baumgardt 2021) times Harris distances, plus heliocentric Vr, through the
+pipeline receipted in lab/gaiaLab.mjs G0-G5b. Five things are not:
+
+1. POSITIONS ARE MEASURED AT LOAD ONLY. The instant 'k' finishes, the
+   clusters fly in OUR potential on OUR clock. A seat on screen after
+   N Myr is this model's extrapolation, not the catalogue's row.
+2. THE TRAIL SHOWS THE FUTURE WHILE THE DOT LIVES THE PRESENT. Two times
+   on one screen — CHEATS #9's two-clocks disease, third strain. The trail
+   is a real integration (dt 0.5 Myr, sampled every 10 Myr, capped at
+   6 Gyr or the 250 kpc exit), but the sampling, cap, and cyan are display.
+3. COLOUR IS COMPUTED, IN TWO DIALECTS. Movers: red means positive total
+   energy in the CURRENT halo. The 19 Vlsr-only holdouts wear muted
+   orange/steel from the old one-slice comparison, which can neither
+   convict nor acquit — the M12e frame lesson, worn as a colour.
+4. THE h KEY EDITS THE UNIVERSE MID-FLIGHT. Energies jump when the halo
+   vanishes — authorized model surgery, AUDIT-logged, not a leak.
+5. ERROR BARS RIDE INVISIBLY. Proper-motion and distance uncertainties
+   propagate into every v3D; the census counts carry few-cluster error
+   bars this display does not draw.

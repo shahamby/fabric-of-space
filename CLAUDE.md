@@ -215,6 +215,16 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   frees ten clusters on line-of-sight speed alone — a lower bound, since
   Vlsr is only the sight-line slice of each velocity. Halo ON frees none.
   Browser: clusters live on the galaxy fabric. Zero new physics cheats.
+- **M12e: COMPLETE** — the halo flies. Gaia EDR3 proper motions (VizieR
+  J/MNRAS/505/5978) crossed with Harris distances and heliocentric Vr give
+  126 clusters full 3D galactocentric velocities; all leapfrog live in
+  galaxyPhi on the galaxy clock. Lab receipted (lab/gaiaLab.mjs G0-G5b:
+  bridge 4.7405, matrix anchors, cross-catalog handshake 0.23 deg, round
+  trip 6e-9, curve handshake 232.1, census 10 -> 21 -> 0, dt-halving 4.00;
+  G5 Shambu's hand: NGC 3201 peri 8.65 / apo 37.93, dE 6.9e-5, negative
+  test flies to 1541 kpc). Browser: clusters in flight, click one for its
+  integrated future (trail + peri/apo), h re-fates 21 real objects live.
+  Frame lesson banked: Vlsr is not a floor — CHEATS #10 amended, #11 filed.
   
 ## Idea backlog
 

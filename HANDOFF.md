@@ -224,6 +224,10 @@ Mercury..Neptune = '1'..'8' (NOT 9 — that's Pluto; Shambu caught my error).
    Verify main.js changes independently after any mixed delivery.
 5. Field names singular/plural (data.results vs .result). Teach: log the
    whole envelope, inspect compartments, stop guessing.
+6. Gate below the floor: a PASS/FAIL threshold set beneath the
+    instrument's own noise (matrix truncation ~1e-8; leapfrog wobble
+    ~(omega*dt)^2). Struck twice in one file. Measure the floor first —
+    dt-halving, component rounding — then set the gate above it.
 
 ## Process facts that matter
 
@@ -736,3 +740,105 @@ Cheats filed: #7, #8, #9. New bug pattern: #11.
 Carried into W30: M12d browser wiring + milestone push (07/20), then
 M12e — Gaia proper motions, real 3D velocities, real orbits.
 -----------------------------------------------------------------------
+
+==== SESSION 2026-07-20 (close) — M12d shipped, M12e staged ===========
+
+M12d PUSH UNBLOCKED. The hook was right, not broken: CLAUDE.md had no
+edits, so `git add CLAUDE.md` staged nothing and the milestone message
+was correctly BLOCKED. Cure was the missing Status bullet. Landed as
+248090a with the VizieR proxy and .gitignore riding along — a fresh
+clone can now reproduce M12d. W29 recap appended same day.
+
+M12e OPENED — option (a), Gaia proper motions. Source verified live:
+Vasiliev & Baumgardt 2021, VizieR J/MNRAS/505/5978/tablea1, 170
+clusters, pmRA/pmDE in mas/yr. It carries no distances or RVs — good:
+Harris already owns both. One fetch, one name-join.
+
+lab/gaiaLab.mjs DELIVERED IN CHAT (not yet in repo). What is in it:
+  - phi() copied from physics.js GALAXY, forced to re-earn M12a's R1
+    before judging anyone (G3: v_c(8.2 kpc) must answer 232.1).
+  - EQ2GAL rotation receipted at load — row 3 rebuilds from the NGP
+    angles, rows orthonormal — and velRepo() must round-trip a
+    galaxy-rest cluster to zero. Fail-loud, before any receipt prints.
+  - RV note: Harris Vr (HELIOCENTRIC), not Vlsr — solar motion is
+    added exactly once, inside velRepo(). Vlsr rides only for C5
+    kinship.
+  - Receipts G0-G5, then G6 = SHAMBU'S HAND: derive the 4.74047
+    bridge from the AU, the Julian year, and the parsec identity
+    (kpc-in-AU x mas-in-rad = 1 exactly). Negative test required.
+Claude dry-ran it against live VizieR: G0-G5 PASS, G6 waiting. One
+seal died honest: G2 first expected 47 Tuc at 4.5 kpc (2010-edition
+memory) — VII/202 is the 1996 edition and says 4.3, so v_t is 119.0
+not 124.6. The known-answer check bit its own maker first. Corrected
+and confessed in the file's comment.
+
+SEALED FOR SHAMBU'S CEREMONY (the answers exist in the 07/20 chat's
+tool blocks — seal before scrolling back):
+  1. G1 join count, out of 145.
+  2. G5 halo OFF: C5's ten was a sight-line count; the full vector
+     can add AND remove members. Your number?
+  3. G5 halo ON: who, if anyone, still leaves?
+  4. G4: fastest cluster? (You met one famous speedster in M12d.)
+
+NEXT SESSION OPENS WITH:
+  1. Fresh-clone audit (always).
+  2. Create lab/gaiaLab.mjs from chat, write the ~6 G6 lines, seal,
+     run: node lab/gaiaLab.mjs
+  3. Lab commit (block in chat; message carries no M-token).
+  4. Then the browser wiring plan lands: velocity arrows on the
+     clusters, an orbit-launch key into galaxyPhi, 'h' mid-flight —
+     watch who stays.
+  5. Free gift waiting in the halo-off list: the names clump into
+     families. Experiment (b)(1), a milestone early.
+========================================================================
+
+## 2026-07-21 — session 07: M12e COMPLETE — the halo flies
+
+lab/gaiaLab.mjs, all receipts PASS: G0 two fetches (11780 + 11910 bytes) |
+G1 crossmatch 145/145 (seal was >=140) | G2 bridge 4.7410 vs 4.74047 |
+G3a matrix anchors | G3b cross-catalog handshake 0.23 deg median |
+G3c curve handshake 232.1 | G3d median cluster v_phi -46.0 (Sun -244.3) |
+G3e round trip 6.0e-9 | G4 census: halo OFF old-Vlsr-way 10, true 3D 21;
+halo ON 0 | G5 (Shambu's hand) NGC 3201: rmin 8.650, rmax 37.934,
+dEmax 6.92e-5, PASS; negative test flies to 1541.67 kpc | G5b dt-halving
+6.92e-5 -> 1.73e-5, ratio 4.00.
+
+TWO LESSONS, BOTH KEEPERS:
+- Vlsr was never a floor. The LSR frame rides the Sun's 232 km/s, so the
+  line-of-sight number can EXCEED the true space speed (NGC 3201: 481.9 vs
+  367.6). M12d's "lower bound" claim amended in CHEATS #10; the honest 3D
+  census reads 21 leavers without dark matter, zero with it.
+- Gate below the floor, struck twice in one file: my G3e gate sat under
+  the matrix's 10-digit truncation (~1e-8), and my G5 spec gate (1e-8) sat
+  ~3.5 orders under leapfrog's honest wobble at dt 0.001. Shambu's 1e-4
+  call was correct; certified by the DT^2 law (G5b ratio 4.00). Proposed
+  bug pattern #12: calibrate the instrument's own noise floor first, then
+  set the gate above it.
+
+Also adjudicated: the G5 guesses comment cited current R 66.8 — the PASS
+gate itself proves the live value was ~9.03 (66.8 > rmax would have
+failed). Comment slip, corrected in-file; seal missed, law held.
+
+Machine invariance: Shambu's transcript vs container run agree to 13+
+significant digits; the negative-test rmax printed digit-identical
+(1541.670747976097). Two CPUs, one universe.
+
+Browser: 'k' now fetches Harris (with Vr) + Gaia tablea1 through the
+proxy, crossmatches 145/145, seeds 126, and the clusters FLY on the M12c
+galaxy clock. Click one: its future integrates live (trail + peri/apo).
+Turning-point invariance receipt: after ~2 Gyr of on-screen flight,
+NGC 3201 still reports the lab's peri/apo — conserved quantities do not
+age. 'h' re-fates 21 real objects mid-flight. Third provenance block +
+D-bundle carry the Gaia sha. CHEATS #10 amended (items 2, 5); #11 filed.
+
+Next (Shambu's call): M12f candidates — (a) Sgr A* real mass in the
+potential (inner Keplerian turn), (b) a halo-mass knob: dial M_s until the
+first real cluster unbinds — dark matter measured by hostage release,
+(c) tidal stream spray: test particles along NGC 3201's orbit.
+
+ADDENDUM (post-soak): the h-census is PHASE-DEPENDENT once the clusters
+have flown. At the catalogue epoch the flip reads 21 unbound; after ~Gyr
+of halo-ON flight the same flip read 11, then 12 — each cluster's energy
+jump on halo removal depends on WHERE in its orbit the flip catches it
+(pericenter flips are the most lethal). Consequence of CHEATS #11 items
+1 and 4, observed live. The 21 is the number for TODAY'S sky.

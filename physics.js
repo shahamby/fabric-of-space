@@ -329,8 +329,81 @@ export function stepGalaxyStars(realSeconds) {
   while (GAL_STARS.carry >= GAL_STARS.DT && steps < 200) {
     for (const s of GAL_STARS.tracers) kdk(s, GAL_STARS.DT);
     for (const s of GAL_STARS.real)    kdk(s, GAL_STARS.DT);
+    if (GAL_CLUSTERS.on) for (const s of GAL_CLUSTERS.list) { if (s.vx !== undefined) kdk3(s, GAL_STARS.DT); }
     GAL_STARS.myr += GAL_STARS.DT;
     GAL_STARS.carry -= GAL_STARS.DT;
     steps++;
   }
+}
+// ---------- M12e: the clusters get their velocity ----------
+// Gaia EDR3 proper motions (Vasiliev & Baumgardt 2021) x Harris distances
+// + heliocentric Vr -> full 3D galactocentric velocities. Pipeline
+// receipted in lab/gaiaLab.mjs G0-G5b: bridge 4.7405, matrix anchors,
+// round trip 6e-9, curve handshake 232.1, dt-halving ratio 4.00.
+
+export const GAL_CLUSTERS = { on: false, list: [] };
+
+const K_PM = 4.740470;                    // km/s per (mas/yr at 1 kpc) — G2
+const AG = [                              // equatorial J2000 -> galactic — G3a
+  [-0.0548755604, -0.8734370902, -0.4838350155],
+  [ 0.4941094279, -0.4448296300,  0.7469822445],
+  [-0.8676661490, -0.1980763734,  0.4559837762],
+];
+const D2R = Math.PI / 180;
+
+function galaxyAccel3(x, y, z) {          // 3D pull, kpc/Myr^2, toward center
+  const r = Math.max(Math.hypot(x, y, z), 0.05), h = 1e-4;
+  const dPhi = (galaxyPhi(r + h) - galaxyPhi(r - h)) / (2 * h);
+  const a = -dPhi * KMS_TO_KPC_MYR * KMS_TO_KPC_MYR / r;
+  return [a * x, a * y, a * z];
+}
+function kdk3(s, dt) {                    // the house shape, third axis included
+  let [ax, ay, az] = galaxyAccel3(s.x, s.y, s.z);
+  s.vx += 0.5 * dt * ax; s.vy += 0.5 * dt * ay; s.vz += 0.5 * dt * az;
+  s.x += dt * s.vx; s.y += dt * s.vy; s.z += dt * s.vz;
+  [ax, ay, az] = galaxyAccel3(s.x, s.y, s.z);
+  s.vx += 0.5 * dt * ax; s.vy += 0.5 * dt * ay; s.vz += 0.5 * dt * az;
+}
+
+// One cluster: (RA, Dec, pmRA*, pmDE, Vr, Rsun) -> repo-frame velocity.
+// Radial piece + two sky pieces in equatorial axes, rotate to galactic,
+// flip to repo (Sun at +X), add the Sun's own ride. Receipt: gaiaLab G3e.
+export function seedClusterVelocities(list) {
+  const vlsrModel = galaxyVCirc(8.2);
+  const VSUN = [-11.1, -(vlsrModel + 12.24), 7.25];   // Schoenrich+2010 + our curve
+  let seeded = 0;
+  for (const c of list) {
+    if (c.pmra === undefined || c.vr === null || !c.rsun) continue;
+    const ra = c.ra * D2R, de = c.de * D2R;
+    const rh = [Math.cos(de) * Math.cos(ra), Math.cos(de) * Math.sin(ra), Math.sin(de)];
+    const ah = [-Math.sin(ra), Math.cos(ra), 0];
+    const dh = [-Math.sin(de) * Math.cos(ra), -Math.sin(de) * Math.sin(ra), Math.cos(de)];
+    const va = K_PM * c.rsun * c.pmra, vd = K_PM * c.rsun * c.pmde;
+    const veq = [0, 1, 2].map((i) => c.vr * rh[i] + va * ah[i] + vd * dh[i]);
+    const vg = AG.map((row) => row[0] * veq[0] + row[1] * veq[1] + row[2] * veq[2]);
+    const v = [-vg[0] + VSUN[0], -vg[1] + VSUN[1], vg[2] + VSUN[2]];   // km/s, repo axes
+    c.v3 = Math.hypot(...v);
+    c.vx = v[0] * KMS_TO_KPC_MYR;         // stored in kpc/Myr, like the tracers
+    c.vy = v[1] * KMS_TO_KPC_MYR;
+    c.vz = v[2] * KMS_TO_KPC_MYR;
+    seeded++;
+  }
+  return seeded;
+}
+
+// Fly a COPY into the future under the CURRENT halo. Returns the path (for
+// the trail), the turning points (for the panel), and whether it ever left.
+export function clusterOrbit(c, maxMyr = 6000, dt = 0.5) {
+  const s = { x: c.x, y: c.y, z: c.z, vx: c.vx, vy: c.vy, vz: c.vz };
+  const pts = [[s.x, s.y, s.z]];
+  let rmin = Math.hypot(s.x, s.y, s.z), rmax = rmin, left = false;
+  const steps = Math.round(maxMyr / dt);
+  for (let n = 1; n <= steps; n++) {
+    kdk3(s, dt);
+    const r = Math.hypot(s.x, s.y, s.z);
+    rmin = Math.min(rmin, r); rmax = Math.max(rmax, r);
+    if (n % 20 === 0) pts.push([s.x, s.y, s.z]);
+    if (r > 250) { left = true; pts.push([s.x, s.y, s.z]); break; }
+  }
+  return { pts, rmin, rmax, left };
 }
