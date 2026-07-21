@@ -278,7 +278,7 @@ const s0 = target ? { p: posRepo(target), v: vGC(target) } : null;
 //      must land between them — a turning-point law, free of any catalog.)
 //   5. Print rmin (pericenter), rmax (apocenter), dEmax.
 //   6. PASS if: rmin <= current radius <= rmax  AND  rmax < 200 (the halo
-//      holds it)  AND  dEmax < 1e-8. Print FAIL loudly in an else. No
+//      holds it)  AND  dEmax < 1e-4 (leapfrog's floor at dt 0.001 — certified by G5b). Print FAIL loudly in an else. No
 //      silent instruments.
 //   7. NEGATIVE test: set HALO = false, rerun the same loop from s0, print
 //      the new rmax. Sealed guess: without dark matter this cluster does
@@ -296,3 +296,15 @@ if (rmin <= Math.hypot(...s0.p) && rmax >= Math.hypot(...s0.p) && rmax < 200 && 
   for (let n = 0; n < 6000; n++) { stepKDK(s, 0.001); rmax = Math.max(rmax, Math.hypot(...s.p)); }
   console.log(rmax); HALO = true;
 } else console.log("FAIL");
+// G5b — certify the 1e-4 gate: halve dt, and dEmax must drop ~x4 (the
+// DT^2 law). Proves 6.9e-5 is the integrator's honest wobble, not a leak.
+// Sealed: ratio lands between 3 and 5.
+HALO = true;
+let s2 = { p: [...s0.p], v: [...s0.v] }, dE2 = 0;
+for (let n = 0; n < 12000; n++) {
+  stepKDK(s2, 0.0005);
+  dE2 = Math.max(dE2, Math.abs(energy(s2) - E0) / Math.abs(E0));
+}
+const ratio = dEmax / dE2;
+console.log(`G5b dt-halving: dEmax ${dEmax.toExponential(2)} -> ${dE2.toExponential(2)}, ` +
+  `ratio ${ratio.toFixed(2)}  [${ratio > 3 && ratio < 5 ? 'PASS' : 'FAIL'}]`);
