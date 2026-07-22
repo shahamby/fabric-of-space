@@ -262,13 +262,15 @@ export const GALAXY = {
   MB: 1.5e10, AB: 0.5,               // bulge
   MD: 6.5e10, AD: 3.0, BD: 0.3,      // disk
   MS: 5.0e11, RS: 16,                // dark halo
+  MBH: 4.30e6,                       // Sgr A* — the published mass (M12f)
 };
 export function galaxyPhi(R) {       // potential at planar radius R kpc, (km/s)²
   const g = GALAXY, r = Math.max(R, 0.05);   // clamp: Sgr A*'s zone, not resolved here
   let phi = -g.G * g.MB / (r + g.AB)
           - g.G * g.MD / Math.sqrt(r * r + (g.AD + g.BD) ** 2);
   if (g.haloOn) phi -= g.G * g.MS * Math.log(1 + r / g.RS) / r;
-  return phi;
+  phi -= g.G * g.MBH / r;   // M12f: the engine, inside the same clamp.
+  return phi;               // B4 receipt: a 0.04 km/s whisper outside 8.6 pc.
 }
 // ---------- M12c: stars that RIDE the well (kpc, Myr) ----------
 // Same potential, same kick-drift-kick shape as the house integrator.
@@ -278,6 +280,22 @@ export const KMS_TO_KPC_MYR = 3.1557e13 / 3.0857e16;   // W0 bridge: 1.0227e-3
 export function galaxyVCirc(R) {          // circular speed, km/s, read off Phi
   const h = 1e-4;
   return Math.sqrt(R * (galaxyPhi(R + h) - galaxyPhi(R - h)) / (2 * h));
+}
+
+// M12f INSTRUMENT (CHEATS #12): the true inner curve, no 0.05 clamp.
+// Panel-only — nothing dynamical ever flies here. Analytic v^2 pieces,
+// floored at 0.0001 kpc (0.1 pc, five orders above the horizon).
+// Receipted in lab/bhLab.mjs: crossover 8.61 pc, slopes -0.49 / +0.50.
+export function galaxyVCircInner(R, withBH) {
+  const g = GALAXY, r = Math.max(R, 1e-4), S = g.AD + g.BD;
+  let v2 = g.G * g.MB * r / ((r + g.AB) ** 2)
+         + g.G * g.MD * r * r / ((r * r + S * S) ** 1.5);
+  if (g.haloOn) {
+    const x = r / g.RS;
+    v2 += g.G * g.MS * (Math.log(1 + x) - x / (1 + x)) / r;
+  }
+  if (withBH) v2 += g.G * g.MBH / r;
+  return Math.sqrt(v2);
 }
 
 function galaxyAccel(x, y) {              // kpc/Myr^2, inward along r-hat

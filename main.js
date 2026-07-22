@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric, updateGalaxyFabric, galaxyDepth } from './fabric.js';
-import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR, GAL_CLUSTERS, seedClusterVelocities, clusterOrbit } from './physics.js';
+import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR, GAL_CLUSTERS, seedClusterVelocities, clusterOrbit, galaxyVCircInner } from './physics.js';
 import { HYG_SAMPLE } from './hygSample.js';
 import harrisVrSnapshot from './data/harris_vr.tsv?raw';  // M12e: Harris incl. heliocentric Vr
 import gaiaSnapshot from './data/gaia_pm.tsv?raw';        // M12e: Gaia EDR3 proper motions
@@ -1065,12 +1065,20 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
 // M12c: the markers answer for themselves, in the galaxy's own units —
   // no AU, no days. Clicking the Sun's seat reports what the well DEMANDS
   // of anything sitting there; press h and the same click reads different.
+// M12f: the debt is paid — the mass is IN. The readout is the inner
+  // rotation curve: FALLING toward the hole (Kepler) beside the RISING
+  // curve a hole-less center would give. Numbers from galaxyVCircInner,
+  // the unclamped instrument — CHEATS #12; receipted in lab/bhLab.mjs.
   if (galaxyPick === sgrA) {
+    const w = (pc) => galaxyVCircInner(pc / 1000, true).toFixed(0);
+    const wo = (pc) => galaxyVCircInner(pc / 1000, false).toFixed(0);
     panel.textContent = `Sgr A* — the galactic center\n` +
-      `real mass: 4.30e+6 M☉  (NOT in this potential)\n` +
-      `r_s: ${schwarzschildRadiusKm(4.30e6).toExponential(3)} km\n` +
-      `Φ at the 0.05 kpc clamp: ${galaxyPhi(0.05).toFixed(0)} (km/s)²\n` +
-      `drawn at 0.8 kpc — CHEATS #8`;
+      `mass: ${GALAXY.MBH.toExponential(2)} M☉ — IN the potential (M12f)\n` +
+      `r_s: ${schwarzschildRadiusKm(GALAXY.MBH).toExponential(3)} km\n` +
+      `inner curve, km/s (with hole | without):\n` +
+      `  1 pc: ${w(1)} | ${wo(1)}    3 pc: ${w(3)} | ${wo(3)}    10 pc: ${w(10)} | ${wo(10)}\n` +
+      `falling vs rising — Keplerian inside 8.6 pc (S2 clock: B1)\n` +
+      `drawn at 0.8 kpc — CHEATS #8; inner readout — CHEATS #12`;
     panel.style.display = 'block';
   } else if (galaxyPick === sunSeat) {
     const vc = galaxyVCirc(8.2);

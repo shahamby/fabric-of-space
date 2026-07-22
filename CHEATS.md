@@ -179,3 +179,24 @@ pipeline receipted in lab/gaiaLab.mjs G0-G5b. Five things are not:
 5. ERROR BARS RIDE INVISIBLY. Proper-motion and distance uncertainties
    propagate into every v3D; the census counts carry few-cluster error
    bars this display does not draw.
+
+## 12. The clamped well and the unclamped readout (M12f)
+
+**Where:** `physics.js` galaxyPhi (the MBH term) + galaxyVCircInner;
+`main.js` Sgr A* panel.
+
+Sgr A*'s published 4.30e6 Msun is IN the potential — the panel's old
+"NOT in this potential" confession is paid. What remains display:
+
+1. THE DYNAMICS KEEP THE 0.05 kpc CLAMP. Every mover and every fabric
+   vertex feels the same floor as before; the hole's pull outside 50 pc
+   is real but microscopic (B4: worst shift 0.042 km/s, at the
+   innermost cluster's seat). Nothing that flies in this sim ever
+   enters the room where the hole rules.
+2. THE PANEL'S INNER CURVE READS THE UNCLAMPED FORMULA. The 1/3/10 pc
+   numbers come from galaxyVCircInner, floored at 0.0001 kpc — five
+   orders above the horizon, far below the dynamics clamp. Instrument
+   and dynamics disagree only in a room no simulated object occupies.
+   Receipted in lab/bhLab.mjs (S2's 16-yr clock: 0.2%).
+3. THE DOT IS STILL 0.8 kpc (CHEATS #8). The hole's true kingdom,
+   8.6 pc, would be a hundredth of that dot's radius.

@@ -851,3 +851,35 @@ sang too (15.3/66.4) — Pal 12's Sagittarius membership is a real published
 finding, proposed years after the first four, reproduced here by curiosity.
 On-screen r values are model-time after ~350 Myr of flight (CHEATS #11
 item 1); the peri/apo rhyme is conserved-quantity physics — today's sky.
+
+## 2026-07-22 — session 08: M12f COMPLETE — the center's engine
+
+lab/bhLab.mjs, 8/8 PASS: B0 horizon bridge 2.9538 km/Msun vs the 2.95
+spent since M7 | B1 S2's published 16.05-yr period reproduced at 16.08
+(0.2%) from our G and the published 4.30e6 Msun; escape from S2's
+pericenter 7974 km/s (2.7% of c); bulge inside S2's whole orbit: 1.5
+Msun | B2 crossover 8.61 pc | B3 Kepler fingerprint at 1 pc: -0.486
+with the hole, +0.498 without — the sign flip is the signature | B4
+regression: vCirc(8.2) still 232.1, worst vEsc shift 0.042 km/s, no
+census flip possible | B5 (Shambu's hand) analytic r = AB*q/(1-q)
+matches the machine at 1x and 100x; sealed ratio 11.83 hit exactly.
+
+TAXONOMY ITEM 7 — THE BRACKET BLUFF, caught by Shambu's negative test:
+my crossover bisection shipped with hi = 0.05, sized only for the real
+hole. At 100x the true root (101.9 pc) escapes the bracket and the
+bisection returned ITS OWN EDGE (50 pc) with a straight face — 103.8%
+error, fail-silent. Shambu's pencil was right; the machine was
+bluffing — and he diagnosed the fix himself (widen past 101.91 pc)
+before the verdict came back. Cure in 7c99f24: hi = 0.2 plus a
+sign-change guard that throws. A bracketed search validates its
+bracket first.
+
+Browser: GALAXY.MBH = 4.30e6 joins galaxyPhi inside the unchanged 0.05
+clamp (dynamics untouched — B4 certifies). New instrument
+galaxyVCircInner reads the true curve down to 0.1 pc, panel only.
+Clicking Sgr A* pays the M12c debt: "IN the potential", with the
+1/3/10 pc readout falling 137 -> 83 -> 66 km/s beside the hole-less
+rise 16 -> 28 -> 50. Kepler at the center, visible. CHEATS #12 filed.
+
+Next (Shambu's call): M12g — (a) rotation curve ON SCREEN as a live
+instrument h can bend, (b) star catalog at scale, (c) halo-mass knob.

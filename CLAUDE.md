@@ -225,6 +225,15 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   test flies to 1541 kpc). Browser: clusters in flight, click one for its
   integrated future (trail + peri/apo), h re-fates 21 real objects live.
   Frame lesson banked: Vlsr is not a floor — CHEATS #10 amended, #11 filed.
+- **M12f: COMPLETE** — the center's engine. Sgr A*'s published 4.30e6
+  Msun enters galaxyPhi as a point mass (same 0.05 kpc clamp — dynamics
+  untouched, B4-certified to 0.042 km/s); galaxyVCircInner reads the
+  true inner curve to 0.1 pc for the panel only. Lab receipted
+  (lab/bhLab.mjs 8/8: horizon bridge 2.9538; S2's 16.05-yr clock
+  reproduced at 16.08; crossover 8.61 pc, numeric = Shambu's analytic
+  at 1x and 100x; fingerprint -0.486/+0.498; B5's negative test caught
+  the bracket bluff — taxonomy item 7). Panel debt paid: clicking
+  Sgr A* shows the curve FALLING toward center. CHEATS #12 filed.
   
 ## Idea backlog
 
