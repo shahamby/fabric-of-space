@@ -842,3 +842,12 @@ of halo-ON flight the same flip read 11, then 12 — each cluster's energy
 jump on halo removal depends on WHERE in its orbit the flip catches it
 (pericenter flips are the most lethal). Consequence of CHEATS #11 items
 1 and 4, observed live. The 21 is the number for TODAY'S sky.
+
+PLAY RECEIPT (2026-07-21 evening): the Sagittarius family, rediscovered by
+click. Sealed prediction — NGC 6715, Terzan 7, Terzan 8, Arp 2 share one
+orbit family. Measured peri/apo (kpc): 14.9/56.3, 13.2/52.0, 16.1/48.9,
+17.1/52.9 — four rhymes. Bonus: Shambu clicked Pal 12 unprompted and it
+sang too (15.3/66.4) — Pal 12's Sagittarius membership is a real published
+finding, proposed years after the first four, reproduced here by curiosity.
+On-screen r values are model-time after ~350 Myr of flight (CHEATS #11
+item 1); the peri/apo rhyme is conserved-quantity physics — today's sky.

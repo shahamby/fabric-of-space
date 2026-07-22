@@ -284,7 +284,9 @@ const s0 = target ? { p: posRepo(target), v: vGC(target) } : null;
 //      the new rmax. Sealed guess: without dark matter this cluster does
 //      not turn around — rmax runs away past 200 kpc. Set HALO back to true.
 let s = { p: [...s0.p], v: [...s0.v] }, E0 = energy(s), rmin = Infinity, rmax = 0, dEmax = 0; HALO = true;
-// Guesses: rmin = 20, rmax = 120 (Current R is around 66.8 kpc)
+// Sealed guesses were rmin 20 / rmax 120, written against a misread current
+// R of 66.8 — the live value is ~9.03, and the PASS gate itself proves it,
+// since 66.8 > rmax. Measured: rmin 8.65 / rmax 37.93. Seal missed; law held.
 for (let n = 0; n < 6000; n++) {
   stepKDK(s, 0.001); let r = Math.hypot(...s.p);
   rmin = Math.min(rmin, r); rmax = Math.max(rmax, r);
