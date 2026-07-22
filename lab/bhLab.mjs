@@ -64,7 +64,10 @@ console.log(`      bulge mass inside S2's orbit: ${mBulgeInside.toFixed(1)} Msun
 // Bisection on v2BH(r) = v2Bulge(r). Scaffold takes the mass as an
 // argument so B5's negative test can reuse it at 100x.
 function crossover(mbh) {
-  let lo = 1e-4, hi = 0.05;
+  let lo = 1e-4, hi = 0.2;
+  if (G * mbh / hi > v2Bulge(hi)) throw new Error(
+    `crossover: the root sits ABOVE the ${hi} kpc bracket — widen hi. ` +
+    `No silent bracket edges.`);;
   for (let i = 0; i < 60; i++) {
     const mid = (lo + hi) / 2;
     if (G * mbh / mid > v2Bulge(mid)) lo = mid; else hi = mid;
@@ -108,13 +111,13 @@ console.log(`      vEsc shift: ${d06.toFixed(3)} km/s at 0.6 kpc, ${d89.toFixed(
   `[${d06 < 0.1 && d89 < 0.1 ? 'PASS' : 'FAIL'}]  — no census flip possible`);
 
 // ---------- B5: the crossover ----------
-// Sealed before running: rAnalytic ≈ 8.61 pc; naive 10x, corrected rBig/rX ≈ 11.83.
+// Sealed: rAnalytic ≈ 8.61 pc; naive ×10, corrected rBig/rX ≈ 11.83.
 const q = Math.sqrt(MBH / MB), rAnalytic = AB * q / (1 - q);
 const err = Math.abs(rAnalytic - rX) / rX;
 if (err < 0.01) console.log(`B5 analytic: ${(rAnalytic * 1000).toFixed(2)} pc [PASS]`);
 else { console.error(`B5 analytic [FAIL]: error ${(100 * err).toFixed(2)}%`); process.exitCode = 1; }
 const q100 = 10 * q, rBig = crossover(100 * MBH);
 const rAnalyticBig = AB * q100 / (1 - q100);
-const errBig = Math.abs(rAnalyticBig - rBig) / rBig;
-if (errBig < 0.01) console.log(`B5 100x: ${(rBig * 1000).toFixed(2)} pc [PASS], rBig/rX=${(rBig / rX).toFixed(2)}`);
-else { console.error(`B5 100x [FAIL]: error ${(100 * errBig).toFixed(2)}%`); process.exitCode = 1; }
+const errBig = Math.abs(rAnalyticBig - rBig) / rBig, ratio = rBig / rX;
+if (errBig < 0.01) console.log(`B5 100x: ${(rBig * 1000).toFixed(2)} pc [PASS], rBig/rX=${ratio.toFixed(2)}`);
+else { console.error(`B5 100x [FAIL]: error ${(100 * errBig).toFixed(2)}%, rBig/rX=${ratio.toFixed(2)}`); process.exitCode = 1; }
