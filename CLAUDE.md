@@ -234,6 +234,15 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   at 1x and 100x; fingerprint -0.486/+0.498; B5's negative test caught
   the bracket bluff — taxonomy item 7). Panel debt paid: clicking
   Sgr A* shows the curve FALLING toward center. CHEATS #12 filed.
+  - **M12g: COMPLETE** — the curve on screen. A 320x170 canvas instrument
+  (v toggles, galaxy mode only) draws 200 samples of galaxyVCircInner on
+  rulers receipted byte-identical in lab/curveLab.mjs (6/6: anchors
+  232.1 / 88.4-at-24.6 / 47.1-at-8.2; round trip 2e-15; valley 65.8 km/s
+  at 8.68 pc; drops 11.7/37.0; V4 Shambu's hand — polyline reading
+  4.6e-5, linear-ruler lie caught at 25.9%). Pressing h sags the plateau
+  live while the Keplerian spike stands. W29 erratum filed: the 88.4 gap
+  belongs to 24.6 kpc; the Sun's seat gap is 47.1. CHEATS #13 filed.
+  
   
 ## Idea backlog
 

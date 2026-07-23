@@ -151,7 +151,7 @@ window.addEventListener('keydown', (event) => {
     sgrA.visible = sunSeat.visible = GALAXY.on;
     if (!GALAXY.on) { GAL_STARS.on = false; tracerCloud.visible = realCloud.visible = false; }
     selected = null; galaxyPick = null; panel.style.display = 'none';   // M12c: no stale readout across the mode switch
-    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; }   // M12d/M12e
+    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; curveCanvas.style.display = 'none'; }   // M12d/M12e/M12g
     console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
       `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
       `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
@@ -184,6 +184,15 @@ window.addEventListener('keydown', (event) => {
       console.log(`AUDIT: ${colourClusters()} clusters now unbound — futures changed mid-flight.`);
       if (clusterPick !== null) refreshClusterTrail();   // same cluster, new fate
     }
+    drawCurve();                                      // M12g: the plateau sags live
+    return;
+  }
+    if (event.key.toLowerCase() === 'v') {              // M12g: the curve, live
+    if (!GALAXY.on) { console.log('AUDIT: press g first — the curve reads the galaxy.'); return; }
+    curveCanvas.style.display = curveCanvas.style.display === 'none' ? 'block' : 'none';
+    drawCurve();
+    console.log(`AUDIT: rotation-curve instrument ${curveCanvas.style.display === 'none'
+      ? 'hidden' : 'ON — rulers receipted in lab/curveLab.mjs V0-V4'}.`);
     return;
   }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
@@ -879,6 +888,62 @@ provPanel.style.cssText =
   'overflow:auto; background:rgba(0,0,0,0.85); border:1px solid #555;' +
   'color:#9fd; font:11px monospace; padding:8px; white-space:pre; display:none;';
 document.body.append(provPanel);
+
+// ---------- M12g: the rotation curve, on screen ----------
+// The instrument whose rulers were receipted in lab/curveLab.mjs V0-V4.
+// Geometry constants are BYTE-IDENTICAL to the lab. CHEATS #13: sample
+// count, colors, ticks are display; every plotted value is
+// galaxyVCircInner — the receipted function. Toggle: v.
+const CURVE = { R_MIN: 1e-3, R_MAX: 30, V_MAX: 250,
+  X0: 34, X1: 308, Y_TOP: 16, Y_AXIS: 140 };
+const CURVE_LOGSPAN = Math.log10(CURVE.R_MAX) - Math.log10(CURVE.R_MIN);
+const curveRToPx = (R) => CURVE.X0 + (Math.log10(R) - Math.log10(CURVE.R_MIN)) / CURVE_LOGSPAN * (CURVE.X1 - CURVE.X0);
+const curveVToPy = (v) => CURVE.Y_AXIS - v / CURVE.V_MAX * (CURVE.Y_AXIS - CURVE.Y_TOP);
+
+const curveCanvas = document.createElement('canvas');
+curveCanvas.width = 320; curveCanvas.height = 170;
+curveCanvas.style.cssText =
+  'position:fixed; bottom:12px; left:12px; background:rgba(8,10,14,0.88);' +
+  'border:1px solid #3a3f4a; border-radius:6px; display:none;';
+document.body.append(curveCanvas);
+
+function drawCurve() {
+  if (curveCanvas.style.display === 'none') return;
+  const c = curveCanvas.getContext('2d');
+  const { X0, X1, Y_TOP, Y_AXIS, R_MIN, V_MAX } = CURVE;
+  c.clearRect(0, 0, 320, 170);
+  c.font = '10px monospace';
+  c.fillStyle = '#8ee6c8';
+  c.fillText(`ROTATION CURVE — dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}`, X0, 11);
+  c.strokeStyle = '#555';
+  c.beginPath(); c.moveTo(X0, Y_AXIS); c.lineTo(X1, Y_AXIS);
+  c.moveTo(X0, Y_TOP); c.lineTo(X0, Y_AXIS); c.stroke();
+  c.fillStyle = '#777';
+  for (const [R, label] of [[0.01, '0.01'], [0.1, '0.1'], [1, '1'], [10, '10 kpc']]) {
+    const px = curveRToPx(R);
+    c.beginPath(); c.moveTo(px, Y_AXIS); c.lineTo(px, Y_AXIS + 4); c.stroke();
+    c.fillText(label, px - 8, Y_AXIS + 14);
+  }
+  c.fillText('250', X0 - 24, Y_TOP + 4);
+  c.fillText('0', X0 - 10, Y_AXIS + 3);
+  const pxV = curveRToPx(0.00868);              // the V2-receipted valley
+  c.setLineDash([3, 3]);
+  c.beginPath(); c.moveTo(pxV, Y_AXIS - 20); c.lineTo(pxV, Y_AXIS); c.stroke();
+  c.setLineDash([]);
+  c.fillText('8.7 pc', pxV - 14, Y_AXIS - 24);
+  c.strokeStyle = '#ff7a4f'; c.lineWidth = 1.5; c.beginPath();
+  for (let i = 0; i < 200; i++) {
+    const R = R_MIN * 10 ** (i / 199 * CURVE_LOGSPAN);
+    const py = curveVToPy(Math.min(galaxyVCircInner(R, true), V_MAX));
+    i === 0 ? c.moveTo(curveRToPx(R), py) : c.lineTo(curveRToPx(R), py);
+  }
+  c.stroke(); c.lineWidth = 1;
+  const vSun = galaxyVCircInner(8.2, true);     // the Sun's dot, live
+  c.fillStyle = '#ffd24f';
+  c.beginPath(); c.arc(curveRToPx(8.2), curveVToPy(vSun), 3.5, 0, 7); c.fill();
+  c.fillStyle = '#bbb';
+  c.fillText(`Sun ${vSun.toFixed(1)}`, curveRToPx(8.2) - 62, curveVToPy(vSun) - 7);
+}
 
 function renderProvenance() {
   const blocks = [];

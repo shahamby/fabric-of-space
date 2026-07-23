@@ -200,3 +200,23 @@ Sgr A*'s published 4.30e6 Msun is IN the potential — the panel's old
    Receipted in lab/bhLab.mjs (S2's 16-yr clock: 0.2%).
 3. THE DOT IS STILL 0.8 kpc (CHEATS #8). The hole's true kingdom,
    8.6 pc, would be a hundredth of that dot's radius.
+
+## 13. The chart that must not lie (M12g)
+
+**Where:** `main.js` CURVE constants, drawCurve, the v key.
+
+The rotation curve is an on-screen instrument now. Every plotted value
+is galaxyVCircInner — the receipted function — at 200 log-spaced radii.
+What is display, confessed:
+
+1. THE RULERS ARE THE LAB'S, BYTE-IDENTICAL. R 0.001-30 kpc log,
+   v 0-250 km/s linear, plot box (34..308, 16..140). Receipted in
+   lab/curveLab.mjs: round trip 2e-15, polyline reading honest to
+   4.6e-5, the linear-ruler lie caught at 25.9% (V4, Shambu's hand).
+2. SAMPLE COUNT, COLORS, TICKS, THE VALLEY TICK, AND THE SUN DOT are
+   for eyes. The valley tick sits at the V2-receipted 8.68 pc, its
+   label rounded to 8.7.
+3. THE CURVE ALWAYS INCLUDES THE HOLE. Only the halo answers to h;
+   there is no toggle for the engine.
+4. VALUES ABOVE 250 km/s WOULD CLIP at the axis top. None exist on
+   this domain today; the guard is for future physics.

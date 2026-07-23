@@ -228,6 +228,12 @@ Mercury..Neptune = '1'..'8' (NOT 9 — that's Pluto; Shambu caught my error).
     instrument's own noise (matrix truncation ~1e-8; leapfrog wobble
     ~(omega*dt)^2). Struck twice in one file. Measure the floor first —
     dt-halving, component rounding — then set the gate above it.
+7. The no-op negative: a negative test that mutates something the math
+    cancels (a consistent log-base swap — the bases vanish in the
+    mapping's ratio) proves nothing while looking rigorous. Verify the
+    sabotage actually changes an observable before trusting the FAIL it
+    was supposed to cause. The upgraded sin: reading a log axis as
+    linear — 25.9% wrong, caught loudly.
 
 ## Process facts that matter
 
@@ -883,3 +889,36 @@ rise 16 -> 28 -> 50. Kepler at the center, visible. CHEATS #12 filed.
 
 Next (Shambu's call): M12g — (a) rotation curve ON SCREEN as a live
 instrument h can bend, (b) star catalog at scale, (c) halo-mass knob.
+
+## 2026-07-22 — session 09: M12g COMPLETE — the curve on screen
+
+lab/curveLab.mjs, 6/6 PASS: V0 anchors 232.1 | gap 88.4 at 24.6 kpc |
+gap 47.1 at 8.2 kpc — the recap's mislocation caught and receipted |
+V1 ruler round trip 2e-15 | V2 valley 65.8 km/s at 8.68 pc, the
+hole-to-bulge hand-off | V3 drops 11.7 / 37.0 restated | V4 (Shambu's
+hand) polyline reading honest to 4.57e-5; the linear-ruler lie caught
+at 25.9%, FAIL branch proven live.
+
+W29 ERRATUM: the recap claimed the 88.4 km/s gap at the Sun's seat.
+galaxyLab R3 always measured it at 24.6 kpc; the seat's own gap is
+47.1 km/s. Three lines corrected + erratum footer (commit ab8a05f).
+The error was the recap author's (Claude); the lab was right
+throughout. Caught while designing V0 — receipts audit their own
+paperwork.
+
+TAXONOMY ITEM 8 — THE NO-OP NEGATIVE: the planned V4 sabotage ("swap
+log10 for ln") mutates nothing; swapped consistently, the bases cancel
+in the ratio. A negative test must be verified to change an observable,
+or its FAIL-readiness is theater. Upgraded to the truer sin — reading
+the log axis as linear.
+
+Browser: canvas bottom-left, v toggles (galaxy mode only), redrawn on
+h and g. 200 samples of galaxyVCircInner on the lab's byte-identical
+rulers; the Sun's dot live at 8.2; valley tick at the receipted
+8.68 pc. Press h with it open: the plateau sags (Sun 232.1 -> 185.0 —
+the erratum's own 47.1, visible), the Keplerian spike stands. Dark
+matter and the hole ruling separate rooms, one graph. CHEATS #13.
+
+Next (Shambu's call): M12h — (a) star catalog at scale, (b) halo-mass
+knob: dial MS to the first hostage release, (c) real MW rotation-curve
+DATA overlaid on this instrument — the toy vs the sky.
