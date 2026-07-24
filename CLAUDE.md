@@ -242,7 +242,16 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   4.6e-5, linear-ruler lie caught at 25.9%). Pressing h sags the plateau
   live while the Keplerian spike stands. W29 erratum filed: the 88.4 gap
   belongs to 24.6 kpc; the Sun's seat gap is 47.1. CHEATS #13 filed.
-  
+- **M12h: COMPLETE** — the disk's true body. 2,373 classical Cepheids
+  (Skowron+ 2019, VizieR J/AcA/69/305/table1, probe-verified) placed
+  from (l, b, d) through the front door; the WARP measured before
+  rendered (lab/cephLab.mjs 6/6: fetch 215,840 B; 2,387 parsed, 14
+  benched and named; frame handshake vs CDS worst 6.8e-4 deg; warp
+  quadrants +1.07/-0.05/-0.58/-0.54 kpc, spread 1.65, inner flat to
+  0.012; flare 2.97; CD5 Shambu's hand — shuffle negative built to
+  self-run twice, geometry 1.646 vs statistics ~0.1-0.3). Browser: w
+  toggles the height-coloured cloud — the warp as a colour tide on the
+  rim. Velocities banked for the overlay milestone. CHEATS #14 filed. 
   
 ## Idea backlog
 

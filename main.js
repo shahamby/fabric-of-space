@@ -7,6 +7,7 @@ import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBod
 import { HYG_SAMPLE } from './hygSample.js';
 import harrisVrSnapshot from './data/harris_vr.tsv?raw';  // M12e: Harris incl. heliocentric Vr
 import gaiaSnapshot from './data/gaia_pm.tsv?raw';        // M12e: Gaia EDR3 proper motions
+import cepheidSnapshot from './data/cepheids.tsv?raw';    // M12h: the disk's body
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -151,7 +152,7 @@ window.addEventListener('keydown', (event) => {
     sgrA.visible = sunSeat.visible = GALAXY.on;
     if (!GALAXY.on) { GAL_STARS.on = false; tracerCloud.visible = realCloud.visible = false; }
     selected = null; galaxyPick = null; panel.style.display = 'none';   // M12c: no stale readout across the mode switch
-    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; curveCanvas.style.display = 'none'; }   // M12d/M12e/M12g
+    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; curveCanvas.style.display = 'none'; cepheidCloud.visible = false; }   // M12d/M12e/M12g/M12h
     console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
       `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
       `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
@@ -193,6 +194,14 @@ window.addEventListener('keydown', (event) => {
     drawCurve();
     console.log(`AUDIT: rotation-curve instrument ${curveCanvas.style.display === 'none'
       ? 'hidden' : 'ON — rulers receipted in lab/curveLab.mjs V0-V4'}.`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'w') {              // M12h: the disk's body
+    if (!GALAXY.on) { console.log('AUDIT: press g first — Cepheids live at galactic scale.'); return; }
+    if (!CEPHEIDS.loaded) { loadCepheids(); return; }
+    cepheidCloud.visible = !cepheidCloud.visible;
+    console.log(`AUDIT: Cepheid disk ${cepheidCloud.visible ? 'shown' : 'hidden'} ` +
+      `(${CEPHEIDS.list.length} from ${CEPHEIDS.source}).`);
     return;
   }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
@@ -516,6 +525,107 @@ function makeStarCloud(count, color, size) {
 const tracerCloud = makeStarCloud(240, 0x9fc4ff, 3);
 const realCloud   = makeStarCloud(HYG_SAMPLE.length, 0xffd24f, 6);
 scene.add(tracerCloud, realCloud);
+
+// ---------- M12h: the Cepheid disk — the galaxy's true body ----------
+// 2,373 real classical Cepheids (Skowron+ 2019, VizieR J/AcA/69/305) at
+// their measured seats, REAL heights, no lift — coloured by height so the
+// warp reads as a colour tide on the outer rim. Structure receipted in
+// lab/cephLab.mjs CD0-CD5 (warp spread 1.65 kpc, flare 2.97, shuffle
+// negative). They do not move — velocities honestly absent, banked for
+// the data-overlay milestone. CHEATS #14. Toggle: w.
+const CEPHEIDS = { loaded: false, list: [], source: null };
+let cepheidProvenance = null;
+
+const cepheidCloud = new THREE.Points(
+  new THREE.BufferGeometry(),
+  new THREE.PointsMaterial({ size: 3, sizeAttenuation: false,
+    vertexColors: true, transparent: true, opacity: 0.9 }));
+cepheidCloud.visible = false;
+scene.add(cepheidCloud);
+
+function parseCepheidTSV(text) {
+  const lines = text.split('\n').filter((l) => l && !l.startsWith('#')).slice(3);
+  const out = [], D2R = Math.PI / 180;
+  for (const line of lines) {
+    const [name, glon, glat, dist, , age] = line.split('\t').map((s) => s.trim());
+    if (!glon || !glat || !dist) continue;          // no distance, no seat
+    const l = +glon * D2R, b = +glat * D2R, d = +dist / 1000;
+    const xh = d * Math.cos(b) * Math.cos(l);       // heliocentric: x to center,
+    const yh = d * Math.cos(b) * Math.sin(l);       // y to rotation, z north
+    const zh = d * Math.sin(b);
+    const X = 8.2 - xh, Y = -yh, z = zh;            // repo axes, Sun at +8.2
+    if (Math.hypot(X, Y, z) > 30) continue;         // the confessed bench (CD1)
+    out.push({ name, X, Y, z, age: age ? +age : null });
+  }
+  return out;
+}
+
+// Height -> colour: warm above the plane, cool below, pale at zero.
+// The ramp saturates at +-1.5 kpc — a display dial, confessed in #14.
+function colourCepheids() {
+  const col = cepheidCloud.geometry.attributes.color;
+  for (let i = 0; i < CEPHEIDS.list.length; i++) {
+    const t = Math.max(-1, Math.min(1, CEPHEIDS.list[i].z / 1.5));
+    if (t >= 0) col.setXYZ(i, 0.85 + 0.15 * t, 0.85 - 0.28 * t, 0.85 - 0.62 * t);
+    else        col.setXYZ(i, 0.85 + 0.40 * t, 0.85 + 0.23 * t, 0.85 - 0.10 * t);
+  }
+  col.needsUpdate = true;
+}
+
+function buildCepheidCloud() {
+  const n = CEPHEIDS.list.length;
+  const pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const c = CEPHEIDS.list[i];
+    pos[i * 3] = c.X; pos[i * 3 + 1] = c.z; pos[i * 3 + 2] = -c.Y;   // real height
+  }
+  const g = cepheidCloud.geometry;
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  g.computeBoundingSphere();
+  colourCepheids();
+}
+
+async function loadCepheids() {
+  const q = '?-source=J/AcA/69/305/table1'
+    + '&-out=Name,GLON,GLAT,Dist,e_Dist,Age,_RA.icrs,_DE.icrs&-out.max=3000';
+  progressBox.style.display = 'block';
+  progressLabel.textContent = 'Collecting Cepheids » VizieR';
+  progressFill.style.width = '40%';
+  let text, source;
+  try {
+    const res = await fetch('/api/vizier' + q);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    text = await res.text();
+    if (text.length < 100000) throw new Error(`short body, ${text.length} bytes`);
+    source = 'VizieR live';
+  } catch (err) {
+    console.log(`AUDIT: Cepheid fetch failed (${err.message}) — using the shipped snapshot.`);
+    text = cepheidSnapshot; source = 'shipped snapshot';
+  }
+  CEPHEIDS.list = parseCepheidTSV(text);
+  CEPHEIDS.source = source;
+  CEPHEIDS.loaded = true;
+  buildCepheidCloud();
+  cepheidCloud.visible = true;
+  progressFill.style.width = '100%';
+  progressLabel.textContent = `${CEPHEIDS.list.length} Cepheids — the disk's body √`;
+  setTimeout(() => { progressBox.style.display = 'none'; }, 1500);
+  cepheidProvenance = {
+    source: `Classical Cepheids (Skowron+ 2019, OGLE) — ${source}`,
+    endpoint: 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=J/AcA/69/305/table1',
+    frame: 'seats from (GLON, GLAT, Dist), repo flip; real heights, no lift',
+    receipts: 'lab/cephLab.mjs CD0-CD5: warp 1.65 kpc, flare 2.97, shuffle negative',
+    session: new Date().toISOString(),
+    plotted: CEPHEIDS.list.length,
+    bytes: text.length,
+    sha256: await sha256Hex(text),
+  };
+  console.log('Cepheid provenance:', cepheidProvenance);
+  console.log(`AUDIT: ${CEPHEIDS.list.length} Cepheids at real seats, coloured by height — ` +
+    `warm above the plane, cool below. The outer rim's colour tide IS the warp ` +
+    `(CD3: +1.07 / -0.58 kpc). They do not move — velocities banked. CHEATS #14.`);
+}
 
 // Lift 0.15 units so the dots clear the wireframe instead of z-fighting it.
 function syncGalaxyStars() {
@@ -990,6 +1100,19 @@ function renderProvenance() {
   } else {
     blocks.push('CLUSTERS not loaded this session — press k in galaxy mode.');
   }
+  // M12h: the FOURTH live dataset — the Cepheid disk.
+  if (cepheidProvenance) {
+    blocks.push(
+      `SOURCE   ${cepheidProvenance.source}\n` +
+      `FRAME    ${cepheidProvenance.frame}\n` +
+      `RECEIPTS ${cepheidProvenance.receipts}\n` +
+      `SESSION  ${cepheidProvenance.session}\n\n` +
+      `plotted  ${cepheidProvenance.plotted} (14 far outliers benched — CD1)\n` +
+      `bytes    ${cepheidProvenance.bytes}\n` +
+      `sha256=${cepheidProvenance.sha256.slice(0, 12)}…  OK`);
+  } else {
+    blocks.push('CEPHEIDS not loaded this session — press w in galaxy mode.');
+  }
 
   provPanel.textContent = blocks.join('\n\n' + '-'.repeat(46) + '\n\n');
 }
@@ -1075,6 +1198,7 @@ function downloadProvenance() {
     solarSystem: sessionProvenance,
     globularClusters: clusterProvenance,
     gaiaProperMotions: gaiaProvenance,
+    cepheidDisk: cepheidProvenance,
   };
   const blob = new Blob([JSON.stringify(bundle, null, 2)],
                         { type: 'application/json' });

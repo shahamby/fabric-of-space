@@ -922,3 +922,39 @@ matter and the hole ruling separate rooms, one graph. CHEATS #13.
 Next (Shambu's call): M12h — (a) star catalog at scale, (b) halo-mass
 knob: dial MS to the first hostage release, (c) real MW rotation-curve
 DATA overlaid on this instrument — the toy vs the sky.
+
+## 2026-07-23 — session 10: M12h COMPLETE — the disk's true body
+
+Source probe-verified before a line of code (the gaiaLab rule): VizieR
+J/AcA/69/305/table1, Skowron+ 2019 — 2,631 classical Cepheids, Dist in
+pc and Age in Myr receipted from the source's own units line.
+
+lab/cephLab.mjs, 6/6 PASS: CD0 fetch 215,840 bytes | CD1 2,387 with
+full (l, b, Dist) — 14 far outliers (Rgc > 30 kpc, anticenter, up to
+121.7 kpc) BENCHED, counted and named, kept in the snapshot; 2,373 in
+the body | CD2 frame handshake: our AG matrix vs the CDS-computed ICRS
+columns, worst 6.8e-4 deg over 2,387 stars | CD3 THE WARP, measured:
+outer quadrant means +1.07 / -0.05 / -0.58 / -0.54 kpc, spread 1.65,
+inner disk flat to 0.012 — the real Milky Way's bend through our own
+pipeline | CD4 the flare: sigma_z triples outward (0.338 -> 1.006,
+ratio 2.97) | CD5 (Shambu's hand) the shuffle negative: same heights
+dealt to the wrong stars kill the signal (1.646 real vs ~0.1-0.3
+shuffled) — and he built the double-run INTO the file as a closure
+called twice, so every future execution self-verifies. Geometry, not
+statistics.
+
+Disclosure: the bench was added mid-verification after the 121.7 kpc
+star demanded an answer; the sealed CD3/CD4 bands never moved, and the
+cut is confessed in CD1's own print, permanently.
+
+Browser: w toggles 2,373 real stars at real seats and REAL heights,
+coloured warm-above / cool-below — the warp as a colour tide sweeping
+the outer rim, the inner disk pale. Fourth provenance block, D-bundle
+key cepheidDisk, snapshot data/cepheids.tsv. Age column rides the
+snapshot, banked for an age-paint experiment (spiral arms as age
+ribbons — Skowron's own second result).
+
+Next (Shambu's call): M12i — (a) Mroz velocity hunt: real Cepheid data
+points ON the M12g curve instrument, (b) age-paint mode: one key
+variant colours by Age and the arms appear, (c) the HYG knot: the
+visible bubble, as humility.

@@ -220,3 +220,27 @@ What is display, confessed:
    there is no toggle for the engine.
 4. VALUES ABOVE 250 km/s WOULD CLIP at the axis top. None exist on
    this domain today; the guard is for future physics.
+
+## 14. The colour tide (M12h)
+
+**Where:** `main.js` CEPHEIDS block, parseCepheidTSV, colourCepheids,
+the w key.
+
+The seats are MEASURED: 2,373 classical Cepheids (Skowron+ 2019) placed
+from (GLON, GLAT, Dist) through the front door, real heights, no lift —
+and the warp they draw is receipted (lab/cephLab.mjs CD3: quadrant
+means +1.07 / -0.58 kpc, spread 1.65; CD5 shuffle negative proves the
+instrument reads geometry, not statistics). What is display, confessed:
+
+1. COLOUR IS A HEIGHT RAMP, warm above the plane, cool below,
+   saturating at +/- 1.5 kpc. The tide's colours are chosen; the tide's
+   SHAPE is the catalogue's.
+2. THEY DO NOT MOVE. No velocities are wired — honestly absent, banked
+   for the data-overlay milestone. A Cepheid's seat is the catalogue's
+   epoch, frozen.
+3. FOURTEEN FAR OUTLIERS ARE BENCHED (Rgc > 30 kpc — past the fabric's
+   edge and the disk's body). Counted and named in CD1's own print;
+   kept in the snapshot; never silently dropped.
+4. POINT SIZE AND OPACITY are for eyes. The sample itself carries
+   OGLE's footprint bias — the far southern disk is seen deeper than
+   the north; the warp is real, the sampling is a telescope's.
