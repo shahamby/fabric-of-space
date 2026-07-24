@@ -14,6 +14,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace('/api/vizier', '/viz-bin/asu-tsv'),
       },
+      // M12i: the OGLE archive speaks plain HTTP files, no CORS. Same trick.
+      '/api/ogle': {
+        target: 'https://www.astrouw.edu.pl',
+        changeOrigin: true,
+        rewrite: (path) => path.replace('/api/ogle', '/ogle/ogle4/ROTATION_CURVE'),
+      },
     },
   },
 });

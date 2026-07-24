@@ -244,3 +244,28 @@ instrument reads geometry, not statistics). What is display, confessed:
 4. POINT SIZE AND OPACITY are for eyes. The sample itself carries
    OGLE's footprint bias — the far southern disk is seen deeper than
    the north; the warp is real, the sampling is a telescope's.
+
+## 15. The sky on the chart (M12i)
+
+**Where:** `main.js` MROZ block, loadMroz, drawCurve overlay, the m key.
+
+773 classical Cepheids with MEASURED circular velocities (Mroz et al.
+2019, OGLE archive) drawn on the rotation-curve instrument. What is
+display, confessed:
+
+1. THE DOTS ARE THE PUBLISHED VALUES, spent straight from the archive's
+   per-star file. Legitimate coin: lab/mrozLab.mjs MZ2 regenerated all
+   773 rows through our own reduction to the file's printed precision
+   (worst dR 4.99e-4 kpc, dV 5.00e-3 km/s). We spend the file because
+   we proved we could mint it.
+2. FORTY-ONE STARS RIDE THE RAIL. The #13 item 4 guard met real data:
+   41 of 773 carry V above the 250 km/s axis top. They are pinned at
+   the rail as open ticks — R true, V reading 'above the chart' — and
+   counted in the AUDIT line, the panel, and the provenance. Full
+   values live in data/mroz_curve.txt.
+3. ERROR BARS ARE NOT DRAWN. The file carries e_R and e_V per star; the
+   2x2 px dots ignore them. Typical e_V is a few km/s — an order below
+   the 55.5 km/s halo-OFF miss.
+4. THE DATA NEVER MOVES. Press h and only the MODEL sags; the sky is
+   the sky. The seat under the data is Mroz's MODEL 2 (R0 8.09 kpc,
+   theta0 233.6), not our 8.2 — a 1% difference, worn openly.

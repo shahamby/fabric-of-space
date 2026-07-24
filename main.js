@@ -8,6 +8,7 @@ import { HYG_SAMPLE } from './hygSample.js';
 import harrisVrSnapshot from './data/harris_vr.tsv?raw';  // M12e: Harris incl. heliocentric Vr
 import gaiaSnapshot from './data/gaia_pm.tsv?raw';        // M12e: Gaia EDR3 proper motions
 import cepheidSnapshot from './data/cepheids.tsv?raw';    // M12h: the disk's body
+import mrozSnapshot from './data/mroz_curve.txt?raw';     // M12i: the sky's own curve
 import { makeStarfield } from './starfield.js';
 
 // ---------- 1. The stage ----------
@@ -202,6 +203,16 @@ window.addEventListener('keydown', (event) => {
     cepheidCloud.visible = !cepheidCloud.visible;
     console.log(`AUDIT: Cepheid disk ${cepheidCloud.visible ? 'shown' : 'hidden'} ` +
       `(${CEPHEIDS.list.length} from ${CEPHEIDS.source}).`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'm') {              // M12i: the sky on the chart
+    if (!GALAXY.on) { console.log('AUDIT: press g first — the measured curve reads the galaxy.'); return; }
+    if (curveCanvas.style.display === 'none') { curveCanvas.style.display = 'block'; }
+    if (!MROZ.loaded) { loadMroz(); return; }
+    MROZ.shown = !MROZ.shown;
+    drawCurve();
+    console.log(`AUDIT: measured stars ${MROZ.shown ? 'shown' : 'hidden'} ` +
+      `(${MROZ.list.length} from ${MROZ.source}).`);
     return;
   }
   if (event.code === 'BracketLeft')  timeScale = Math.max(1,    timeScale / 2);  // space is an
@@ -535,7 +546,12 @@ scene.add(tracerCloud, realCloud);
 // the data-overlay milestone. CHEATS #14. Toggle: w.
 const CEPHEIDS = { loaded: false, list: [], source: null };
 let cepheidProvenance = null;
-
+// M12i: the sky's own rotation curve — 773 Cepheids with MEASURED circular
+// velocities (Mroz+ 2019). The browser spends the PUBLISHED per-star file;
+// lab/mrozLab.mjs MZ2 proved our machinery regenerates it star-for-star
+// (773/773, worst dV 5.0e-3 km/s). We spend the file because we minted it.
+const MROZ = { loaded: false, shown: false, list: [], railed: 0, source: null };
+let mrozProvenance = null;
 const cepheidCloud = new THREE.Points(
   new THREE.BufferGeometry(),
   new THREE.PointsMaterial({ size: 3, sizeAttenuation: false,
@@ -625,6 +641,53 @@ async function loadCepheids() {
   console.log(`AUDIT: ${CEPHEIDS.list.length} Cepheids at real seats, coloured by height — ` +
     `warm above the plane, cool below. The outer rim's colour tide IS the warp ` +
     `(CD3: +1.07 / -0.58 kpc). They do not move — velocities banked. CHEATS #14.`);
+}
+
+async function loadMroz() {
+  progressBox.style.display = 'block';
+  progressLabel.textContent = 'Collecting the measured curve » OGLE archive';
+  progressFill.style.width = '40%';
+  let text, source;
+  try {
+    const res = await fetch('/api/ogle/rotation_curve.txt');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    text = await res.text();
+    if (text.length < 30000) throw new Error(`short body, ${text.length} bytes`);
+    source = 'OGLE archive live';
+  } catch (err) {
+    console.log(`AUDIT: Mroz fetch failed (${err.message}) — using the shipped snapshot.`);
+    text = mrozSnapshot; source = 'shipped snapshot';
+  }
+  MROZ.list = []; MROZ.railed = 0;
+  for (const line of text.split('\n')) {
+    const s = line.trim();
+    if (!s || s.startsWith('#')) continue;
+    const t = s.split(/\s+/);
+    const R = +t[1], V = +t[3];
+    if (!Number.isFinite(R) || !Number.isFinite(V)) continue;
+    if (V > CURVE.V_MAX) MROZ.railed++;           // pinned at the rail, never hidden
+    MROZ.list.push({ R, V });
+  }
+  MROZ.loaded = true; MROZ.shown = true; MROZ.source = source;
+  progressFill.style.width = '100%';
+  progressLabel.textContent = `${MROZ.list.length} measured stars on the chart √`;
+  setTimeout(() => { progressBox.style.display = 'none'; }, 1500);
+  mrozProvenance = {
+    source: `Cepheid rotation curve (Mroz+ 2019, ApJL 870 L10) — ${source}`,
+    endpoint: 'https://www.astrouw.edu.pl/ogle/ogle4/ROTATION_CURVE/rotation_curve.txt',
+    method: 'published per-star (R, v_circ); their MODEL 2 seat R0 8.09 kpc, theta0 233.6',
+    receipts: 'lab/mrozLab.mjs MZ0-MZ5: 773/773 handshake; ON 4.9 vs OFF 55.5 km/s',
+    session: new Date().toISOString(),
+    plotted: MROZ.list.length,
+    railed: MROZ.railed,
+    bytes: text.length,
+    sha256: await sha256Hex(text),
+  };
+  console.log('Mroz provenance:', mrozProvenance);
+  console.log(`AUDIT: ${MROZ.list.length} measured stars on the curve instrument ` +
+    `(${MROZ.railed} above the 250 axis, pinned at the rail). ` +
+    `Press h — the model answers to the sky now. CHEATS #15.`);
+  drawCurve();
 }
 
 // Lift 0.15 units so the dots clear the wireframe instead of z-fighting it.
@@ -1053,6 +1116,21 @@ function drawCurve() {
   c.beginPath(); c.arc(curveRToPx(8.2), curveVToPy(vSun), 3.5, 0, 7); c.fill();
   c.fillStyle = '#bbb';
   c.fillText(`Sun ${vSun.toFixed(1)}`, curveRToPx(8.2) - 62, curveVToPy(vSun) - 7);
+  // M12i: the sky testifies. Dots are published measurements; they never
+  // move. Stars above the 250 axis ride the rail as open ticks — counted,
+  // confessed (CHEATS #15).
+  if (MROZ.loaded && MROZ.shown) {
+    c.fillStyle = 'rgba(140,190,255,0.75)';
+    for (const s of MROZ.list) {
+      if (s.V <= V_MAX) c.fillRect(curveRToPx(s.R) - 1, curveVToPy(s.V) - 1, 2, 2);
+    }
+    c.strokeStyle = '#8cbeff';
+    for (const s of MROZ.list) {
+      if (s.V > V_MAX) c.strokeRect(curveRToPx(s.R) - 1.5, Y_TOP - 1.5, 3, 3);
+    }
+    c.fillStyle = '#8cbeff';
+    c.fillText(`${MROZ.list.length} stars, Mroz+19 (${MROZ.railed} railed)`, X1 - 168, Y_TOP + 4);
+  }
 }
 
 function renderProvenance() {
@@ -1112,6 +1190,19 @@ function renderProvenance() {
       `sha256=${cepheidProvenance.sha256.slice(0, 12)}…  OK`);
   } else {
     blocks.push('CEPHEIDS not loaded this session — press w in galaxy mode.');
+  }
+  // M12i: the FIFTH dataset — the measured rotation curve.
+  if (mrozProvenance) {
+    blocks.push(
+      `SOURCE   ${mrozProvenance.source}\n` +
+      `METHOD   ${mrozProvenance.method}\n` +
+      `RECEIPTS ${mrozProvenance.receipts}\n` +
+      `SESSION  ${mrozProvenance.session}\n\n` +
+      `plotted  ${mrozProvenance.plotted} (${mrozProvenance.railed} above the 250 axis — railed)\n` +
+      `bytes    ${mrozProvenance.bytes}\n` +
+      `sha256=${mrozProvenance.sha256.slice(0, 12)}…  OK`);
+  } else {
+    blocks.push('MEASURED CURVE not loaded this session — press m in galaxy mode.');
   }
 
   provPanel.textContent = blocks.join('\n\n' + '-'.repeat(46) + '\n\n');
@@ -1199,6 +1290,7 @@ function downloadProvenance() {
     globularClusters: clusterProvenance,
     gaiaProperMotions: gaiaProvenance,
     cepheidDisk: cepheidProvenance,
+    measuredCurve: mrozProvenance,
   };
   const blob = new Blob([JSON.stringify(bundle, null, 2)],
                         { type: 'application/json' });

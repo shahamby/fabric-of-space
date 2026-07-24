@@ -251,7 +251,18 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   0.012; flare 2.97; CD5 Shambu's hand — shuffle negative built to
   self-run twice, geometry 1.646 vs statistics ~0.1-0.3). Browser: w
   toggles the height-coloured cloud — the warp as a colour tide on the
-  rim. Velocities banked for the overlay milestone. CHEATS #14 filed. 
+  rim. Velocities banked for the overlay milestone. CHEATS #14 filed.
+- **M12i: COMPLETE** — the sky on the chart. 773 classical Cepheids with
+  MEASURED circular velocities (Mroz+ 2019, ApJL 870 L10, OGLE archive —
+  the probe moved the front door off VizieR) drawn on the M12g instrument;
+  m fetches/toggles, snapshot fallback. Lab receipted (lab/mrozLab.mjs
+  MZ0-MZ5: 773/773 star-by-star handshake vs the published science file,
+  worst dV 5.0e-3 km/s; sky flatness 0.954 vs Kepler's 0.67; model
+  residuals halo-ON 4.9 vs OFF 55.5 km/s over 11 bins, outermost miss
+  76.2; MZ5 Shambu's hand — rotation-length receipt exact to the last
+  digit, zero-Sun negative crashes the ring median from 231.5 to 8.2).
+  41 stars above the 250 axis ride the rail, counted. Press h: the model
+  abandons the measured stars on screen. CHEATS #15.
   
 ## Idea backlog
 
