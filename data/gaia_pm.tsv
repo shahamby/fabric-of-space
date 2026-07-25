@@ -1,12 +1,12 @@
 #
 #   VizieR Astronomical Server vizier.cds.unistra.fr
-#    Date: 2026-07-21T13:35:56 [V7.5.6]
+#    Date: 2026-07-25T13:20:10 [V7.5.6]
 #   In case of problem, please report to:	cds-question@unistra.fr
 #
 #
 #Coosys	J2000:	eq_FK5 J2000
 #INFO	service_protocol=ASU	  IVOID of the protocol through which the data was retrieved
-#INFO	request_date=2026-07-21T13:35:56	  Query execution date
+#INFO	request_date=2026-07-25T13:20:10	  Query execution date
 #INFO	request=https://vizier.cds.unistra.fr/viz-bin/asu-tsv?-source=J/MNRAS/505/5978/tablea1&-out=Name,OName,RAJ2000,DEJ2000,pmRA,pmDE&-out.max=300	  Full request URL
 #INFO	contact=cds-question@unistra.fr	  Email or URL to contact publisher
 #INFO	server_software=VizieR/7.5.6	  Software version
