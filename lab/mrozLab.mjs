@@ -47,7 +47,7 @@ for (const line of curveText.split('\n')) {
   const s = line.trim();
   if (!s || s.startsWith('#')) continue;
   const t = s.split(/\s+/);
-  pub.set(t[0], { R: +t[1], V: +t[3] });
+  pub.set(t[0], { R: +t[1], V: +t[3], eV: +t[4] });   // M12j: the error column, kept
 }
 
 const flagged = stars.filter((s) => s.flag === 1);
@@ -263,3 +263,86 @@ console.log(`MZ5b negative receipt: zero-Sun median ` +
   `${noSunRing.toFixed(4)} km/s, MZ3 seal ` +
   `${sealLow.toFixed(1)}–${sealHigh.toFixed(1)}  ` +
   `[${anchorCrashed ? 'PASS' : 'FAIL'}]`);
+
+// ---------- MZ6: the bins carry error bars (M12j) ----------
+// Spend the FILE's coin (CHEATS #15 doctrine): published V and e_V.
+// Same bins as MZ4 — 1 kpc, 5 to 20, testify n >= 8. Each bin: N stars,
+// mean V, SD (the sky's thickness), SEM = SD/sqrt(N) (how well the MEAN
+// is known — the verdict's ruler). SEALED: bin count EQUALS MZ4's nBins,
+// and every SEM lands in 0.5-5 km/s.
+const BINS = [];
+for (let e = 5; e < 20; e++) {
+  const inBin = [...pub.values()].filter((p) => p.R >= e && p.R < e + 1);
+  if (inBin.length < 8) continue;
+  const N = inBin.length;
+  const mean = inBin.reduce((a, p) => a + p.V, 0) / N;
+  const sd = Math.sqrt(inBin.reduce((a, p) => a + (p.V - mean) ** 2, 0) / (N - 1));
+  BINS.push({ mid: e + 0.5, N, mean, sd, sem: sd / Math.sqrt(N) });
+}
+console.log('MZ6 bin    N   mean     SD    SEM');
+for (const b of BINS) console.log(`   ${b.mid.toFixed(1).padStart(5)} ${String(b.N).padStart(4)}` +
+  ` ${b.mean.toFixed(1).padStart(6)} ${b.sd.toFixed(1).padStart(6)} ${b.sem.toFixed(1).padStart(6)}`);
+const semOk = BINS.every((b) => b.sem > 0.5 && b.sem < 5);
+console.log(`MZ6 bins ${BINS.length} (MZ4 counted ${nBins}), SEM range ` +
+  `${Math.min(...BINS.map((b) => b.sem)).toFixed(1)}-${Math.max(...BINS.map((b) => b.sem)).toFixed(1)}  ` +
+  `[${BINS.length === nBins && semOk ? 'PASS' : 'FAIL'}]`);
+
+// ---------- MZ7: THE VERDICT — chi-square per bin, both hypotheses ----------
+// chi2/nu = mean of ((data - model)/SEM)^2 over the bins; nu = 11,
+// nothing was fitted to this data. SEALED: ON lands in 4-18 (a toy model,
+// convicted of being a toy, not of being wrong-shaped); OFF exceeds 300
+// (annihilation); OFF/ON exceeds 30. Second line: per-star chi2 with the
+// PUBLISHED e_V, for the record, ungated — peculiar motions live there.
+let c2On = 0, c2Off = 0, c2sOn = 0, c2sOff = 0;
+for (const b of BINS) {
+  HALO = true;  const onV  = vInner(b.mid);
+  HALO = false; const offV = vInner(b.mid);
+  HALO = true;
+  c2On  += ((b.mean - onV)  / b.sem) ** 2;
+  c2Off += ((b.mean - offV) / b.sem) ** 2;
+}
+for (const p of pub.values()) {
+  HALO = true;  const onV  = vInner(p.R);
+  HALO = false; const offV = vInner(p.R);
+  HALO = true;
+  c2sOn  += ((p.V - onV)  / p.eV) ** 2;
+  c2sOff += ((p.V - offV) / p.eV) ** 2;
+}
+const nuOn = c2On / BINS.length, nuOff = c2Off / BINS.length;
+console.log(`MZ7 verdict chi2/nu: halo ON ${nuOn.toFixed(1)}, OFF ${nuOff.toFixed(1)}, ` +
+  `ratio ${(nuOff / nuOn).toFixed(1)}  ` +
+  `[${nuOn > 4 && nuOn < 18 && nuOff > 300 && nuOff / nuOn > 30 ? 'PASS' : 'FAIL'}]`);
+console.log(`MZ7 per-star (published e_V, ${pub.size} stars): ` +
+  `ON ${(c2sOn / pub.size).toFixed(1)}, OFF ${(c2sOff / pub.size).toFixed(1)}  (for the record)`);
+
+// ---------- MZ8: SHAMBU'S HAND — the acquittal negative ----------
+let lcgState = 12345;
+const lcg = () => (lcgState = (lcgState * 48271) % 2147483647) / 2147483647;
+
+const zBell = () => {
+  let total = 0;
+  for (let i = 0; i < 12; i++) total += lcg();
+  return total - 6;
+};
+
+let c2Acq = 0, c2Cross = 0;
+for (const b of BINS) {
+  HALO = true;  const onV  = vInner(b.mid);
+  HALO = false; const offV = vInner(b.mid);
+  HALO = true;
+
+  const fake = onV + zBell() * b.sem;
+  c2Acq   += ((fake - onV)  / b.sem) ** 2;
+  c2Cross += ((fake - offV) / b.sem) ** 2;
+}
+
+const acq = c2Acq / BINS.length;
+const cross = c2Cross / BINS.length;
+
+console.log(`MZ8 acquittal chi2/nu ${acq.toFixed(2)}  ` +
+  `[${acq > 0.2 && acq < 2.6 ? 'PASS' : 'FAIL'}]  ` +
+  `(seal 0.2-2.6; a TRUE model reads ~1, not 0)`);
+
+console.log(`MZ8 cross chi2/nu ${cross.toFixed(1)}  ` +
+  `[${cross > 300 ? 'PASS' : 'FAIL'}]  ` +
+  `(the negative still convicts — taxonomy #8 armor)`);
