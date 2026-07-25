@@ -264,7 +264,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   41 stars above the 250 axis ride the rail, counted. Press h: the model
   abandons the measured stars on screen. CHEATS #15.
 - **R1: COMPLETE** — review commit, the honesty pass. F1 seed-frame sealed
-  (h can no longer write cluster data; gaiaLab G6: ____ km/s leak -> ____),
+  (h can no longer write cluster data; gaiaLab G6: 30.260 km/s leak -> 0.000),
   F2 principal-death disarm (a merge that eats Sun/Earth/Mercury now AUDITs
   and disarms the lap/perihelion instruments — no frozen-corpse readings),
   F3 HUD Sun-lap computed live (217.1 halo ON / 272.4 OFF), F4 in-flight
