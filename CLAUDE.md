@@ -263,6 +263,14 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   digit, zero-Sun negative crashes the ring median from 231.5 to 8.2).
   41 stars above the 250 axis ride the rail, counted. Press h: the model
   abandons the measured stars on screen. CHEATS #15.
+- **R1: COMPLETE** — review commit, the honesty pass. F1 seed-frame sealed
+  (h can no longer write cluster data; gaiaLab G6: ____ km/s leak -> ____),
+  F2 principal-death disarm (a merge that eats Sun/Earth/Mercury now AUDITs
+  and disarms the lap/perihelion instruments — no frozen-corpse readings),
+  F3 HUD Sun-lap computed live (217.1 halo ON / 272.4 OFF), F4 in-flight
+  guards on the k/w/m loaders, F5 a Horizons failure lands the progress bar
+  and AUDITs, F7 chart label clear of the rail. F6 (fabric dirty flag)
+  deferred to the backlog.
   
 ## Idea backlog
 

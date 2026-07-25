@@ -387,7 +387,13 @@ function kdk3(s, dt) {                    // the house shape, third axis include
 // Radial piece + two sky pieces in equatorial axes, rotate to galactic,
 // flip to repo (Sun at +X), add the Sun's own ride. Receipt: gaiaLab G3e.
 export function seedClusterVelocities(list) {
-  const vlsrModel = galaxyVCirc(8.2);
+  // F1 (R1): the h key is a DISPLAY toggle; seeding is DATA. The calibration
+  // frame is halo ON (gaiaLab G3c's 232.1 km/s), no matter what the screen
+  // showed when k was pressed. Receipt: gaiaLab G6 seed-frame invariance.
+  const savedHalo = GALAXY.haloOn;
+  GALAXY.haloOn = true;
+  const vlsrModel = galaxyVCirc(8.2);       // always the receipted frame
+  GALAXY.haloOn = savedHalo;
   const VSUN = [-11.1, -(vlsrModel + 12.24), 7.25];   // Schoenrich+2010 + our curve
   let seeded = 0;
   for (const c of list) {

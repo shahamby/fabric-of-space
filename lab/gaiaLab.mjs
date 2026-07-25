@@ -310,3 +310,20 @@ for (let n = 0; n < 12000; n++) {
 const ratio = dEmax / dE2;
 console.log(`G5b dt-halving: dEmax ${dEmax.toExponential(2)} -> ${dE2.toExponential(2)}, ` +
   `ratio ${ratio.toFixed(2)}  [${ratio > 3 && ratio < 5 ? 'PASS' : 'FAIL'}]`);
+  
+// ---------- G6: seed-frame invariance — SHAMBU'S HAND (R1/F1) ----------
+// h is a lamp switch (display). The seeder is a tape measure (data).
+// The same cluster seeded lamp-on and lamp-off MUST measure the same
+// speed, or the order of key presses is writing the science.
+import { copyFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+mkdirSync('lab/out', { recursive: true });
+copyFileSync('physics.js', 'lab/out/physicsLive.mjs');
+const PLIVE = await import(pathToFileURL('lab/out/physicsLive.mjs').href);
+const mkTest = () => [{ ra: 250.4, de: 36.5, pmra: -3.2, pmde: -2.6, vr: -120, rsun: 7.9 }];
+PLIVE.GALAXY.haloOn = true;  const seedA = mkTest(); PLIVE.seedClusterVelocities(seedA);
+PLIVE.GALAXY.haloOn = false; const seedB = mkTest(); PLIVE.seedClusterVelocities(seedB);
+PLIVE.GALAXY.haloOn = true;
+const dvSeed = Math.abs(seedA[0].v3 - seedB[0].v3);
+console.log(`G6  seed-frame invariance: |dv| = ${dvSeed.toFixed(3)} km/s  ` +
+  `[${dvSeed < 1e-9 ? 'PASS' : 'FAIL'}]  (h must never touch the data)`);

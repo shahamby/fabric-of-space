@@ -269,3 +269,19 @@ display, confessed:
 4. THE DATA NEVER MOVES. Press h and only the MODEL sags; the sky is
    the sky. The seat under the data is Mroz's MODEL 2 (R0 8.09 kpc,
    theta0 233.6), not our 8.2 — a 1% difference, worn openly.
+
+## 16. The seeded frame and the hand-written lap (R1 — review commit)
+
+**Where:** `physics.js` seedClusterVelocities; `main.js` HUD galaxy line.
+
+Two places display had touched reality, repaired and receipted:
+
+1. THE h KEY COULD WRITE THE DATA. Cluster seeding read the LIVE halo
+   toggle: press h before the first k and all velocities seeded with the
+   Sun riding at 185.0 instead of 232.1 — order of key presses as a
+   hidden input. Sealed to the calibration frame (halo ON), receipted in
+   gaiaLab G6: |dv| ____ km/s before the fix, ____ after.
+2. THE HUD LAP WAS A LITERAL. 'Sun's lap 217.1 Myr' was typed by hand,
+   true only with the halo on. Now computed live from galaxyVCirc(8.2):
+   217.1 with the halo, 272.4 without — the j AUDIT and the HUD finally
+   read the same instrument.

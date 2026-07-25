@@ -171,7 +171,13 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.key.toLowerCase() === 'k') {              // M12d: the real halo
     if (!GALAXY.on) { console.log('AUDIT: press g first — clusters live at galactic scale.'); return; }
-    if (!CLUSTERS.loaded) { loadClusters(); return; }
+    if (!CLUSTERS.loaded) {                            // F4: one fetch in flight, ever
+      if (!CLUSTERS.inFlight) {
+        CLUSTERS.inFlight = true;
+        loadClusters().finally(() => { CLUSTERS.inFlight = false; });
+      } else console.log('AUDIT: cluster fetch already in flight — key ignored.');
+      return;
+    }
     clusterCloud.visible = !clusterCloud.visible;
     if (!clusterCloud.visible) { clusterPick = null; refreshClusterTrail(); }
     console.log(`AUDIT: globular clusters ${clusterCloud.visible ? 'shown' : 'hidden'} ` +
@@ -199,7 +205,13 @@ window.addEventListener('keydown', (event) => {
   }
   if (event.key.toLowerCase() === 'w') {              // M12h: the disk's body
     if (!GALAXY.on) { console.log('AUDIT: press g first — Cepheids live at galactic scale.'); return; }
-    if (!CEPHEIDS.loaded) { loadCepheids(); return; }
+    if (!CEPHEIDS.loaded) {                            // F4: one fetch in flight, ever
+      if (!CEPHEIDS.inFlight) {
+        CEPHEIDS.inFlight = true;
+        loadCepheids().finally(() => { CEPHEIDS.inFlight = false; });
+      } else console.log('AUDIT: Cepheid fetch already in flight — key ignored.');
+      return;
+    }
     cepheidCloud.visible = !cepheidCloud.visible;
     console.log(`AUDIT: Cepheid disk ${cepheidCloud.visible ? 'shown' : 'hidden'} ` +
       `(${CEPHEIDS.list.length} from ${CEPHEIDS.source}).`);
@@ -208,7 +220,13 @@ window.addEventListener('keydown', (event) => {
   if (event.key.toLowerCase() === 'm') {              // M12i: the sky on the chart
     if (!GALAXY.on) { console.log('AUDIT: press g first — the measured curve reads the galaxy.'); return; }
     if (curveCanvas.style.display === 'none') { curveCanvas.style.display = 'block'; }
-    if (!MROZ.loaded) { loadMroz(); return; }
+    if (!MROZ.loaded) {                                // F4: one fetch in flight, ever
+      if (!MROZ.inFlight) {
+        MROZ.inFlight = true;
+        loadMroz().finally(() => { MROZ.inFlight = false; });
+      } else console.log('AUDIT: Mroz fetch already in flight — key ignored.');
+      return;
+    }
     MROZ.shown = !MROZ.shown;
     drawCurve();
     console.log(`AUDIT: measured stars ${MROZ.shown ? 'shown' : 'hidden'} ` +
@@ -863,8 +881,8 @@ function spawnSmoke(beta) {
 }
 
 // Lap detector: Earth's bearing as seen from the Sun's position, in the ecliptic plane.
-const earthSim = simBodies.find((body) => body.name === 'Earth');
-const sunSim = simBodies.find((body) => body.name === 'Sun');
+let earthSim = simBodies.find((body) => body.name === 'Earth');      // F2: let — a principal can die
+let sunSim = simBodies.find((body) => body.name === 'Sun');          // F2: let — a principal can die
 const heliocentricAngle = () =>
   Math.atan2(earthSim.pos[1] - sunSim.pos[1], earthSim.pos[0] - sunSim.pos[0]);
 const wrap = a => Math.atan2(Math.sin(a), Math.cos(a)); // fold any angle into [-π, π]
@@ -876,6 +894,7 @@ let lastLapDay = 0;
 // M8f parabola); a lap is a CROSSING (full slope — a line through the
 // two samples that straddle zero lands on it). Same disease, smaller dose.
 function checkLap() {
+  if (!earthSim || !sunSim) return;      // F2: instrument disarmed — principal gone
   const offset = wrap(heliocentricAngle() - startAngle); // radians past the start line
   if (simDays - lastLapDay > 180 && prevOffset < 0 && offset >= 0) {
     const f = prevOffset / (prevOffset - offset);  // fraction of the step where the line hits zero
@@ -889,7 +908,7 @@ function checkLap() {
 
 // Perihelion instrument (M8a): stamp Mercury's Sun-relative bearing at each
 // closest approach. Stamp-to-stamp drift IS the precession we're hunting.
-const mercurySim = simBodies.find((body) => body.name === 'Mercury');
+let mercurySim = simBodies.find((body) => body.name === 'Mercury');  // F2: let — a principal can die
 const mercurySunDistance = () => Math.hypot(
   mercurySim.pos[0] - sunSim.pos[0],
   mercurySim.pos[1] - sunSim.pos[1],
@@ -913,6 +932,7 @@ let periRel2 = null, periRel1 = null;  // M8f — the last two Sun-relative posi
 
 function checkPerihelion() {
   handleContacts();                      // M9 — surfaces exist; per-STEP, same honesty rule as the instrument
+  if (!mercurySim || !sunSim) return;    // F2: instrument disarmed — principal gone
   const rx = mercurySim.pos[0] - sunSim.pos[0],
         ry = mercurySim.pos[1] - sunSim.pos[1],
         rz = mercurySim.pos[2] - sunSim.pos[2];
@@ -1030,6 +1050,19 @@ function handleContacts() {
     `at day ${simDays.toFixed(1)}. New mass ${survivor.mass.toExponential(3)} Msun, ` +
     `radius ${survivor.radius_km.toFixed(0)} km, KE destroyed ${(eBefore - eAfter).toExponential(2)}.`);
   E0 = eAfter;                               // authorized change — re-seal AFTER confessing
+  // F2 (R1): a named principal can be eaten (mass surgery makes it reachable).
+  // A captured reference would then read a frozen corpse forever — bug
+  // taxonomy #2's exact shape. Confess loudly, disarm what depended on it.
+  if (eaten === sunSim || eaten === earthSim || eaten === mercurySim) {
+    console.log(`AUDIT: PRINCIPAL ABSORBED — ${eaten.name} no longer exists. ` +
+      `Dependent instruments disarmed; their ledgers end here.`);
+    if (eaten === mercurySim || eaten === sunSim) {
+      mercurySim = null;
+      periHud = 'Mercury perihelion: DISARMED — principal absorbed';
+    }
+    if (eaten === earthSim || eaten === sunSim) earthSim = null;
+    if (eaten === sunSim) sunSim = null;
+  }
   const sIdx = simBodies.indexOf(survivor);
   setCollapseVisual(bodyMeshes[sIdx], checkCollapse(survivor));  // heavier now — horizon check
   handleContacts();                          // indices shifted; rescan fresh
@@ -1129,7 +1162,7 @@ function drawCurve() {
       if (s.V > V_MAX) c.strokeRect(curveRToPx(s.R) - 1.5, Y_TOP - 1.5, 3, 3);
     }
     c.fillStyle = '#8cbeff';
-    c.fillText(`${MROZ.list.length} stars, Mroz+19 (${MROZ.railed} railed)`, X1 - 168, Y_TOP + 4);
+    c.fillText(`${MROZ.list.length} stars, Mroz+19 (${MROZ.railed} railed)`, X1 - 168, Y_TOP + 14);   // F7: below the rail ticks
   }
 }
 
@@ -1233,6 +1266,7 @@ let sessionProvenance = null;
 // Horizons - Fetch function
 async function fetchAllBodies() {
   progressBox.style.display = 'block';
+  try {                                    // F5: a failed fetch must LAND, not freeze
   const results = {};
   const records = [];
     const msPerDay = 24 * 60 * 60 * 1000;
@@ -1274,6 +1308,12 @@ async function fetchAllBodies() {
   console.log('Session provenance:', sessionProvenance);   // ← Option C, done
   applyLiveVectors(results);
   return results
+  } catch (err) {                          // F5: fail loud, stand the bar down
+    progressBox.style.display = 'none';
+    console.log(`AUDIT: Horizons fetch FAILED — ${err.message}. ` +
+      `Sim continues on the last good state; press L to retry.`);
+    return null;
+  }
 }
 
 // Horizons - Download provenance
@@ -1405,7 +1445,8 @@ if (GALAXY.on && (GAL_STARS.on || GAL_CLUSTERS.on)) {   // M12c: the disk turns;
     if (!paused) stepGalaxyStars(real);
     if (GAL_STARS.on) syncGalaxyStars();
     if (GAL_CLUSTERS.on && clusterCloud.visible) { syncClusterCloud(); colourClusters(); }
-    hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap 217.1 Myr`;
+    const sunLapMyr = 2 * Math.PI * 8.2 / (galaxyVCirc(8.2) * KMS_TO_KPC_MYR);   // F3: live — honours h
+    hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap ${sunLapMyr.toFixed(1)} Myr`;
   }
   if (GALAXY.on) updateGalaxyFabric(fabric);
   else updateFabric(fabric, simBodies, G, trueScale);
