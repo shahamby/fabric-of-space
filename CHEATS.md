@@ -280,7 +280,7 @@ Two places display had touched reality, repaired and receipted:
    toggle: press h before the first k and all velocities seeded with the
    Sun riding at 185.0 instead of 232.1 — order of key presses as a
    hidden input. Sealed to the calibration frame (halo ON), receipted in
-   gaiaLab G6: |dv| ____ km/s before the fix, ____ after.
+   gaiaLab G6: |dv| 30.260 km/s before, 0.000 after km/s
 2. THE HUD LAP WAS A LITERAL. 'Sun's lap 217.1 Myr' was typed by hand,
    true only with the halo on. Now computed live from galaxyVCirc(8.2):
    217.1 with the halo, 272.4 without — the j AUDIT and the HUD finally
