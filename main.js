@@ -1303,6 +1303,33 @@ function drawVerdict() {
 }
 
 function renderProvenance() {
+  const blocks = [];
+
+  if (sessionProvenance) {
+    blocks.push(
+      `SOURCE   ${sessionProvenance.source}\n` +
+      `FRAME    ${sessionProvenance.frame}\n` +
+      `SESSION  ${sessionProvenance.session}\n\n` +
+      sessionProvenance.bodies.map(r =>
+        `${r.body.padEnd(8)} cmd=${r.command}  ${r.epoch}  ` +
+        `sha256=${r.sha256.slice(0, 12)}…  ${r.parsed}`
+      ).join('\n'));
+  } else {
+    blocks.push('SOLAR    no live fetch this session — shipped snapshot (bodies.json).');
+  }
+  // M12e: the THIRD dataset — Gaia proper motions. Same rule as M12d: an
+  // absent record is itself a fact worth writing down.
+  if (gaiaProvenance) {
+    blocks.push(
+      `SOURCE   ${gaiaProvenance.source}\n` +
+      `PIPELINE ${gaiaProvenance.pipeline}\n` +
+      `SESSION  ${gaiaProvenance.session}\n\n` +
+      `matched  ${gaiaProvenance.matched} of 145, ${gaiaProvenance.seeded} seeded with 3D velocity\n` +
+      `bytes    ${gaiaProvenance.bytes}\n` +
+      `sha256=${gaiaProvenance.sha256.slice(0, 12)}…  OK`);
+  } else {
+    blocks.push('GAIA PMs not loaded this session — press k in galaxy mode.');
+  }
 
   // M12d: the catalogue is a SECOND dataset and gets its own block. The old
   // panel knew only about Horizons, so loading clusters live still printed

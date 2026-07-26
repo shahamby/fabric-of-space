@@ -35,6 +35,10 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
   lines — placeholder diagrams read as code and get typed as code.
 - Cloning a function can split the donor: after any clone, audit BOTH the
   copy and the original before running.
+- **Paste anchors sandwich, never edge.** Any block inserted before existing
+  code must include the following distinctive line in both FIND and REPLACE,
+  so that line rides along in the paste and cannot be lost. A bare function
+  header is never a valid anchor.
 
 ## Non-negotiable conventions
 
@@ -290,6 +294,13 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   now SAY SO instead of leaking an HTTP code. Receipt: hosted URL, fresh
   profile, g/m/r reads 9.0 and h reads 1329.5 — MZ7's numbers from a machine
   that never cloned the repo. Track A continues: A2 legend, A3 tour.
+  Fix riding along: the M12j paste anchor (a bare function header) silently
+  ate 27 lines from renderProvenance — const blocks, the Horizons record and
+  the Gaia record — and the P panel threw ReferenceError on the public build.
+  Restored byte-identical from fb54627. Receipt added: eslint no-undef over
+  every .js/.mjs, wired into the Pages workflow ahead of the build, so an
+  undefined identifier now fails the deploy instead of shipping. New rule:
+  paste anchors sandwich, never edge.
   
 ## Idea backlog
 
