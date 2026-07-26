@@ -153,7 +153,7 @@ window.addEventListener('keydown', (event) => {
     sgrA.visible = sunSeat.visible = GALAXY.on;
     if (!GALAXY.on) { GAL_STARS.on = false; tracerCloud.visible = realCloud.visible = false; }
     selected = null; galaxyPick = null; panel.style.display = 'none';   // M12c: no stale readout across the mode switch
-    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; curveCanvas.style.display = 'none'; cepheidCloud.visible = false; }   // M12d/M12e/M12g/M12h
+    if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; curveCanvas.style.display = 'none'; verdictCanvas.style.display = 'none'; cepheidCloud.visible = false; }   // M12d/M12e/M12g/M12h/M12j
     console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
       `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
       `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
@@ -193,6 +193,7 @@ window.addEventListener('keydown', (event) => {
       if (clusterPick !== null) refreshClusterTrail();   // same cluster, new fate
     }
     drawCurve();                                      // M12g: the plateau sags live
+    drawVerdict();                                    // M12j: and the verdict answers
     return;
   }
     if (event.key.toLowerCase() === 'v') {              // M12g: the curve, live
@@ -201,6 +202,18 @@ window.addEventListener('keydown', (event) => {
     drawCurve();
     console.log(`AUDIT: rotation-curve instrument ${curveCanvas.style.display === 'none'
       ? 'hidden' : 'ON — rulers receipted in lab/curveLab.mjs V0-V4'}.`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'r') {              // M12j: the verdict
+    if (!GALAXY.on) { console.log('AUDIT: press g first — the verdict reads the galaxy.'); return; }
+    verdictCanvas.style.display = verdictCanvas.style.display === 'none' ? 'block' : 'none';
+    drawVerdict();
+    if (verdictCanvas.style.display === 'none') { console.log('AUDIT: verdict panel hidden.'); return; }
+    console.log(`AUDIT: verdict panel ON — chi2/nu ${verdictChi2(GALAXY.haloOn).toFixed(1)} ` +
+      `with the halo ${GALAXY.haloOn ? 'ON' : 'OFF'}, ` +
+      `${verdictChi2(!GALAXY.haloOn).toFixed(1)} the other way. ` +
+      `${MROZ.loaded ? `${MROZ.bins.length} testifying bins` : 'press m to load the sky'}. ` +
+      `Rulers: lab/mrozLab.mjs MZ6-MZ8.`);
     return;
   }
   if (event.key.toLowerCase() === 'w') {              // M12h: the disk's body
@@ -568,7 +581,7 @@ let cepheidProvenance = null;
 // velocities (Mroz+ 2019). The browser spends the PUBLISHED per-star file;
 // lab/mrozLab.mjs MZ2 proved our machinery regenerates it star-for-star
 // (773/773, worst dV 5.0e-3 km/s). We spend the file because we minted it.
-const MROZ = { loaded: false, shown: false, list: [], railed: 0, source: null };
+const MROZ = { loaded: false, shown: false, list: [], bins: [], railed: 0, source: null };
 let mrozProvenance = null;
 const cepheidCloud = new THREE.Points(
   new THREE.BufferGeometry(),
@@ -681,10 +694,22 @@ async function loadMroz() {
     const s = line.trim();
     if (!s || s.startsWith('#')) continue;
     const t = s.split(/\s+/);
-    const R = +t[1], V = +t[3];
+    const R = +t[1], V = +t[3], eV = +t[4];
     if (!Number.isFinite(R) || !Number.isFinite(V)) continue;
     if (V > CURVE.V_MAX) MROZ.railed++;           // pinned at the rail, never hidden
-    MROZ.list.push({ R, V });
+    MROZ.list.push({ R, V, eV });
+  }
+  // M12j: the bins are DATA — published R and V only, no model, no halo
+  // (the F1 rule). Built ONCE at load, never per frame. Byte-identical
+  // recipe to mrozLab MZ6: 1 kpc bins, 5 to 20, a bin testifies at N >= 8.
+  MROZ.bins = [];
+  for (let e = 5; e < 20; e++) {
+    const inBin = MROZ.list.filter((s) => s.R >= e && s.R < e + 1);
+    if (inBin.length < 8) continue;
+    const N = inBin.length;
+    const mean = inBin.reduce((a, s) => a + s.V, 0) / N;
+    const sd = Math.sqrt(inBin.reduce((a, s) => a + (s.V - mean) ** 2, 0) / (N - 1));
+    MROZ.bins.push({ mid: e + 0.5, N, mean, sd, sem: sd / Math.sqrt(N) });
   }
   MROZ.loaded = true; MROZ.shown = true; MROZ.source = source;
   progressFill.style.width = '100%';
@@ -703,9 +728,10 @@ async function loadMroz() {
   };
   console.log('Mroz provenance:', mrozProvenance);
   console.log(`AUDIT: ${MROZ.list.length} measured stars on the curve instrument ` +
-    `(${MROZ.railed} above the 250 axis, pinned at the rail). ` +
-    `Press h — the model answers to the sky now. CHEATS #15.`);
+    `(${MROZ.railed} above the 250 axis, pinned at the rail), binned into ` +
+    `${MROZ.bins.length} testifying bins. Press r for the verdict. CHEATS #15, #17.`);
   drawCurve();
+  drawVerdict();
 }
 
 // Lift 0.15 units so the dots clear the wireframe instead of z-fighting it.
@@ -1166,34 +1192,102 @@ function drawCurve() {
   }
 }
 
-function renderProvenance() {
-  const blocks = [];
+// ---------- M12j: the verdict panel ----------
+// The log chart (CHEATS #13) spends 90% of its width on the inner galaxy;
+// every measured star lives in its last 10%. This panel is LINEAR in R
+// over 4-17 kpc — the band where the sky testifies — so 11 bins and their
+// error bars are legible. Same receipted galaxyVCircInner, same bins as
+// mrozLab MZ6, same chi-square as MZ7. Toggle: r.
+const VERD = { R_LO: 4, R_HI: 17, V_LO: 130, V_HI: 260,
+  X0: 40, X1: 310, Y_TOP: 28, Y_BOT: 152 };
+const vpx = (R) => VERD.X0 + (R - VERD.R_LO) / (VERD.R_HI - VERD.R_LO) * (VERD.X1 - VERD.X0);
+const vpy = (V) => VERD.Y_BOT - (V - VERD.V_LO) / (VERD.V_HI - VERD.V_LO) * (VERD.Y_BOT - VERD.Y_TOP);
 
-  if (sessionProvenance) {
-    blocks.push(
-      `SOURCE   ${sessionProvenance.source}\n` +
-      `FRAME    ${sessionProvenance.frame}\n` +
-      `SESSION  ${sessionProvenance.session}\n\n` +
-      sessionProvenance.bodies.map(r =>
-        `${r.body.padEnd(8)} cmd=${r.command}  ${r.epoch}  ` +
-        `sha256=${r.sha256.slice(0, 12)}…  ${r.parsed}`
-      ).join('\n'));
-  } else {
-    blocks.push('SOLAR    no live fetch this session — shipped snapshot (bodies.json).');
+const verdictCanvas = document.createElement('canvas');
+verdictCanvas.width = 320; verdictCanvas.height = 190;
+verdictCanvas.style.cssText =
+  'position:fixed; bottom:190px; left:12px; background:rgba(8,10,14,0.88);' +
+  'border:1px solid #3a3f4a; border-radius:6px; display:none;';
+document.body.append(verdictCanvas);
+
+// chi2/nu over the testifying bins. Divides by SEM — how well each bin MEAN
+// is known — not SD, which is how thick the sky is. MZ7's ruler exactly.
+function verdictChi2(halo) {
+  if (!MROZ.bins.length) return NaN;
+  let c2 = 0;
+  for (const b of MROZ.bins) c2 += ((b.mean - galaxyVCircInner(b.mid, true, halo)) / b.sem) ** 2;
+  return c2 / MROZ.bins.length;
+}
+
+function drawVerdict() {
+  if (verdictCanvas.style.display === 'none') return;
+  const c = verdictCanvas.getContext('2d');
+  const { X0, X1, Y_TOP, Y_BOT, R_LO, R_HI } = VERD;
+  c.clearRect(0, 0, 320, 190);
+  c.font = '10px monospace';
+  c.fillStyle = '#8ee6c8';
+  c.fillText('VERDICT PANEL — 4 to 17 kpc, linear', 8, 13);
+  c.strokeStyle = '#555';
+  c.beginPath(); c.moveTo(X0, Y_BOT); c.lineTo(X1, Y_BOT);
+  c.moveTo(X0, Y_TOP); c.lineTo(X0, Y_BOT); c.stroke();
+  c.fillStyle = '#777';
+  for (const R of [4, 6, 8, 10, 12, 14, 16]) {
+    const px = vpx(R);
+    c.beginPath(); c.moveTo(px, Y_BOT); c.lineTo(px, Y_BOT + 4); c.stroke();
+    c.fillText(String(R), px - 6, Y_BOT + 14);
   }
-  // M12e: the THIRD dataset — Gaia proper motions. Same rule as M12d: an
-  // absent record is itself a fact worth writing down.
-  if (gaiaProvenance) {
-    blocks.push(
-      `SOURCE   ${gaiaProvenance.source}\n` +
-      `PIPELINE ${gaiaProvenance.pipeline}\n` +
-      `SESSION  ${gaiaProvenance.session}\n\n` +
-      `matched  ${gaiaProvenance.matched} of 145, ${gaiaProvenance.seeded} seeded with 3D velocity\n` +
-      `bytes    ${gaiaProvenance.bytes}\n` +
-      `sha256=${gaiaProvenance.sha256.slice(0, 12)}…  OK`);
-  } else {
-    blocks.push('GAIA PMs not loaded this session — press k in galaxy mode.');
+  c.fillText('kpc', X1 - 22, Y_BOT + 14);
+  for (const V of [260, 195, 130]) c.fillText(String(V), X0 - 26, vpy(V) + 3);
+  if (!MROZ.loaded) {
+    c.fillStyle = '#bbb';
+    c.fillText('press m to load the measured sky', X0 + 20, vpy(195));
+    return;
   }
+  // Both models, always: solid = the live hypothesis, dashed = the other.
+  for (const halo of [true, false]) {
+    const live = halo === GALAXY.haloOn;
+    c.strokeStyle = halo ? '#ff7a4f' : '#8a7a72';
+    c.lineWidth = live ? 2 : 1;
+    c.setLineDash(live ? [] : [4, 3]);
+    c.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const R = R_LO + (R_HI - R_LO) * i / 120;
+      const py = vpy(galaxyVCircInner(R, true, halo));
+      i === 0 ? c.moveTo(vpx(R), py) : c.lineTo(vpx(R), py);
+    }
+    c.stroke();
+  }
+  c.setLineDash([]); c.lineWidth = 1;
+  // The sky: bin means, whisker = +-1 SD. Published values, never moved.
+  c.strokeStyle = '#5fe3b0'; c.fillStyle = '#5fe3b0';
+  for (const b of MROZ.bins) {
+    const px = vpx(b.mid), hi = vpy(b.mean + b.sd), lo = vpy(b.mean - b.sd);
+    c.beginPath();
+    c.moveTo(px, lo); c.lineTo(px, hi);
+    c.moveTo(px - 3, hi); c.lineTo(px + 3, hi);
+    c.moveTo(px - 3, lo); c.lineTo(px + 3, lo);
+    c.stroke();
+    c.beginPath(); c.arc(px, vpy(b.mean), 2, 0, 7); c.fill();
+  }
+  // Legend, in the empty ground under the halo-OFF model.
+  c.strokeStyle = '#ff7a4f'; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(X0 + 6, 120); c.lineTo(X0 + 20, 120); c.stroke();
+  c.strokeStyle = '#8a7a72'; c.lineWidth = 1; c.setLineDash([4, 3]);
+  c.beginPath(); c.moveTo(X0 + 6, 133); c.lineTo(X0 + 20, 133); c.stroke();
+  c.setLineDash([]);
+  c.fillStyle = '#bbb';
+  c.fillText(`halo ON${GALAXY.haloOn ? ' (live)' : ''}`, X0 + 26, 123);
+  c.fillText(`halo OFF${GALAXY.haloOn ? '' : ' (live)'}`, X0 + 26, 136);
+  c.fillStyle = '#5fe3b0';
+  c.fillText(`I ${MROZ.bins.length} bins, bar 1 SD`, X0 + 6, 148);
+  // The number. Green under MZ7's ON seal of 18, red above it.
+  const live = verdictChi2(GALAXY.haloOn), other = verdictChi2(!GALAXY.haloOn);
+  c.fillStyle = live < 18 ? '#8ee6c8' : '#ff6b5a';
+  c.fillText(`VERDICT chi2/nu ${live.toFixed(1)}   (halo ${GALAXY.haloOn ? 'OFF' : 'ON'}` +
+    ` would read ${other.toFixed(1)})`, 8, 178);
+}
+
+function renderProvenance() {
 
   // M12d: the catalogue is a SECOND dataset and gets its own block. The old
   // panel knew only about Horizons, so loading clusters live still printed

@@ -286,11 +286,15 @@ export function galaxyVCirc(R) {          // circular speed, km/s, read off Phi
 // Panel-only — nothing dynamical ever flies here. Analytic v^2 pieces,
 // floored at 0.0001 kpc (0.1 pc, five orders above the horizon).
 // Receipted in lab/bhLab.mjs: crossover 8.61 pc, slopes -0.49 / +0.50.
-export function galaxyVCircInner(R, withBH) {
+export function galaxyVCircInner(R, withBH, haloOverride) {
   const g = GALAXY, r = Math.max(R, 1e-4), S = g.AD + g.BD;
+  // M12j: haloOverride lets a caller ASK for the counterfactual curve
+  // without touching GALAXY.haloOn. Omit it and behaviour is unchanged —
+  // the F1 lesson built in: no global is mutated just to read a number.
+  const halo = haloOverride === undefined ? g.haloOn : haloOverride;
   let v2 = g.G * g.MB * r / ((r + g.AB) ** 2)
          + g.G * g.MD * r * r / ((r * r + S * S) ** 1.5);
-  if (g.haloOn) {
+  if (halo) {
     const x = r / g.RS;
     v2 += g.G * g.MS * (Math.log(1 + x) - x / (1 + x)) / r;
   }

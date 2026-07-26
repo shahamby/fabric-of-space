@@ -271,6 +271,17 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   guards on the k/w/m loaders, F5 a Horizons failure lands the progress bar
   and AUDITs, F7 chart label clear of the rail. F6 (fabric dirty flag)
   deferred to the backlog.
+- **M12j: COMPLETE** — the chart stops persuading and starts testifying.
+  773 published Cepheid velocities binned into 11 testifying bins (1 kpc,
+  5-20, N >= 8); error bars on screen and a live chi-square verdict.
+  Lab receipted (lab/mrozLab.mjs MZ6-MZ8): MZ6 bins match MZ4's count with
+  SEM 0.9-3.9 km/s; MZ7 verdict chi2/nu halo ON 9.0 vs OFF 1329.5, ratio
+  147.7 (per-star with published e_V: 28.1 vs 638.3); MZ8 Shambu's hand —
+  the ACQUITTAL negative, a fake sky drawn from the ON model reads 1.00,
+  not 0, and the same fake sky still convicts the OFF model at 1357.8.
+  'r' opens the verdict panel (linear 4-17 kpc); the browser's number is
+  MZ7's number to the decimal. Press h: the model abandons the error bars
+  and the verdict goes red. CHEATS #17.
   
 ## Idea backlog
 

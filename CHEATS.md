@@ -285,3 +285,27 @@ Two places display had touched reality, repaired and receipted:
    true only with the halo on. Now computed live from galaxyVCirc(8.2):
    217.1 with the halo, 272.4 without — the j AUDIT and the HUD finally
    read the same instrument.
+
+## 17. The verdict panel (M12j)
+
+**Where:** `main.js` VERD block, drawVerdict, verdictChi2, the r key.
+
+The hypothesis test on screen. What is display, confessed:
+
+1. THE PANEL IS LINEAR; THE OTHER CHART IS LOG. Same physics, two
+   frames. The log chart (#13) exists for Sgr A*'s 8.7 pc valley and
+   crushes all 773 measured stars into its last 10% — 11 bins across
+   27 px, whiskers 3-9 px, one smear. This panel spends its whole
+   width on 4-17 kpc, where the sky actually testifies. Nothing is
+   hidden: every star still rides the log chart under m.
+2. THE BAR AND THE TEST USE DIFFERENT RULERS. Whiskers draw +-1 SD —
+   how thick the sky is, what the eye should see. chi2/nu divides by
+   SEM = SD/sqrt(N) — how well each bin MEAN is known, which is what a
+   hypothesis test must use. Both printed by mrozLab MZ6; the legend
+   says "bar 1 SD" so the two are never confused.
+3. THE COLOUR THRESHOLD IS 18. Green below, red above. 18 is MZ7's
+   sealed upper bound for the halo-ON verdict, not a taste.
+4. BOTH CURVES ARE ALWAYS DRAWN. The dashed one is a counterfactual —
+   galaxyVCircInner's haloOverride argument, which reads a curve
+   WITHOUT mutating GALAXY.haloOn. Two-arg calls are byte-identical to
+   pre-M12j behaviour (verified over 1600 samples, worst |dv| 0).
