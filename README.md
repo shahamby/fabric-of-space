@@ -1,5 +1,8 @@
 # Fabric of Space
 
+**[Open it in your browser →](https://shahamby.github.io/fabric-of-space/)**
+*(no install; the hosted build carries its own data snapshots)*
+
 An interactive 3D solar system where gravity is something you can *see*.
 
 ![The fabric, Just another boring day in the system — All data verified and in sync with NASA](docs/before_status_preview.png)

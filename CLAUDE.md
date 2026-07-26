@@ -282,6 +282,14 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   'r' opens the verdict panel (linear 4-17 kpc); the browser's number is
   MZ7's number to the decimal. Press h: the model abandons the error bars
   and the verdict goes red. CHEATS #17.
+- **A1: COMPLETE** — the URL exists. `base: './'` (GitHub Pages serves at a
+  subpath; the default absolute asset path 404s there — verified). Static
+  build carries every catalog inside the bundle via the ?raw imports, so a
+  hosted visitor gets all 773 Cepheids, 145 clusters and the full solar
+  system with no network. Live-catalog keys are dark on a hosted build and
+  now SAY SO instead of leaking an HTTP code. Receipt: hosted URL, fresh
+  profile, g/m/r reads 9.0 and h reads 1329.5 — MZ7's numbers from a machine
+  that never cloned the repo. Track A continues: A2 legend, A3 tour.
   
 ## Idea backlog
 
