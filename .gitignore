@@ -2,3 +2,6 @@ node_modules
 dist
 lab/out/physicsLive.mjs
 userLogs
+lab/out/
+data/gaia_vb21.tsv
+data/harris_m12e.tsv
