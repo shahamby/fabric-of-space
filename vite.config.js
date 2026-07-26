@@ -1,6 +1,11 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  // A1: GitHub Pages serves this repo at /fabric-of-space/, not at the
+  // domain root. Without a relative base, the build emits src="/assets/..."
+  // which 404s there — a black screen. './' makes every asset path relative
+  // to wherever the page actually sits, so the same dist/ works anywhere.
+  base: './',
   server: {
     proxy: {
       '/api/horizons': {

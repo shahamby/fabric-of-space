@@ -11,6 +11,21 @@ import cepheidSnapshot from './data/cepheids.tsv?raw';    // M12h: the disk's bo
 import mrozSnapshot from './data/mroz_curve.txt?raw';     // M12i: the sky's own curve
 import { makeStarfield } from './starfield.js';
 
+// ---------- A1: hosted mode ----------
+// The dev server carries the CORS proxies (vite.config.js). A built bundle
+// served from a static host has no /api/* to proxy through — a STRUCTURAL
+// limit, not a bug, so say so instead of leaking an HTTP code at a visitor.
+// Nothing is lost but freshness: every catalog is compiled into this page by
+// the ?raw imports above, so all 773 Cepheids, 145 clusters and the full
+// solar system are here offline. import.meta.env.PROD is true in a build,
+// false under `npm run dev`.
+const HOSTED = import.meta.env.PROD;
+const LIVE_OFF = 'hosted build — no CORS proxy here, so live catalogs are ' +
+  'unreachable; running on the snapshots compiled into this page';
+const fetchNote = (err) => (HOSTED ? LIVE_OFF : err.message);
+if (HOSTED) console.log(`AUDIT: ${LIVE_OFF}. Everything else is fully live — ` +
+  `the integrator, the fabric, the instruments.`);
+
 // ---------- 1. The stage ----------
 // Think movie set: a Scene holds objects, a Camera views them,
 // and a Renderer is the crew that draws each frame onto a canvas.
@@ -499,7 +514,7 @@ async function loadClusters() {
       if (text.length < minBytes) throw new Error(`short body, ${text.length} bytes`);
       return { text, source: 'VizieR live' };
     } catch (err) {
-      console.log(`AUDIT: ${label} fetch failed (${err.message}) — using the shipped snapshot.`);
+      console.log(`AUDIT: ${label} fetch failed (${fetchNote(err)}) — using the shipped snapshot.`);
       return { text: fallback, source: 'shipped snapshot' };
     }
   }
@@ -647,7 +662,7 @@ async function loadCepheids() {
     if (text.length < 100000) throw new Error(`short body, ${text.length} bytes`);
     source = 'VizieR live';
   } catch (err) {
-    console.log(`AUDIT: Cepheid fetch failed (${err.message}) — using the shipped snapshot.`);
+    console.log(`AUDIT: Cepheid fetch failed (${fetchNote(err)}) — using the shipped snapshot.`);
     text = cepheidSnapshot; source = 'shipped snapshot';
   }
   CEPHEIDS.list = parseCepheidTSV(text);
@@ -686,7 +701,7 @@ async function loadMroz() {
     if (text.length < 30000) throw new Error(`short body, ${text.length} bytes`);
     source = 'OGLE archive live';
   } catch (err) {
-    console.log(`AUDIT: Mroz fetch failed (${err.message}) — using the shipped snapshot.`);
+    console.log(`AUDIT: Mroz fetch failed (${fetchNote(err)}) — using the shipped snapshot.`);
     text = mrozSnapshot; source = 'shipped snapshot';
   }
   MROZ.list = []; MROZ.railed = 0;
@@ -1404,8 +1419,8 @@ async function fetchAllBodies() {
   return results
   } catch (err) {                          // F5: fail loud, stand the bar down
     progressBox.style.display = 'none';
-    console.log(`AUDIT: Horizons fetch FAILED — ${err.message}. ` +
-      `Sim continues on the last good state; press L to retry.`);
+    console.log(`AUDIT: Horizons fetch FAILED — ${fetchNote(err)}. ` +
+      `Sim continues on the last good state${HOSTED ? '' : '; press L to retry'}.`);
     return null;
   }
 }
