@@ -1085,3 +1085,33 @@ on all five. .gitattributes pins data/** to LF, because a checksum that
 changes with your operating system is not a checksum. Hosted boot
 notice on screen, dismissible; L answers in a sentence instead of a
 flash. CHEATS #18.
+
+## 2026-07-27 — session 14: A2 COMPLETE — the legend, and a lab that guards it
+
+Wall 2 measured before it was fixed: main.js bound 24 actions, README
+documented 10. Every key added since M12a — the entire galaxy tier —
+was undiscoverable to anyone but its author. A key that works and is
+documented nowhere is fail-silent by construction.
+
+KEYS is now the single source of truth: one array, 25 entries, grouped
+in the order a newcomer should meet them. The ? panel is GENERATED from
+it at boot, so the text on screen and the list in the code cannot be
+different things. A permanent 'press ? for controls' hint sits at the
+bottom of the screen — the only unprompted text in the app.
+
+lab/legendLab.mjs is the guard, and it is the eslint gate one level up:
+that one proves the code is consistent with itself, this one proves the
+DOCS are consistent with the code. It reads the keydown firewall and
+the KEYS array out of main.js and fails on drift in EITHER direction —
+L1 catches a key bound but undocumented, L2 catches a key documented
+but unbound. L3 is the negative: it sabotages a COPY of the source with
+a secret 'q' binding and demands L1's logic catch it, so the lab can
+never pass by being blind. 25 = 25, four PASS. Non-zero exit, wired
+into the Pages workflow between the lint and the build.
+
+README's control table rewritten from the same list, ending with the
+shortest path to the point: g -> m -> r -> h. CHEATS #19.
+
+Deviation logged: legendLab.mjs was written by Claude, not Shambu's
+hand, at Shambu's explicit request for a paste-only session. The lab
+authorship rule stands for future sessions.

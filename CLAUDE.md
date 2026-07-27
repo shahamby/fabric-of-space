@@ -335,9 +335,9 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
 - ~~HANDOFF.md needs an append-only header line~~ — DONE: landed with the
   M5–M7 session append (commit 4f5db44).
 - ~~Commit-msg hook prefix bypass~~ — CONFIRMED live 07/13 by negative test,
-  regex tightened to word-boundary M<number>: match, sterile retest BLOCKED. CLOSED.
+  regex tightened to word-boundary M`'<number>'`: match, sterile retest BLOCKED. CLOSED.
 - ~~Stray dev server~~ may be holding port 5173 (current session moved to 5174).
-  Fix when seen: netstat -ano | findstr :5173 → taskkill /PID <pid> /F. - Verified 07/12/2026
+  Fix when seen: netstat -ano | findstr :5173 → taskkill /PID `'<pid>'` /F. - Verified 07/12/2026
 - ~~M5c provenance design decision~~ — RESOLVED: one source, three views
   (console / P panel / D download). Shipped in M5c.
 - M9 known limits: DT 0.05 can tunnel a planet-planet contact at extreme
