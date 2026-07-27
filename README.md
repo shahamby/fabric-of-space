@@ -73,18 +73,26 @@ sent anywhere except your request to NASA.
 
 ## Controls
 
-| Key | Action |
-| --- | --- |
-| Click | Select a body — info panel shows mass, distance, speed, and its Schwarzschild radius |
-| Drag / scroll | Orbit and zoom the camera |
-| `Space` | Pause / resume the integrator |
-| `=` / `-` | Double / halve the selected body's mass (collapse check runs on every change) |
-| `N` | Spawn a rogue body |
-| `[` / `]` | Halve / double time scale (1–2048 simulated days per second) |
-| `T` | Toggle true-scale display — the honest, nearly-flat universe |
-| `L` | Load live epoch — re-anchor the sim to real NASA data from yesterday |
-| `P` | Toggle the provenance panel |
-| `D` | Download session provenance (JSON with per-body SHA-256) |
+Press **`?`** in the app for the full list — it is generated from the same
+array the code reads, and `lab/legendLab.mjs` fails the build if the two
+ever disagree.
+
+---
+
+| mouse | drag to orbit, scroll to zoom, click a body to select |
+| `Space` `[` `]` | pause · slower · faster |
+| `t` | true scale |
+| `=` `-` | double / halve the selected body's mass |
+| `e` | Einstein on/off (1PN) — Mercury's +42.8″/century |
+| `b` | solar magnetic field |
+| `n` `c` `C` `x` `X` | rogue · dust · polar dust · smoke β 0.49 · smoke β 0.51 |
+| `g` | **galaxy mode** — 1 grid unit becomes 1 kiloparsec |
+| `h` | **dark halo on/off** |
+| `j` `k` `w` | tracer stars · 145 globular clusters · 2,373 Cepheids |
+| `v` `m` `r` | rotation curve · 773 measured stars · **verdict panel** |
+| `L` `P` `D` | live Horizons fetch · provenance · download provenance |
+
+**Shortest path to the point:** `g` → `m` → `r` → then press `h`.
 
 Recipe for a black hole: select Jupiter and press `=` twenty-five times.
 Press 24 leaves the horizon buried ~23,000 km beneath the cloud tops;

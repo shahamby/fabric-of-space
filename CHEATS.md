@@ -329,3 +329,21 @@ What is display, confessed:
    instead of a flash. One line to remove if you host behind your own proxy.
 4. THE BOOT NOTICE IS THE ONLY UNPROMPTED TEXT this app puts on screen.
    It dismisses on click and never returns that session.
+
+## 19. The legend is generated, not written (A2)
+
+**Where:** `main.js` KEYS, drawLegend, the ? key; `lab/legendLab.mjs`.
+
+The panel is built from the KEYS array at boot, so the text on screen and
+the list in the code cannot be different things. What is display,
+confessed:
+
+1. THE GROUPS AND THE ORDER ARE EDITORIAL. Keys are listed in the order a
+   newcomer should meet them, not the order they appear in the firewall.
+   The MEMBERSHIP is not editorial: legendLab L1/L2 fails if a single key
+   is bound without a line here, or promised here without a binding.
+2. THE DESCRIPTIONS ARE PROSE and nothing verifies them. legendLab proves
+   the key EXISTS, not that the sentence is true. A wrong sentence is
+   still possible; a missing key is not.
+3. THE HINT AT THE BOTTOM never goes away except while the legend is open.
+   It is the only permanent unprompted text in the app.

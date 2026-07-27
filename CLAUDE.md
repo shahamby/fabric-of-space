@@ -309,6 +309,15 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   .gitattributes pins data/** to LF so a checksum cannot depend on the OS.
   Hosted boot notice on screen, dismissible; L answers in a sentence instead
   of a flash. CHEATS #18.
+- **A2: COMPLETE** — Wall 2 down. 24 actions were bound and 10 documented;
+  the whole galaxy tier was undiscoverable. KEYS is now the single source
+  of truth, the ? legend is generated from it, and a permanent 'press ?
+  for controls' hint sits at the bottom of the screen. lab/legendLab.mjs
+  reads both the keydown firewall and the KEYS array out of main.js and
+  fails on drift in either direction — 25/25 agreement, with L3 sabotaging
+  a copy of the source to prove the lab can fail. Wired into the Pages
+  workflow ahead of the build, beside the eslint gate. README rewritten
+  from the same list. CHEATS #19.
 
 ## Idea backlog
 
