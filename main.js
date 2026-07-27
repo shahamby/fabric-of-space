@@ -9,6 +9,7 @@ import harrisVrSnapshot from './data/harris_vr.tsv?raw';  // M12e: Harris incl. 
 import gaiaSnapshot from './data/gaia_pm.tsv?raw';        // M12e: Gaia EDR3 proper motions
 import cepheidSnapshot from './data/cepheids.tsv?raw';    // M12h: the disk's body
 import mrozSnapshot from './data/mroz_curve.txt?raw';     // M12i: the sky's own curve
+import bodiesSnapshot from './data/bodies.json?raw';       // A1.1: the solar epoch, as BYTES (bodies.js imports the parsed object; provenance needs the file)
 import { makeStarfield } from './starfield.js';
 
 // ---------- A1: hosted mode ----------
@@ -23,8 +24,23 @@ const HOSTED = import.meta.env.PROD;
 const LIVE_OFF = 'hosted build — no CORS proxy here, so live catalogs are ' +
   'unreachable; running on the snapshots compiled into this page';
 const fetchNote = (err) => (HOSTED ? LIVE_OFF : err.message);
-if (HOSTED) console.log(`AUDIT: ${LIVE_OFF}. Everything else is fully live — ` +
-  `the integrator, the fabric, the instruments.`);
+if (HOSTED) {
+  console.log(`AUDIT: ${LIVE_OFF}. Everything else is fully live — ` +
+    `the integrator, the fabric, the instruments.`);
+  const notice = document.createElement('div');   // A1.1: say it on SCREEN, once, dismissibly
+  notice.style.cssText =
+    'position:fixed; top:56px; left:50%; transform:translateX(-50%); max-width:540px;' +
+    'background:rgba(8,10,14,0.92); border:1px solid #3a3f4a; border-radius:6px; z-index:20;' +
+    'color:#9fd; font:12px/1.55 monospace; padding:10px 14px; cursor:pointer;';
+  notice.textContent =
+    'Hosted build — this page carries its own data: the full solar system, ' +
+    '145 globular clusters, 773 measured Cepheids. Live catalogue fetches need ' +
+    'the dev server, so they fall back to these snapshots. Press P for their checksums.' +
+    '\n\n[click to dismiss]';
+  notice.style.whiteSpace = 'pre-wrap';
+  notice.addEventListener('click', () => notice.remove());
+  document.body.append(notice);        // module scripts are deferred — body exists
+}
 
 // ---------- 1. The stage ----------
 // Think movie set: a Scene holds objects, a Camera views them,
@@ -52,6 +68,51 @@ async function sha256Hex(text) {
   const hash = await crypto.subtle.digest('SHA-256', bytes);
   return [...new Uint8Array(hash)]
     .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ---------- A1.1: the compiled snapshots have provenance too ----------
+// This bundle CARRIES its data (the ?raw imports above). On a hosted build
+// nothing is fetched, so the panel used to report five absences — true, and
+// useless, while 773 Cepheids sat inside the page. Hash what is actually
+// here, once at boot, through the same crypto path the live fetches use.
+// Receipt: lab/snapshotLab.mjs hashes the same files on disk; the browser's
+// digits must match byte for byte. .gitattributes pins these files to LF so
+// the answer cannot depend on which OS checked the repo out.
+const SNAPSHOTS = {
+  solar:    { file: 'data/bodies.json',    text: bodiesSnapshot,
+              what: 'NASA/JPL Horizons state vectors, frozen at build time' },
+  gaia:     { file: 'data/gaia_pm.tsv',    text: gaiaSnapshot,
+              what: 'Gaia EDR3 cluster proper motions (Vasiliev & Baumgardt 2021)' },
+  clusters: { file: 'data/harris_vr.tsv',  text: harrisVrSnapshot,
+              what: 'Harris globular cluster catalogue (1996, 2010 ed.)' },
+  cepheids: { file: 'data/cepheids.tsv',   text: cepheidSnapshot,
+              what: 'OGLE Cepheids — the disk\'s body' },
+  mroz:     { file: 'data/mroz_curve.txt', text: mrozSnapshot,
+              what: 'Mroz+ 2019 measured rotation curve, published per-star' },
+};
+let snapshotsHashed = false;
+(async () => {
+  for (const s of Object.values(SNAPSHOTS)) {
+    s.bytes = new TextEncoder().encode(s.text).length;
+    try { s.sha256 = await sha256Hex(s.text); }
+    catch { s.sha256 = null; }        // no secure context — say so, never throw
+  }
+  snapshotsHashed = true;
+  console.log('AUDIT: compiled snapshots hashed — ' + Object.entries(SNAPSHOTS)
+    .map(([k, s]) => `${k} ${s.bytes}B ${s.sha256 ? s.sha256.slice(0, 12) : 'NO-HASH'}`)
+    .join(' | ') + '. Press P for the full record.');
+})();
+
+// One honest block for a dataset with no live record this session.
+function compiledBlock(label, key, hint) {
+  const s = SNAPSHOTS[key];
+  if (!snapshotsHashed) return `${label} compiled snapshot — hashing, press P again.`;
+  return `${label} COMPILED SNAPSHOT — carried inside this page, no fetch\n` +
+    `SOURCE   ${s.what}\n` +
+    `FILE     ${s.file}\n` +
+    `bytes    ${s.bytes}\n` +
+    (s.sha256 ? `sha256=${s.sha256.slice(0, 12)}…  OK` : 'sha256   unavailable — page is not in a secure context') +
+    (hint ? `\n${hint}` : '');
 }
 
 // Black hole helper
@@ -1315,7 +1376,8 @@ function renderProvenance() {
         `sha256=${r.sha256.slice(0, 12)}…  ${r.parsed}`
       ).join('\n'));
   } else {
-    blocks.push('SOLAR    no live fetch this session — shipped snapshot (bodies.json).');
+    blocks.push(compiledBlock('SOLAR   ', 'solar',
+      HOSTED ? null : 'press L for a live Horizons fetch'));
   }
   // M12e: the THIRD dataset — Gaia proper motions. Same rule as M12d: an
   // absent record is itself a fact worth writing down.
@@ -1328,7 +1390,8 @@ function renderProvenance() {
       `bytes    ${gaiaProvenance.bytes}\n` +
       `sha256=${gaiaProvenance.sha256.slice(0, 12)}…  OK`);
   } else {
-    blocks.push('GAIA PMs not loaded this session — press k in galaxy mode.');
+    blocks.push(compiledBlock('GAIA PMs', 'gaia',
+      'press k in galaxy mode to try the live catalogue'));
   }
 
   // M12d: the catalogue is a SECOND dataset and gets its own block. The old
@@ -1345,7 +1408,8 @@ function renderProvenance() {
       `bytes    ${clusterProvenance.bytes}\n` +
       `sha256=${clusterProvenance.sha256.slice(0, 12)}…  OK`);
   } else {
-    blocks.push('CLUSTERS not loaded this session — press k in galaxy mode.');
+    blocks.push(compiledBlock('CLUSTERS', 'clusters',
+      'press k in galaxy mode to try the live catalogue'));
   }
   // M12h: the FOURTH live dataset — the Cepheid disk.
   if (cepheidProvenance) {
@@ -1358,7 +1422,8 @@ function renderProvenance() {
       `bytes    ${cepheidProvenance.bytes}\n` +
       `sha256=${cepheidProvenance.sha256.slice(0, 12)}…  OK`);
   } else {
-    blocks.push('CEPHEIDS not loaded this session — press w in galaxy mode.');
+    blocks.push(compiledBlock('CEPHEIDS', 'cepheids',
+      'press w in galaxy mode to try the live catalogue'));
   }
   // M12i: the FIFTH dataset — the measured rotation curve.
   if (mrozProvenance) {
@@ -1371,7 +1436,8 @@ function renderProvenance() {
       `bytes    ${mrozProvenance.bytes}\n` +
       `sha256=${mrozProvenance.sha256.slice(0, 12)}…  OK`);
   } else {
-    blocks.push('MEASURED CURVE not loaded this session — press m in galaxy mode.');
+    blocks.push(compiledBlock('CURVE   ', 'mroz',
+      'press m in galaxy mode to try the live archive'));
   }
 
   provPanel.textContent = blocks.join('\n\n' + '-'.repeat(46) + '\n\n');
@@ -1401,6 +1467,15 @@ let sessionProvenance = null;
 
 // Horizons - Fetch function
 async function fetchAllBodies() {
+  if (HOSTED) {                            // A1.1: answer on screen, not only in the console
+    progressBox.style.display = 'block';
+    progressFill.style.width = '0%';
+    progressLabel.textContent = 'Live Horizons needs the dev server — running on the compiled epoch.';
+    setTimeout(() => { progressBox.style.display = 'none'; }, 5000);
+    console.log(`AUDIT: L pressed on a ${LIVE_OFF}. The solar epoch in this page is ` +
+      `data/bodies.json; press P for its checksum.`);
+    return null;
+  }
   progressBox.style.display = 'block';
   try {                                    // F5: a failed fetch must LAND, not freeze
   const results = {};

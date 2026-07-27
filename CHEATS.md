@@ -309,3 +309,23 @@ The hypothesis test on screen. What is display, confessed:
    galaxyVCircInner's haloOverride argument, which reads a curve
    WITHOUT mutating GALAXY.haloOn. Two-arg calls are byte-identical to
    pre-M12j behaviour (verified over 1600 samples, worst |dv| 0).
+
+## 18. What the hosted page says about itself (A1.1)
+
+**Where:** `main.js` SNAPSHOTS, compiledBlock, the hosted notice, the L guard.
+
+The provenance panel used to report only LIVE fetches, so a hosted visitor
+saw five absences while 773 Cepheids and 145 clusters sat inside the page.
+What is display, confessed:
+
+1. THE COMPILED RECORD IS AS REAL AS THE LIVE ONE. Byte counts and sha256
+   are computed at boot from the actual bundled strings, through the same
+   crypto.subtle path the live fetches use — not typed in. Cross-examined
+   by lab/snapshotLab.mjs SN1, which hashes the same files in Node.
+2. THE HASH DEPENDS ON LINE ENDINGS, so .gitattributes pins data/** to LF.
+   A checksum that changes with your operating system is not a checksum.
+3. L IS DISABLED ON A HOSTED BUILD, not merely failing. It returns before
+   the request instead of letting it 404 — the visitor gets a sentence
+   instead of a flash. One line to remove if you host behind your own proxy.
+4. THE BOOT NOTICE IS THE ONLY UNPROMPTED TEXT this app puts on screen.
+   It dismisses on click and never returns that session.

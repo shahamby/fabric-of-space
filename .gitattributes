@@ -1,0 +1,5 @@
+# A1.1: provenance is a claim about BYTES. Git on Windows would otherwise
+# rewrite LF to CRLF in the working copy, so the same file would hash
+# differently there than on the Linux build runner — a checksum that depends
+# on your OS is not a checksum. These files are byte-exact, everywhere.
+data/** -text

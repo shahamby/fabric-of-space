@@ -301,7 +301,15 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   every .js/.mjs, wired into the Pages workflow ahead of the build, so an
   undefined identifier now fails the deploy instead of shipping. New rule:
   paste anchors sandwich, never edge.
-  
+- **A1.1: COMPLETE** — the hosted page can account for itself. Provenance now
+  reports the COMPILED snapshots (bytes + runtime sha256) instead of five
+  absences: solar 4291/6cf6d13a6cf7, gaia 11780/989ad75bb6ad, clusters
+  11910/c16f2fcd98d8, cepheids 215840/f5cdd1cc6cea, mroz 36559/270466d87042.
+  Cross-examined by lab/snapshotLab.mjs SN1 (Node-side, same five files).
+  .gitattributes pins data/** to LF so a checksum cannot depend on the OS.
+  Hosted boot notice on screen, dismissible; L answers in a sentence instead
+  of a flash. CHEATS #18.
+
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,
