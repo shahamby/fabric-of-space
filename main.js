@@ -29,7 +29,7 @@ if (HOSTED) {
     `the integrator, the fabric, the instruments.`);
   const notice = document.createElement('div');   // A1.1: say it on SCREEN, once, dismissibly
   notice.style.cssText =
-    'position:fixed; top:56px; left:50%; transform:translateX(-50%); max-width:540px;' +
+    'position:fixed; top:84px; left:50%; transform:translateX(-50%); max-width:540px;' +
     'background:rgba(8,10,14,0.92); border:1px solid #3a3f4a; border-radius:6px; z-index:20;' +
     'color:#9fd; font:12px/1.55 monospace; padding:10px 14px; cursor:pointer;';
   notice.textContent =

@@ -11,7 +11,7 @@ Complements CLAUDE.md (working agreement + status); does not replace it.
   trampoline analogy, with real math and real data.
 - v1 = solar-system sandbox (nearly complete). v2 = Milky Way galaxy tier.
 - Repo (GROUND TRUTH — always clone/pull before advising):
-  https://github.com/shahamby/fabric-of-space (public)
+  `https://github.com/shahamby/fabric-of-space` (public)
 - Environment: Windows, VS Code workspace "MrGrouper", Chrome, Vite +
   Three.js. Dependencies are `three` and `vite` ONLY — nothing added
   without explicit approval. Commits are made by hand in the VS Code
@@ -132,8 +132,8 @@ original prompt's DataGathering status-bar requirement — replacing the
 static import; provenance recorded automatically; cached bodies.json as
 the offline fallback.
 
-- API: https://ssd.jpl.nasa.gov/api/horizons.api with params already
-  proven in this project: format=json, COMMAND='<id>' (10, 1–8),
+- API: `https://ssd.jpl.nasa.gov/api/horizons.api` with params already
+  proven in this project: format=json, COMMAND=`'<id>'` (10, 1–8),
   EPHEM_TYPE='VECTORS', CENTER='500@0', OUT_UNITS='AU-D',
   REF_PLANE='ECLIPTIC', CSV_FORMAT='YES', START/STOP/STEP. Parse the
   $$SOE..$$EOE block, first row: JD, date, X, Y, Z, VX, VY, VZ.
@@ -179,7 +179,7 @@ APPEND-ONLY FILE: add new session notes below; never rewrite history above.
 
 ---
 
-# Session append — 2026-07-08 through 2026-07-10 (M5a → M7c + public release)
+## Session append — 2026-07-08 through 2026-07-10 (M5a → M7c + public release)
 
 Note to self (Claude → Claude). Read CLAUDE.md first; this is the color
 commentary that the spec doesn't carry.
@@ -288,6 +288,7 @@ Current HEAD at session close: 2b6116c (panel r_s fix) + README/LICENSE
 commits landing this evening. v1 is COMPLETE through M7 and public-ready.
 
 ---
+
 ## Session append — 2026-07-12 (M8 hackathon: Einstein enters the sim)
 
 Arc: M8a shipped, M8b shipped, M8c ceremony pending. First milestones ever
@@ -321,6 +322,7 @@ with ZERO new CHEATS entries — physics upgrades, not display tricks.
   delete it; dependencies stay three + vite only.
 
   ---
+
 ## 2026-07-13 — session append: the night the dime landed
 
 **Arc:** M9 shipped (contact physics — Venus absorbed live, Jupiter slingshotted
@@ -408,6 +410,7 @@ trusting any spec, including Claudester's.
 
 Three breaks caught before they burned, all in one review Shambu called
 on himself ("I do not want to mess up our streak"):
+
 1. The skeleton ate the engine (pattern #9): a landing-spot diagram with
    "// ...unchanged..." placeholders was typed IN PLACE of leapfrogStep's
    real loops. Every planet would have frozen on launch. New rule in the
@@ -445,6 +448,7 @@ watchdog: armed, twice per step, silent. W29 recap due Sunday 07/19 —
 verify the scheduled task fires.
 
 Next steps (M10c — the payoff):
+
 - Solar dipole field: a B(pos) function in physics.js, moment along
   ecliptic z, 1/r³ falloff; borisTurn samples it per body. The bracket
   already samples pre- and post-drift positions — the plumbing is ready
@@ -461,9 +465,11 @@ Next steps (M10c — the payoff):
   light-travel time (light tier), 4D-to-3D projections (dimensional).
 
 ## 2026-07-16 — session 01: M10c COMPLETE — the mirror left the lab
+
 (spans 07-15 evening into 07-16; closes the arc session 00 opened)
 
 Shipped, in three receipted phases:
+
 - dipoleLab.mjs (SI): falloff 8.000000000, pole/equator 2.000000000, speed
   hash 4.03e-13 across 11.4M steps, and THE MIRROR — a 30° tilt bounced at
   3.9998x home field, 33.15° latitude vs 33.15° predicted. Paper first,
@@ -483,6 +489,7 @@ Shipped, in three receipted phases:
   floor never approached.
 
 Live-sky findings (the 44,000-day soak):
+
 - The eccentricity pump: the field does no work but it torques. Grains
   keep orbit SIZE and trade SHAPE; perihelia dive; Dust-12's dove below
   the solar radius and M9 fed it to the Sun — two milestones
@@ -499,6 +506,7 @@ Live-sky findings (the 44,000-day soak):
   launch energy to within rounding.
 
 Errata & confessions:
+
 - 0d091ea is the physicsLive.mjs untracking, wearing an empty commit
   message. History stands; this line is its name. Hook gap logged.
 - Claudinator's .gitignore append produced `distlab/out/` — no trailing
@@ -509,6 +517,7 @@ Errata & confessions:
   receipt files); narrowed to the one generated artifact.
 
 Next steps:
+
 - M10d (small, next session's opener): lap-stamp sub-step cure — the
   M8f medicine for the second organ.
 - M11, the fork (Shambu's call): radiation pressure, LIGHT'S FIRST ENTRY.
@@ -521,6 +530,7 @@ Shipped: checkLap() — per-step zero-crossing, straight-line sub-step stamp.
 Old frame-level detector deleted. A crossing needs 2 points; a minimum needed 3.
 
 Receipts:
+
 - Frame-lock gone: steady 365.3. The 365.2s are real Jupiter wobble sitting
   on the one-decimal rounding seam.
 - Invariance: boots at 20 and 2048 d/s match lap-for-lap to the tenth, and
@@ -529,6 +539,7 @@ Receipts:
   Einstein's +42.8 only shows in the two-boot differential (M8c).
 
 Non-milestone findings:
+
 - 'q' typed in the Vite terminal QUITS the dev server — same signature as the
   soak drops. OneDrive ruled out. Ceremony reloads are now F5 in the browser.
 - timeScale boots at 20: doubling gives 40..1280, then clamps to 2048. 64 and
@@ -548,6 +559,7 @@ W29 recap due Sunday 07/19.
 ## 2026-07-17 — session 03: M11 COMPLETE — light entered; course reset to the fabric
 
 Lab receipts (lab/radiationLab.mjs, SI first principles, 4/4 PASS):
+
 - W1: beta 0.3827 at 0.5 / 1 / 2 AU — one number everywhere.
 - W2: beta-0.5 year — predicted 516.50 d, measured 516.50 d (M10d stamp).
 - W3: knife-edge at beta = 1/2 — 0.49 BOUND, apoapsis 50.00 AU (paper 50.00);
@@ -566,6 +578,7 @@ e-9-class); merged smoke loses beta (v1). Zero new cheats. Stray VS Code
 auto-import (three/tsl) caught in the lab file and removed.
 
 Bookkeeping:
+
 - 07/16 soak drops CONFIRMED as Shambu's 'q' presses (first round). Closed.
 - M10d landed as TWO commits, same message: df31c79 (code + status, 15:30)
   and e83904c (HANDOFF + cleanup, 16:16). Benign split, named here; pushed
@@ -584,6 +597,7 @@ rendered. W29 recap Sunday 07/19.
 ## 2026-07-18 — session 04: M12a COMPLETE — the galaxy measured before rendered
 
 lab/galaxyLab.mjs, 5/5 PASS (galaxy units audited against SI in W0):
+
 - Rotation curve, halo ON: 217, 239, 232, 222, 214, 205 km/s from 2 to
   24.6 kpc — the flat line. OFF: 200, 212, 185, 161, 141, 117 — the fall.
 - R1: Sun's speed 232.1 km/s at 8.2 kpc (target 230 ± 5).
@@ -592,7 +606,7 @@ lab/galaxyLab.mjs, 5/5 PASS (galaxy units audited against SI in W0):
 - R4 (Shambu's hand): Kepler fingerprint v²·R — ratioOff 1.006 (visible
   galaxy: Kepler holds), ratioOn 1.563 (halo: Kepler breaks). Vera Rubin's
   discovery, reproduced at the desk. His PASS/FAIL line used
-  ["FAIL","PASS"][+cond] — unprompted idiomatic JS. The student now writes
+  `["FAIL","PASS"][+cond]` — unprompted idiomatic JS. The student now writes
   his own instruments.
 - Every number matched pre-registration to the printed digit.
 
@@ -690,6 +704,7 @@ rises to 543.2 — it is held. One real object, one measured speed, and dark
 matter is the only thing between 'bound' and 'gone'.
 
 TWO ERRORS OF MINE, both caught by Shambu's screenshot:
+
 - The D4 receipt quoted 279.4 km/s (the 8.2 kpc value) where NGC 3201 needs
   the 8.9 kpc value, 269.5. The code was right; my table was wrong.
 - I built clusterProvenance, logged it to console, and never wired it to the
@@ -738,14 +753,15 @@ The week Einstein was receipted and the galaxy opened.
    CHEATS #9.
 9. clusterLab landed: 147-row Harris catalogue fetched live, 145
    parsed, C5 (Shambu) runaway census staged for the fabric.
-10. Ops: commit-msg hook regex tightened to word-boundary M<number>,
+10. Ops: commit-msg hook regex tightened to word-boundary M`<number>`,
     negative-tested live (07/13).
 
 Shambu's hands this week: CHECK4, W4, R4, S4 (+negative test), C5.
 Cheats filed: #7, #8, #9. New bug pattern: #11.
 Carried into W30: M12d browser wiring + milestone push (07/20), then
 M12e — Gaia proper motions, real 3D velocities, real orbits.
------------------------------------------------------------------------
+
+---
 
 ==== SESSION 2026-07-20 (close) — M12d shipped, M12e staged ===========
 
@@ -761,17 +777,18 @@ clusters, pmRA/pmDE in mas/yr. It carries no distances or RVs — good:
 Harris already owns both. One fetch, one name-join.
 
 lab/gaiaLab.mjs DELIVERED IN CHAT (not yet in repo). What is in it:
-  - phi() copied from physics.js GALAXY, forced to re-earn M12a's R1
-    before judging anyone (G3: v_c(8.2 kpc) must answer 232.1).
-  - EQ2GAL rotation receipted at load — row 3 rebuilds from the NGP
-    angles, rows orthonormal — and velRepo() must round-trip a
-    galaxy-rest cluster to zero. Fail-loud, before any receipt prints.
-  - RV note: Harris Vr (HELIOCENTRIC), not Vlsr — solar motion is
-    added exactly once, inside velRepo(). Vlsr rides only for C5
-    kinship.
-  - Receipts G0-G5, then G6 = SHAMBU'S HAND: derive the 4.74047
-    bridge from the AU, the Julian year, and the parsec identity
-    (kpc-in-AU x mas-in-rad = 1 exactly). Negative test required.
+
+- phi() copied from physics.js GALAXY, forced to re-earn M12a's R1
+  before judging anyone (G3: v_c(8.2 kpc) must answer 232.1).
+- EQ2GAL rotation receipted at load — row 3 rebuilds from the NGP
+  angles, rows orthonormal — and velRepo() must round-trip a
+  galaxy-rest cluster to zero. Fail-loud, before any receipt prints.
+- RV note: Harris Vr (HELIOCENTRIC), not Vlsr — solar motion is
+  added exactly once, inside velRepo(). Vlsr rides only for C5
+  kinship.
+- Receipts G0-G5, then G6 = SHAMBU'S HAND: derive the 4.74047
+  bridge from the AU, the Julian year, and the parsec identity
+  (kpc-in-AU x mas-in-rad = 1 exactly). Negative test required.
 Claude dry-ran it against live VizieR: G0-G5 PASS, G6 waiting. One
 seal died honest: G2 first expected 47 Tuc at 4.5 kpc (2010-edition
 memory) — VII/202 is the 1996 edition and says 4.3, so v_t is 119.0
@@ -780,6 +797,7 @@ and confessed in the file's comment.
 
 SEALED FOR SHAMBU'S CEREMONY (the answers exist in the 07/20 chat's
 tool blocks — seal before scrolling back):
+
   1. G1 join count, out of 145.
   2. G5 halo OFF: C5's ten was a sight-line count; the full vector
      can add AND remove members. Your number?
@@ -787,6 +805,7 @@ tool blocks — seal before scrolling back):
   4. G4: fastest cluster? (You met one famous speedster in M12d.)
 
 NEXT SESSION OPENS WITH:
+
   1. Fresh-clone audit (always).
   2. Create lab/gaiaLab.mjs from chat, write the ~6 G6 lines, seal,
      run: node lab/gaiaLab.mjs
@@ -796,7 +815,8 @@ NEXT SESSION OPENS WITH:
      watch who stays.
   5. Free gift waiting in the halo-off list: the names clump into
      families. Experiment (b)(1), a milestone early.
-========================================================================
+
+---
 
 ## 2026-07-21 — session 07: M12e COMPLETE — the halo flies
 
@@ -810,6 +830,7 @@ dEmax 6.92e-5, PASS; negative test flies to 1541.67 kpc | G5b dt-halving
 6.92e-5 -> 1.73e-5, ratio 4.00.
 
 TWO LESSONS, BOTH KEEPERS:
+
 - Vlsr was never a floor. The LSR frame rides the Sun's 232 km/s, so the
   line-of-sight number can EXCEED the true space speed (NGC 3201: 481.9 vs
   367.6). M12d's "lower bound" claim amended in CHEATS #10; the honest 3D
@@ -958,3 +979,109 @@ Next (Shambu's call): M12i — (a) Mroz velocity hunt: real Cepheid data
 points ON the M12g curve instrument, (b) age-paint mode: one key
 variant colours by Age and the arms appear, (c) the HYG knot: the
 visible bubble, as humility.
+
+## 2026-07-25 — session 11: R1 COMPLETE — the honesty pass
+
+Six review findings closed in one commit, receipt first.
+
+F1 was the honesty item: seedClusterVelocities read the LIVE halo
+toggle, so pressing h before the first k seeded all 126 clusters with
+the Sun riding at 185.0 instead of 232.1 — the order of key presses
+was a hidden input to measured data. gaiaLab G6 (Shambu's hand) tests
+it directly: seed one synthetic cluster lamp-on and lamp-off, demand
+the same speed. FAIL-before 30.260 km/s against the pre-R1 engine at
+fb54627, PASS 0.000 after — and 30.260 matched Claude's container to
+the last digit, cross-machine determinism receipt #1.
+
+F2 principal-death disarm: a merge that eats Sun, Earth or Mercury now
+AUDITs loudly and nulls the dependent instrument, instead of reading a
+frozen corpse forever (bug taxonomy #2's exact shape). F3 the HUD's
+Sun-lap was a hand-typed 217.1, true only with the halo on; now
+computed live — 217.1 ON, 272.4 OFF, so HUD, seat panel and the j
+AUDIT finally read one instrument. F4 in-flight guards on k/w/m. F5 a
+failed Horizons fetch lands the progress bar and AUDITs instead of
+freezing it — proven by a real VizieR 502 in the wild, which also
+exercised the snapshot fallback for free. F7 chart label off the rail.
+F6 (fabric dirty flag) deferred.
+
+Discipline note: the G6 FAIL-before was captured only after the fix had
+already landed, on a scratch copy of physics.js recovered from
+fb54627. A negative test never seen to fail is theater; it was made to
+fail before the receipt was accepted.
+
+## 2026-07-25 — session 12: M12j COMPLETE — the chart becomes a test
+
+The rotation curve stopped persuading and started testifying.
+
+lab/mrozLab.mjs gained three receipts. MZ6: the 773 published Cepheids
+binned into 11 testifying bins (1 kpc, 5-20, N >= 8), each carrying
+mean, SD and SEM — bin count sealed against MZ4's, SEM range 0.9-3.9
+km/s. MZ7 the verdict: chi2/nu over the bins, dividing by SEM, nothing
+fitted — halo ON 9.0, halo OFF 1329.5, ratio 147.7. Per-star with the
+published e_V, for the record: 28.1 vs 638.3.
+
+MZ8 is Shambu's hand and the deepest line of the milestone: the
+ACQUITTAL negative. A fake sky drawn from the ON model plus noise at
+exactly the measurement scale must read chi2/nu near 1, NOT 0 — a true
+model matches its data to within the error bars and no better. It read
+1.00. The same fake sky against the OFF model still convicts at 1357.8,
+within 2% of the real sky's 1329.5, because the halo gap dwarfs both
+the noise and the model's own 4.9 km/s error. A test that survives
+having its data swapped for a simulation is testing the model.
+
+Browser: the verdict panel, key r. The log chart (CHEATS #13) spends
+90% of its width on the inner galaxy and crushes all 773 stars into
+its last 27 px — measured before drawing, which forced a second
+instrument rather than an unreadable one. The panel is LINEAR over
+4-17 kpc: 11 error bars at 21 px spacing, both models drawn (solid =
+live, dashed = counterfactual), verdict live on h. galaxyVCircInner
+gained an optional haloOverride so the counterfactual is ASKED for
+rather than obtained by mutating GALAXY.haloOn — the F1 lesson built
+into the signature. Two-arg behaviour byte-identical over 1600 samples.
+The browser's number equals MZ7's number: 9.0, then 1329.5 in red.
+CHEATS #17.
+
+## 2026-07-26/27 — session 13: A1 + A1.1 — the URL, and a page that can account for itself
+
+Track A opened after an honest audit: the physics was strong and the
+packaging was at zero. Three walls between the repo and a stranger —
+nobody can run it, nobody knows what to press, half the instrument
+lives in the console. A1 attacks the first.
+
+A1: base './' in vite.config.js (Pages serves at a subpath; the default
+absolute asset path 404s into a black screen — reproduced before
+fixing). The bundle carries its data via the ?raw imports, so the
+hosted page boots fully offline with all 773 Cepheids and 145
+clusters. GitHub Actions builds and publishes on push. Live at
+`https://shahamby.github.io/fabric-of-space/`.
+
+Then the incident. The M12j paste anchor was a bare function header,
+`function renderProvenance() {`. The paste consumed the 27 lines below
+it — const blocks, the Horizons record, the Gaia record — and the P
+panel threw ReferenceError on the PUBLIC build for four commits. The
+provenance panel, the instrument whose whole job is proving the data
+is real, was the thing that shipped broken. Restored byte-identical
+from fb54627.
+
+New rule, earned: PASTE ANCHORS SANDWICH, NEVER EDGE. Any block
+inserted before existing code must include the following distinctive
+line in both FIND and REPLACE, so that line rides along in the paste
+and cannot be lost.
+
+New receipt, earned: eslint no-undef across every .js and .mjs, wired
+into the Pages workflow AHEAD of the build. Proven real by re-breaking
+the exact bug in a scratch clone (11 errors) and restoring (clean). An
+undefined identifier now fails the deploy instead of shipping. 27 files
+gated.
+
+A1.1 closed the gap the incident exposed. The panel had reported only
+LIVE fetches, so a hosted visitor saw five absences while real data sat
+inside the page. Now every dataset without a live record reports its
+COMPILED snapshot — bytes and sha256 hashed at boot from the actual
+bundled strings, through the same crypto.subtle path the live fetches
+use. lab/snapshotLab.mjs SN1 (Shambu's hand) hashes the same five files
+in Node: 5/5 PASS, and the browser's twelve hex digits match the lab's
+on all five. .gitattributes pins data/** to LF, because a checksum that
+changes with your operating system is not a checksum. Hosted boot
+notice on screen, dismissible; L answers in a sentence instead of a
+flash. CHEATS #18.
