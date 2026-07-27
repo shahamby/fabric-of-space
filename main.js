@@ -124,47 +124,38 @@ function compiledBlock(label, key, hint) {
 // agree — bind a key without documenting it and the lab FAILs before the
 // commit does. Same doctrine as CHEATS: nothing undeclared. Toggle: ?
 const KEYS = [
-  { group: 'LOOKING',       key: '?',     does: 'this legend' },
-  { group: 'LOOKING',       key: 'Space', does: 'pause / resume' },
-  { group: 'LOOKING',       key: '[',     does: 'slower — halve the clock' },
-  { group: 'LOOKING',       key: ']',     does: 'faster — double the clock' },
-  { group: 'LOOKING',       key: 't',     does: 'true scale — planets shrink to real size' },
+  { group: 'LOOKING',       key: '?',     does: 'this legend',                                        short: 'legend / detail' },
+  { group: 'LOOKING',       key: 'Space', does: 'pause / resume',                                     short: 'pause' },
+  { group: 'LOOKING',       key: '[',     does: 'slower — halve the clock',                           short: 'slower' },
+  { group: 'LOOKING',       key: ']',     does: 'faster — double the clock',                           short: 'faster' },
+  { group: 'LOOKING',       key: 't',     does: 'true scale — planets shrink to real size',            short: 'true scale' },
 
-  { group: 'SOLAR SYSTEM',  key: '=',     does: 'DOUBLE the selected body\'s mass — watch the fabric' },
-  { group: 'SOLAR SYSTEM',  key: '-',     does: 'halve the selected body\'s mass' },
-  { group: 'SOLAR SYSTEM',  key: 'e',     does: 'Einstein on/off — 1PN, Mercury\'s +42.8"/century' },
-  { group: 'SOLAR SYSTEM',  key: 'b',     does: 'solar magnetic field + its field lines' },
-  { group: 'SOLAR SYSTEM',  key: 'n',     does: 'spawn a rogue body' },
-  { group: 'SOLAR SYSTEM',  key: 'c',     does: 'spawn charged dust' },
-  { group: 'SOLAR SYSTEM',  key: 'C',     does: 'spawn POLAR dust — bounces between mirror points' },
-  { group: 'SOLAR SYSTEM',  key: 'x',     does: 'smoke grain, beta 0.49 — bound, comes back' },
-  { group: 'SOLAR SYSTEM',  key: 'X',     does: 'smoke grain, beta 0.51 — past the knife-edge, gone' },
+  { group: 'SOLAR SYSTEM',  key: '=',     does: 'DOUBLE the selected body\'s mass — watch the fabric', short: 'mass x2' },
+  { group: 'SOLAR SYSTEM',  key: '-',     does: 'halve the selected body\'s mass',                     short: 'mass /2' },
+  { group: 'SOLAR SYSTEM',  key: 'e',     does: 'Einstein on/off — 1PN, Mercury\'s +42.8"/century',    short: 'Einstein 1PN' },
+  { group: 'SOLAR SYSTEM',  key: 'b',     does: 'solar magnetic field + its field lines',              short: 'magnetic field' },
+  { group: 'SOLAR SYSTEM',  key: 'n',     does: 'spawn a rogue body',                                  short: 'rogue body' },
+  { group: 'SOLAR SYSTEM',  key: 'c',     does: 'spawn charged dust',                                  short: 'charged dust' },
+  { group: 'SOLAR SYSTEM',  key: 'C',     does: 'spawn POLAR dust — bounces between mirror points',    short: 'polar dust' },
+  { group: 'SOLAR SYSTEM',  key: 'x',     does: 'smoke grain, beta 0.49 — bound, comes back',          short: 'smoke b0.49' },
+  { group: 'SOLAR SYSTEM',  key: 'X',     does: 'smoke grain, beta 0.51 — past the knife-edge, gone',  short: 'smoke b0.51' },
 
-  { group: 'GALAXY',        key: 'g',     does: 'galaxy mode — 1 grid unit becomes 1 kiloparsec' },
-  { group: 'GALAXY',        key: 'h',     does: 'DARK HALO on/off — the whole point, press it' },
-  { group: 'GALAXY',        key: 'j',     does: 'tracer stars — straight spokes wind into arms' },
-  { group: 'GALAXY',        key: 'k',     does: '145 real globular clusters, in flight' },
-  { group: 'GALAXY',        key: 'w',     does: '2,373 real Cepheids — the disk\'s warp' },
-  { group: 'GALAXY',        key: 'v',     does: 'rotation curve chart (log R, 1 pc to 30 kpc)' },
-  { group: 'GALAXY',        key: 'm',     does: '773 MEASURED stars on that chart' },
-  { group: 'GALAXY',        key: 'r',     does: 'VERDICT panel — chi2/nu, the hypothesis test' },
+  { group: 'GALAXY',        key: 'g',     does: 'galaxy mode — 1 grid unit becomes 1 kiloparsec',      short: 'GALAXY MODE' },
+  { group: 'GALAXY',        key: 'h',     does: 'DARK HALO on/off — the whole point, press it',        short: 'DARK HALO on/off' },
+  { group: 'GALAXY',        key: 'j',     does: 'tracer stars — straight spokes wind into arms',       short: 'tracer stars' },
+  { group: 'GALAXY',        key: 'k',     does: '145 real globular clusters, in flight',               short: '145 clusters' },
+  { group: 'GALAXY',        key: 'w',     does: '2,373 real Cepheids — the disk\'s warp',              short: '2373 Cepheids' },
+  { group: 'GALAXY',        key: 'v',     does: 'rotation curve chart (log R, 1 pc to 30 kpc)',        short: 'rotation curve' },
+  { group: 'GALAXY',        key: 'm',     does: '773 MEASURED stars on that chart',                    short: '773 measured' },
+  { group: 'GALAXY',        key: 'r',     does: 'VERDICT panel — chi2/nu, the hypothesis test',        short: 'VERDICT panel' },
 
-  { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons' },
-  { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256' },
-  { group: 'RECORDS',       key: 'D',     does: 'download the provenance record as JSON' },
+  { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons', short: 'live JPL fetch' },
+  { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256',        short: 'provenance' },
+  { group: 'RECORDS',       key: 'D',     does: 'download the provenance record as JSON',              short: 'download record' },
 ];
 
 const legendPanel = document.createElement('div');
-legendPanel.style.cssText =
-  'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);' +
-  'width:min(560px,92vw); max-height:82vh; overflow:auto; z-index:30;' +
-  'background:rgba(8,10,14,0.94); border:1px solid #3a3f4a; border-radius:8px;' +
-  'color:#cfe3ee; font:12px/1.6 monospace; padding:16px 20px; display:none;' +
-  'white-space:pre; cursor:pointer;';
-legendPanel.addEventListener('click', () => {
-  legendPanel.style.display = 'none';
-  legendHint.style.display = 'block';
-});
+legendPanel.addEventListener('click', () => { legendMode = 0; applyLegend(); });
 document.body.append(legendPanel);
 
 const legendHint = document.createElement('div');
@@ -174,7 +165,40 @@ legendHint.style.cssText =
 legendHint.textContent = 'press ? for controls';
 document.body.append(legendHint);
 
-function drawLegend() {
+// 0 = closed, 1 = DOCKED (compact, stays open, ignores the mouse so you can
+// fly the camera straight through it), 2 = FULL (centred, the first read).
+// ? cycles. The panel says what the next press does, so nothing is hidden.
+// No z-index on the docked state ON PURPOSE: every data panel is appended
+// after this one, so provenance and the charts always draw OVER the
+// reference sheet rather than under it.
+let legendMode = 0;
+
+const DOCKED_CSS =
+  'position:fixed; top:132px; right:12px; pointer-events:none;' +
+  'background:rgba(8,10,14,0.82); border:1px solid #2c313a; border-radius:6px;' +
+  'color:#9fb8c8; font:11px/1.5 monospace; padding:8px 12px; white-space:pre;';
+const FULL_CSS =
+  'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);' +
+  'width:min(560px,92vw); max-height:82vh; overflow:auto; z-index:30;' +
+  'background:rgba(8,10,14,0.94); border:1px solid #3a3f4a; border-radius:8px;' +
+  'color:#cfe3ee; font:12px/1.6 monospace; padding:16px 20px;' +
+  'white-space:pre; cursor:pointer;';
+
+// DOCKED: two columns, solar system on the left, galaxy and records on the right.
+function compactLegend() {
+  const left = KEYS.filter(k => k.group === 'LOOKING' || k.group === 'SOLAR SYSTEM');
+  const right = KEYS.filter(k => k.group === 'GALAXY' || k.group === 'RECORDS');
+  const cell = (k) => k ? `${k.key.padEnd(6)}${k.short}`.padEnd(24) : ' '.repeat(24);
+  const rows = ['CONTROLS' + ' '.repeat(16) + '? for detail', ''];
+  for (let i = 0; i < Math.max(left.length, right.length); i++) {
+    rows.push(cell(left[i]) + '  ' + cell(right[i]).trimEnd());
+  }
+  rows.push('', 'mouse: drag orbit  scroll zoom  click select');
+  return rows.join('\n');
+}
+
+// FULL: every key with its full sentence, the first-read version.
+function fullLegend() {
   const lines = ['FABRIC OF SPACE — controls', ''];
   lines.push('  mouse       drag to orbit, scroll to zoom, click a body to select');
   let group = null;
@@ -184,10 +208,22 @@ function drawLegend() {
   }
   lines.push('', '  Nothing here is a cartoon: every number comes from a public',
     '  catalogue and every visual shortcut is confessed in CHEATS.md.',
-    '', '  [click anywhere in this box, or press ? again, to close]');
-  legendPanel.textContent = lines.join('\n');
+    '', '  [press ? again to close, or click this box]');
+  return lines.join('\n');
 }
-drawLegend();
+
+function applyLegend() {
+  if (legendMode === 0) {
+    legendPanel.style.display = 'none';
+    legendHint.style.display = 'block';
+    return;
+  }
+  legendHint.style.display = 'none';
+  legendPanel.style.display = 'block';
+  legendPanel.style.cssText = (legendMode === 1 ? DOCKED_CSS : FULL_CSS) + 'display:block;';
+  legendPanel.textContent = legendMode === 1 ? compactLegend() : fullLegend();
+}
+applyLegend();
 
 // Black hole helper
 const BLACK_HOLE_MAT = new THREE.MeshBasicMaterial({ color: 0x000000 });
@@ -257,10 +293,9 @@ let E0 = totalEnergy(simBodies, G);             // Re-baselined on change; keep 
 // One listener routes every key — one firewall, many rules. Never add a second keydown.
 let trueScale = false;
 window.addEventListener('keydown', (event) => {
-  if (event.key === '?') {                            // A2: the legend
-    legendPanel.style.display = legendPanel.style.display === 'none' ? 'block' : 'none';
-    if (legendPanel.style.display !== 'none') legendHint.style.display = 'none';
-    else legendHint.style.display = 'block';
+  if (event.key === '?') {                            // A2: closed -> docked -> full -> closed
+    legendMode = (legendMode + 1) % 3;
+    applyLegend();
     return;
   }
   if (event.key.toLowerCase() === 't') {

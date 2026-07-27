@@ -347,3 +347,9 @@ confessed:
    still possible; a missing key is not.
 3. THE HINT AT THE BOTTOM never goes away except while the legend is open.
    It is the only permanent unprompted text in the app.
+4. TWO VIEWS, ONE LIST. ? cycles closed -> docked -> full. The docked
+   sheet is a SHORTENING of the same KEYS array, not a second list, so
+   legendLab still guards both. The docked panel takes no mouse events
+   and carries no z-index, so the camera flies through it and every data
+   panel draws over it — a reference sheet must never win a fight with
+   an instrument.
