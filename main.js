@@ -993,6 +993,7 @@ async function loadMroz() {
   console.log(`AUDIT: ${MROZ.list.length} measured stars on the curve instrument ` +
     `(${MROZ.railed} above the 250 axis, pinned at the rail), binned into ` +
     `${MROZ.bins.length} testifying bins. Press r for the verdict. CHEATS #15, #17.`);
+  buildValley();                                  // B3: the scan, once
   drawCurve();
   drawVerdict();
 }
@@ -1483,8 +1484,38 @@ function nfwM200(ms) {
   return { c, r200: c * GALAXY.RS, M200: ms * f(c) };
 }
 
+// ---------- B3: the valley ----------
+// B2 gave the halo a knob and printed one number. A number you have to
+// remember is not a measurement. This scans chi2/nu across the knob's whole
+// travel ONCE (it depends on the bins and the potential SHAPE, not on where
+// the knob currently sits), so the panel can show you the floor, the width
+// of the floor, and where you are standing — all at the same time.
+const VALLEY = { lo: 0.1, hi: 3.0, pts: [], min: null, max: 1, wLo: null, wHi: null };
+
+function buildValley() {
+  VALLEY.pts = []; VALLEY.min = null;
+  if (!MROZ.bins.length) return;
+  // Same save/restore discipline as haloLab: the dial is borrowed, never left
+  // moved. Synchronous, so nothing observes the intermediate values.
+  const saved = GALAXY.MS;
+  for (let i = 0; i <= 96; i++) {
+    const r = VALLEY.lo * Math.pow(VALLEY.hi / VALLEY.lo, i / 96);
+    GALAXY.MS = r * GALAXY.MS_CAL;
+    VALLEY.pts.push({ r, chi: verdictChi2(true) });
+  }
+  GALAXY.MS = saved;
+  VALLEY.min = VALLEY.pts.reduce((a, p) => (p.chi < a.chi ? p : a), VALLEY.pts[0]);
+  VALLEY.max = Math.max(...VALLEY.pts.map((p) => p.chi));
+  // The chi2 + 1 band — the CURVATURE of the valley, not an error bar on the
+  // Milky Way. CHEATS #21 item 2 says why. Drawn so the narrowness is visible.
+  const target = VALLEY.min.chi + 1;
+  const below = VALLEY.pts.filter((p) => p.chi <= target);
+  VALLEY.wLo = below.length ? below[0].r : null;
+  VALLEY.wHi = below.length ? below[below.length - 1].r : null;
+}
+
 const verdictCanvas = document.createElement('canvas');
-verdictCanvas.width = 320; verdictCanvas.height = 208;
+verdictCanvas.width = 320; verdictCanvas.height = 292;
 verdictCanvas.style.cssText =
   'position:fixed; bottom:190px; left:12px; background:rgba(8,10,14,0.88);' +
   'border:1px solid #3a3f4a; border-radius:6px; display:none;';
@@ -1503,7 +1534,7 @@ function drawVerdict() {
   if (verdictCanvas.style.display === 'none') return;
   const c = verdictCanvas.getContext('2d');
   const { X0, X1, Y_TOP, Y_BOT, R_LO, R_HI } = VERD;
-  c.clearRect(0, 0, 320, 208);
+  c.clearRect(0, 0, 320, 292);
   c.font = '10px monospace';
   c.fillStyle = '#8ee6c8';
   c.fillText('VERDICT PANEL — 4 to 17 kpc, linear', 8, 13);
@@ -1570,7 +1601,65 @@ function drawVerdict() {
   const atFloor = Math.abs(GALAXY.MS / GALAXY.MS_CAL - 0.993) < 0.01;
   c.fillStyle = atFloor ? '#8ee6c8' : '#8fa4b4';
   c.fillText(`halo ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x   ` +
-    `M200 ${nv.M200.toExponential(2)} Msun   , . dial   / reset`, 8, 194);
+    `M200 ${nv.M200.toExponential(2)} Msun   , . dial   / reset   u undo`, 8, 194);
+  drawValley(c);
+}
+
+// B3: the valley strip. Log in both axes — the knob travels 30x and chi2/nu
+// travels 330x, so nothing else fits. The floor, its width, and your own
+// position, on one 44-pixel band.
+function drawValley(c) {
+  const X0 = VERD.X0, X1 = VERD.X1, Y0 = 230, Y1 = 274;
+  c.strokeStyle = '#2c313a'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(8, 212); c.lineTo(312, 212); c.stroke();
+  c.font = '10px monospace';
+  if (!VALLEY.pts.length) {
+    c.fillStyle = '#6f7d88';
+    c.fillText('VALLEY — press m to load the sky', 8, 226);
+    return;
+  }
+  const L = Math.log10(VALLEY.lo), span = Math.log10(VALLEY.hi) - L;
+  const loC = Math.log10(VALLEY.min.chi), hiC = Math.log10(VALLEY.max);
+  const lx = (r) => X0 + (Math.log10(r) - L) / span * (X1 - X0);
+  const ly = (chi) => Y1 - (Math.log10(chi) - loC) / (hiC - loC) * (Y1 - Y0);
+
+  c.fillStyle = '#8ee6c8';
+  c.fillText(`VALLEY — chi2/nu across the knob's travel`, 8, 226);
+
+  // the chi2+1 band: how narrow the floor is
+  if (VALLEY.wLo && VALLEY.wHi) {
+    c.fillStyle = 'rgba(142,230,200,0.18)';
+    c.fillRect(lx(VALLEY.wLo), Y0, Math.max(2, lx(VALLEY.wHi) - lx(VALLEY.wLo)), Y1 - Y0);
+  }
+  // axis
+  c.strokeStyle = '#555';
+  c.beginPath(); c.moveTo(X0, Y1); c.lineTo(X1, Y1); c.stroke();
+  // the curve
+  c.strokeStyle = '#ff7a4f'; c.lineWidth = 1.5;
+  c.beginPath();
+  VALLEY.pts.forEach((p, i) => (i ? c.lineTo(lx(p.r), ly(p.chi)) : c.moveTo(lx(p.r), ly(p.chi))));
+  c.stroke();
+  // the floor
+  c.strokeStyle = '#8ee6c8'; c.lineWidth = 1; c.setLineDash([2, 3]);
+  c.beginPath(); c.moveTo(lx(VALLEY.min.r), ly(VALLEY.min.chi)); c.lineTo(lx(VALLEY.min.r), Y1 + 3); c.stroke();
+  c.setLineDash([]);
+  // where you are standing
+  const here = GALAXY.MS / GALAXY.MS_CAL;
+  if (here >= VALLEY.lo && here <= VALLEY.hi) {
+    const hc = verdictChi2(true);
+    c.strokeStyle = '#ffd24f'; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(lx(here), Y0); c.lineTo(lx(here), Y1); c.stroke();
+    c.fillStyle = '#ffd24f';
+    c.beginPath(); c.arc(lx(here), ly(Math.max(hc, VALLEY.min.chi)), 3, 0, 7); c.fill();
+  }
+  c.fillStyle = '#777';
+  c.fillText('0.1x', X0 - 4, Y1 + 13);
+  c.fillText('1x', lx(1) - 5, Y1 + 13);
+  c.fillText('3x', X1 - 12, Y1 + 13);
+  c.fillStyle = '#8ee6c8';
+  c.fillText(`floor ${VALLEY.min.chi.toFixed(1)} at ${VALLEY.min.r.toFixed(2)}x` +
+    (VALLEY.wLo ? `   +1 band ${VALLEY.wLo.toFixed(2)}-${VALLEY.wHi.toFixed(2)}x` : ''),
+    X0 + 30, Y1 + 13);
 }
 
 function renderProvenance() {
