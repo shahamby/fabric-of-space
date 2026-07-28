@@ -148,6 +148,9 @@ const KEYS = [
   { group: 'GALAXY',        key: 'v',     does: 'rotation curve chart (log R, 1 pc to 30 kpc)',        short: 'rotation curve' },
   { group: 'GALAXY',        key: 'm',     does: '773 MEASURED stars on that chart',                    short: '773 measured' },
   { group: 'GALAXY',        key: 'r',     does: 'VERDICT panel — chi2/nu, the hypothesis test',        short: 'VERDICT panel' },
+  { group: 'GALAXY',        key: ',',     does: 'dial the halo mass DOWN 2% — watch chi2/nu climb',   short: 'halo mass -2%' },
+  { group: 'GALAXY',        key: '.',     does: 'dial the halo mass UP 2% — hunt the floor',          short: 'halo mass +2%' },
+  { group: 'GALAXY',        key: '/',     does: 'reset the halo mass to the house value',             short: 'halo reset' },
 
   { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons', short: 'live JPL fetch' },
   { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256',        short: 'provenance' },
@@ -373,6 +376,31 @@ window.addEventListener('keydown', (event) => {
     if (!clusterCloud.visible) { clusterPick = null; refreshClusterTrail(); }
     console.log(`AUDIT: globular clusters ${clusterCloud.visible ? 'shown' : 'hidden'} ` +
       `(${CLUSTERS.list.length} loaded from ${CLUSTERS.source}).`);
+    return;
+  }
+  if (event.key === ',' || event.key === '.' || event.key === '/') {   // B2: the halo knob
+    if (!GALAXY.on) { console.log('AUDIT: press g first — the halo knob reads the galaxy.'); return; }
+    const before = GALAXY.MS;
+    if (event.key === '/') GALAXY.MS = GALAXY.MS_CAL;
+    else GALAXY.MS = Math.min(3 * GALAXY.MS_CAL, Math.max(0.1 * GALAXY.MS_CAL,
+      GALAXY.MS * (event.key === '.' ? 1.02 : 1 / 1.02)));
+    if (GALAXY.MS === before && event.key !== '/') {
+      console.log(`AUDIT: halo knob at its stop (${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x house) — ` +
+        `the scan window haloLab HL1 used is 0.1x to 3.0x.`);
+      return;
+    }
+    if (CLUSTERS.loaded) {
+      console.log(`AUDIT: ${colourClusters()} clusters now unbound — the halo changed under them.`);
+      if (clusterPick !== null) refreshClusterTrail();
+    }
+    drawCurve();
+    drawVerdict();
+    const v = nfwM200(GALAXY.MS);
+    const chi = MROZ.bins.length ? verdictChi2(true).toFixed(1) : 'press m';
+    console.log(`AUDIT: halo mass ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(3)}x house — ` +
+      `M200 ${v.M200.toExponential(2)} Msun (c ${v.c.toFixed(1)}, r200 ${v.r200.toFixed(0)} kpc), ` +
+      `vCirc(8.2) ${galaxyVCirc(8.2).toFixed(1)} km/s, chi2/nu ${chi}. ` +
+      `Floor is 0.993x at 8.96 — lab/haloLab.mjs HL1.`);
     return;
   }
   if (event.key.toLowerCase() === 'h') {              // M12b: dark matter, live
@@ -1394,8 +1422,25 @@ const VERD = { R_LO: 4, R_HI: 17, V_LO: 130, V_HI: 260,
 const vpx = (R) => VERD.X0 + (R - VERD.R_LO) / (VERD.R_HI - VERD.R_LO) * (VERD.X1 - VERD.X0);
 const vpy = (V) => VERD.Y_BOT - (V - VERD.V_LO) / (VERD.V_HI - VERD.V_LO) * (VERD.Y_BOT - VERD.Y_TOP);
 
+// B2: MS is the NFW CHARACTERISTIC mass, not the number anyone quotes.
+// The virial mass is derived — solve M(<r200) = (4/3)pi r200^3 * 200 * rho_c.
+// CHEATS #21 rule: quote M200, never MS. haloLab HL4 computes this
+// independently; the two must agree (8.174e11 Msun, c 12.1, r200 193 kpc).
+const RHO_CRIT = 136;                        // Msun/kpc^3 at H0 = 70
+function nfwM200(ms) {
+  const f = (x) => Math.log(1 + x) - x / (1 + x);
+  let lo = 0.1, hi = 100;
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2;
+    if (ms * f(mid) > (4 / 3) * Math.PI * (mid * GALAXY.RS) ** 3 * 200 * RHO_CRIT) lo = mid;
+    else hi = mid;
+  }
+  const c = (lo + hi) / 2;
+  return { c, r200: c * GALAXY.RS, M200: ms * f(c) };
+}
+
 const verdictCanvas = document.createElement('canvas');
-verdictCanvas.width = 320; verdictCanvas.height = 190;
+verdictCanvas.width = 320; verdictCanvas.height = 208;
 verdictCanvas.style.cssText =
   'position:fixed; bottom:190px; left:12px; background:rgba(8,10,14,0.88);' +
   'border:1px solid #3a3f4a; border-radius:6px; display:none;';
@@ -1414,7 +1459,7 @@ function drawVerdict() {
   if (verdictCanvas.style.display === 'none') return;
   const c = verdictCanvas.getContext('2d');
   const { X0, X1, Y_TOP, Y_BOT, R_LO, R_HI } = VERD;
-  c.clearRect(0, 0, 320, 190);
+  c.clearRect(0, 0, 320, 208);
   c.font = '10px monospace';
   c.fillStyle = '#8ee6c8';
   c.fillText('VERDICT PANEL — 4 to 17 kpc, linear', 8, 13);
@@ -1476,6 +1521,12 @@ function drawVerdict() {
   c.fillStyle = live < 18 ? '#8ee6c8' : '#ff6b5a';
   c.fillText(`VERDICT chi2/nu ${live.toFixed(1)}   (halo ${GALAXY.haloOn ? 'OFF' : 'ON'}` +
     ` would read ${other.toFixed(1)})`, 8, 178);
+  // B2: where the knob is sitting. M200, never MS — CHEATS #21.
+  const nv = nfwM200(GALAXY.MS);
+  const atFloor = Math.abs(GALAXY.MS / GALAXY.MS_CAL - 0.993) < 0.01;
+  c.fillStyle = atFloor ? '#8ee6c8' : '#8fa4b4';
+  c.fillText(`halo ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x   ` +
+    `M200 ${nv.M200.toExponential(2)} Msun   , . dial   / reset`, 8, 194);
 }
 
 function renderProvenance() {

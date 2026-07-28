@@ -390,3 +390,24 @@ that on a key:
 3. THE HOUSE VALUE WAS ALREADY RIGHT, to 0.7%. B does not discover a new
    number; it converts a CHOSEN constant into a FOUND one. That is the
    whole milestone and it should not be sold as more.
+
+## 22. The halo knob (B2)
+
+**Where:** `main.js` the , . / handlers, nfwM200, the verdict panel's
+bottom line.
+
+The dark halo's mass is now a dial. What is display, confessed:
+
+1. THE READOUT QUOTES M200, NEVER MS, per #21. The conversion is a
+   bisection on the NFW profile with RS pinned at 16 kpc, computed twice
+   by two independent implementations — main.js nfwM200 and haloLab HL4 —
+   which agree at 8.174e11 Msun, c 12.1, r200 193 kpc.
+2. THE STEP IS 2% AND THE STOPS ARE 0.1x TO 3.0x, matching the window
+   haloLab HL1 scanned. The knob cannot be dialled anywhere the lab has
+   not already been. At a stop it AUDITs instead of silently refusing.
+3. THE MINT HIGHLIGHT AT 0.99x is a display flourish keyed to HL1's
+   floor of 0.993x. It marks a number the LAB found; the browser does not
+   search for it.
+4. THE KNOB CANNOT TOUCH MEASURED DATA. Cluster seeding is pinned to
+   MS_CAL — B0, receipted in gaiaLab G7 at 0.000 km/s. Dial first or last,
+   the 126 velocities are identical.

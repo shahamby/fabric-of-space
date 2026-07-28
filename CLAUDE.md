@@ -337,7 +337,18 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   is the NFW characteristic mass and the quotable number is M200 = 8.17e11
   Msun at c 12.1. HL5 also checks the lab left the dial where it found it.
   CHEATS #21. Next: B2, the knob on , and .
-  
+- **B2: COMPLETE** — the halo mass is a dial. ',' and '.' step MS by 2%
+  within haloLab's own 0.1x-3.0x scan window, '/' resets to the house
+  value; the rotation curve, verdict panel, cluster census and cluster
+  trail all answer live, and the HUD, fabric and seat panel follow through
+  animate(). The verdict panel gained a bottom line reading the halo ratio
+  and M200 — quoting M200 and never MS, per CHEATS #21 — and turns mint at
+  HL1's floor. main.js nfwM200 and haloLab HL4 agree independently at
+  8.174e11 Msun, c 12.1, r200 193 kpc. legendLab caught the three new keys
+  as undocumented on its first run against real work, which is the first
+  time that guard has fired outside a drill. CHEATS #22. Next: B3, the
+  valley drawn on the panel.  
+
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,
