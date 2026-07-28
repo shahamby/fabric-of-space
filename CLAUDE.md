@@ -358,6 +358,12 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   halo where you put it — so you can ask what the REAL cluster does in a
   dialled galaxy. Restore verified byte-exact after 200 Myr through a randomly
   yanked halo. legendLab 29/29. CHEATS #23.
+- **S2 PREREQUISITE (S0):** the keydown firewall has no input guard. The moment
+  a text field exists, typing "Terzan" fires t / e / r / z / a / n and spawns a
+  rogue body. S2 (name search) MUST open with `if (event.target.matches('input,
+  textarea, [contenteditable]')) return;` at the top of the firewall, receipted
+  by typing a word into the box and confirming no key fires. Not shipped with
+  S1 because S1 has no input and an untested guard is theatre.
 
 ## Idea backlog
 

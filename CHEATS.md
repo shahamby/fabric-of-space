@@ -438,3 +438,24 @@ and the cluster does NOT return to its original orbit. Apocentre went 14.7
 5. THE GALAXY CLOCK IS NOT REWOUND. u restores the clusters only; the
    clock keeps running as a stopwatch, and the tracer stars (j) are not
    touched. Said in the AUDIT rather than hidden.
+
+## 25. The hunt (S1)
+
+**Where:** `main.js` HUNT, the f key.
+
+Four questions over the 145 clusters, cycled by f. What is display,
+confessed:
+
+1. THREE QUERIES READ DATA, ONE READS THE MODEL. Fastest, farthest and
+   highest are pure catalogue geometry. "Closest to escaping" divides by
+   escapeSpeed, so it moves when the halo knob moves — and it SHOULD.
+   That asymmetry is the receipt that the wiring is right.
+2. EVERY ANSWER IS LIVE. The clusters are in flight and path-dependent
+   (#23), so the winner at day 0 need not be the winner at day 900. The
+   AUDIT prints the number, never just the name, so the reader can see
+   what was actually being compared.
+3. TIES ARE BROKEN BY CATALOGUE ORDER. Strictly-greater comparison, so
+   the first in Harris order wins a tie. No tie has been observed; the
+   rule is stated rather than left to chance.
+4. THE CAMERA DOES NOT MOVE. f selects and draws the trail; it does not
+   fly you there. Nothing hidden — the panel names the winner.

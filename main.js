@@ -152,6 +152,7 @@ const KEYS = [
   { group: 'GALAXY',        key: '.',     does: 'dial the halo mass UP 2% — hunt the floor',          short: 'halo mass +2%' },
   { group: 'GALAXY',        key: '/',     does: 'halo mass back to house — clusters KEEP their history', short: 'halo reset' },
   { group: 'GALAXY',        key: 'u',     does: 'undo: clusters back to the catalogue epoch, halo untouched', short: 'undo dialling' },
+  { group: 'GALAXY',        key: 'f',     does: 'find: cycle fastest / farthest / highest / nearest escape', short: 'find a cluster' },
 
   { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons', short: 'live JPL fetch' },
   { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256',        short: 'provenance' },
@@ -377,6 +378,23 @@ window.addEventListener('keydown', (event) => {
     if (!clusterCloud.visible) { clusterPick = null; refreshClusterTrail(); }
     console.log(`AUDIT: globular clusters ${clusterCloud.visible ? 'shown' : 'hidden'} ` +
       `(${CLUSTERS.list.length} loaded from ${CLUSTERS.source}).`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'f') {              // S1: find the interesting one
+    if (!GALAXY.on) { console.log('AUDIT: press g first — f hunts through the clusters.'); return; }
+    if (!CLUSTERS.loaded) { console.log('AUDIT: no clusters loaded — press k first.'); return; }
+    const flying = CLUSTERS.list.filter((c) => c.vx !== undefined);
+    if (!flying.length) { console.log('AUDIT: no clusters carry 3D velocities.'); return; }
+    HUNT.mode = (HUNT.mode + 1) % HUNT.queries.length;
+    const q = HUNT.queries[HUNT.mode];
+    let best = flying[0], bestScore = q.score(best);
+    for (const c of flying) { const s = q.score(c); if (s > bestScore) { best = c; bestScore = s; } }
+    clusterPick = CLUSTERS.list.indexOf(best);
+    galaxyPick = null;
+    refreshClusterTrail();
+    console.log(`AUDIT: hunt "${q.name}" over ${flying.length} clusters — ${best.id} wins at ` +
+      `${q.say(best)}. Selected; its trail is drawn and the panel is open. ` +
+      `f again for "${HUNT.queries[(HUNT.mode + 1) % HUNT.queries.length].name}".`);
     return;
   }
   if (event.key.toLowerCase() === 'u') {              // B2.1: undo the dialling
@@ -698,6 +716,37 @@ function syncClusterCloud() {
   }
   a.needsUpdate = true;
 }
+
+// ---------- S1: the hunt ----------
+// Finding one dot among 145 by eye is the wrong instrument. These are the
+// questions you actually want answered, and every one is a single pass over
+// data already in memory. No text box, no index, no new failure mode: f
+// cycles the question and the winner selects itself. Every answer is LIVE —
+// dial the halo or fly the clock and the winner can change, which is the
+// point. Escape speed is the same galaxyPhi the census uses (M12d).
+const HUNT = {
+  mode: -1,                                   // first press lands on query 0
+  queries: [
+    { name: 'fastest',
+      score: (c) => Math.hypot(c.vx, c.vy, c.vz),
+      say: (c) => `|v3D| ${(Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR).toFixed(1)} km/s` },
+    { name: 'farthest from Sgr A*',
+      score: (c) => Math.hypot(c.x, c.y, c.z),
+      say: (c) => `r ${Math.hypot(c.x, c.y, c.z).toFixed(1)} kpc` },
+    { name: 'highest above the plane',
+      score: (c) => Math.abs(c.z),
+      say: (c) => `|z| ${Math.abs(c.z).toFixed(1)} kpc` },
+    { name: 'closest to escaping',
+      score: (c) => (Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR) /
+                    escapeSpeed(Math.hypot(c.x, c.y, c.z)),
+      say: (c) => {
+        const r = Math.hypot(c.x, c.y, c.z);
+        const v = Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR;
+        return `v/vEsc ${(v / escapeSpeed(r)).toFixed(3)} ` +
+          `(${v.toFixed(1)} of ${escapeSpeed(r).toFixed(1)} km/s at r ${r.toFixed(1)} kpc)`;
+      } },
+  ],
+};
 
 // B2.1: put the clusters back where the catalogues say they are. The halo is
 // NOT touched — that is the point. Dial the halo, press u, and you are asking
