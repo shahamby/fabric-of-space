@@ -370,3 +370,23 @@ proving the data is real.
 Re-archiving is now opt-in (SNAPSHOT=1). A normal run fetches, verifies,
 and leaves the shipped bytes untouched. Found by B0's own workflow: G7
 requires running gaiaLab, and running gaiaLab broke SN1.
+
+## 21. What the halo knob will actually be measuring (B1)
+
+**Where:** `lab/haloLab.mjs`.
+
+The valley exists: chi2/nu has a floor at MS = 4.967e11 Msun, 0.993 x the
+house value, at chi2/nu 8.96. Three things must be said before B2 puts
+that on a key:
+
+1. MS IS NOT THE NUMBER PEOPLE QUOTE. It is the NFW characteristic mass
+   with RS pinned at 16 kpc. The virial mass it implies is M200 = 8.17e11
+   Msun at c = 12.1, r200 = 193 kpc — computed in HL4, ungated, because it
+   is arithmetic on a pinned RS rather than a measurement. Quote M200.
+2. THE +-3.2% WIDTH IS GEOMETRY, NOT AN ERROR BAR. The floor sits at
+   chi2/nu 9, not 1, so the model carries systematics beyond its halo mass
+   and a real uncertainty would need the errors rescaled. The width is the
+   curvature of the valley and is never to be printed as +- on a mass.
+3. THE HOUSE VALUE WAS ALREADY RIGHT, to 0.7%. B does not discover a new
+   number; it converts a CHOSEN constant into a FOUND one. That is the
+   whole milestone and it should not be sold as more.

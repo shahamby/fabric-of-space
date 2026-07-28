@@ -9,7 +9,6 @@
 // The browser overlay ships nothing that does not pass here first.
 // Run:  node lab/mrozLab.mjs        (MZ5 is Shambu's hand — see slot)
 
-import { writeFileSync } from 'node:fs';
 import { writeSnapshot } from './snapshot.mjs';
 
 // ---------- MZ0: the fetch — two files through the front door ----------

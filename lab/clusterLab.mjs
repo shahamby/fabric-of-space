@@ -6,7 +6,7 @@
 //   are these things still bound if you take the dark matter away?
 // Run:  node lab/clusterLab.mjs
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { writeSnapshot } from './snapshot.mjs';
 
 const URL = 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv'

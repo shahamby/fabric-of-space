@@ -326,7 +326,18 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   (lab/snapshot.mjs, SNAPSHOT=1) after running gaiaLab silently rewrote two
   of the five sealed checksums. CHEATS #20. Next: B1 haloLab — the valley,
   minimum sealed at 0.993x house, chi2/nu 8.96.
-
+- **B1: COMPLETE** — the valley is real, located and un-bluffable.
+  lab/haloLab.mjs HL0 handshakes with MZ7 at 9.0 over the same 11 bins;
+  HL1 finds the floor at MS 4.967e11 Msun (0.993 x house), chi2/nu 8.96;
+  HL2 the Delta-chi2 = 1 width is +-3.2%, quoted as valley curvature and
+  never as an error bar; HL3 is taxonomy #7's second appearance — the
+  finder is handed a window that excludes the floor and must report the
+  edge instead of naming it, which without the guard would have claimed
+  1.50 x house, a 51% error stated as a measurement. HL4 records that MS
+  is the NFW characteristic mass and the quotable number is M200 = 8.17e11
+  Msun at c 12.1. HL5 also checks the lab left the dial where it found it.
+  CHEATS #21. Next: B2, the knob on , and .
+  
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,

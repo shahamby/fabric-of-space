@@ -7,7 +7,7 @@
 // the plane, S-shaped) and the FLARE (the disk thickens outward).
 // Run:  node lab/cephLab.mjs
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { writeSnapshot } from './snapshot.mjs';
 
 const URL = 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv'
