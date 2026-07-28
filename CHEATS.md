@@ -411,3 +411,30 @@ The dark halo's mass is now a dial. What is display, confessed:
 4. THE KNOB CANNOT TOUCH MEASURED DATA. Cluster seeding is pinned to
    MS_CAL — B0, receipted in gaiaLab G7 at 0.000 km/s. Dial first or last,
    the 126 velocities are identical.
+
+## 23. The knob has a memory (B2.1)
+
+**Where:** `main.js` c.seed in loadClusters, restoreClusters, the u key.
+
+Found by Shambu while flying NGC 6426: dial the halo, come back to 1.00x,
+and the cluster does NOT return to its original orbit. Apocentre went 14.7
+-> 64.8 kpc across one round trip. What is going on, confessed:
+
+1. THE CLUSTERS ARE INTEGRATED LIVE, not merely predicted. kdk3 advances
+   them through galaxyPhi on the galaxy clock, so moving MS changes the
+   force on them AT THAT INSTANT. Energy is pumped in or out. Their
+   trajectories are PATH-DEPENDENT from the first keypress onward.
+2. THE READOUTS ARE THEREFORE HISTORIES, not propagations. After any
+   dialling, r / |v3D| / peri / apo describe a cluster that has been
+   kicked — not the measured state carried forward in one potential.
+3. TWO KEYS, TWO QUESTIONS. / resets the halo and KEEPS the history:
+   "what happened to the thing I have been playing with?" u restores the
+   catalogue epoch and leaves the halo alone: "what does the MEASURED
+   cluster do in THIS galaxy?" Only the second is a physics question.
+4. THE MEASURED STATE SURVIVES EVERYTHING. c.seed is copied once at load,
+   before the clock starts, and nothing writes to it. Restore is byte-
+   exact — verified by flying a cluster 200 Myr through a randomly
+   yanked halo (158.0 -> 193.1 km/s) and reading 158.023 back.
+5. THE GALAXY CLOCK IS NOT REWOUND. u restores the clusters only; the
+   clock keeps running as a stopwatch, and the tracer stars (j) are not
+   touched. Said in the AUDIT rather than hidden.

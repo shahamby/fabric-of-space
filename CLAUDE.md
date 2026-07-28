@@ -348,6 +348,16 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   as undocumented on its first run against real work, which is the first
   time that guard has fired outside a drill. CHEATS #22. Next: B3, the
   valley drawn on the panel.  
+- **B2.1: COMPLETE** — the knob's memory, found by Shambu in flight and given
+  an undo. The clusters are integrated live, so dialling MS changes the force
+  on them mid-flight and their orbits become path-dependent (NGC 6426's
+  apocentre moved 14.7 -> 64.8 kpc across one round trip at the same halo
+  mass). The catalogue epoch is now copied into c.seed once at load, before
+  the clock starts. Two keys, two questions: '/' resets the halo and keeps the
+  flown history, 'u' restores the measured Harris/Gaia state and leaves the
+  halo where you put it — so you can ask what the REAL cluster does in a
+  dialled galaxy. Restore verified byte-exact after 200 Myr through a randomly
+  yanked halo. legendLab 29/29. CHEATS #23.
 
 ## Idea backlog
 

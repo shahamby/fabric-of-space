@@ -150,7 +150,8 @@ const KEYS = [
   { group: 'GALAXY',        key: 'r',     does: 'VERDICT panel — chi2/nu, the hypothesis test',        short: 'VERDICT panel' },
   { group: 'GALAXY',        key: ',',     does: 'dial the halo mass DOWN 2% — watch chi2/nu climb',   short: 'halo mass -2%' },
   { group: 'GALAXY',        key: '.',     does: 'dial the halo mass UP 2% — hunt the floor',          short: 'halo mass +2%' },
-  { group: 'GALAXY',        key: '/',     does: 'reset the halo mass to the house value',             short: 'halo reset' },
+  { group: 'GALAXY',        key: '/',     does: 'halo mass back to house — clusters KEEP their history', short: 'halo reset' },
+  { group: 'GALAXY',        key: 'u',     does: 'undo: clusters back to the catalogue epoch, halo untouched', short: 'undo dialling' },
 
   { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons', short: 'live JPL fetch' },
   { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256',        short: 'provenance' },
@@ -378,6 +379,23 @@ window.addEventListener('keydown', (event) => {
       `(${CLUSTERS.list.length} loaded from ${CLUSTERS.source}).`);
     return;
   }
+  if (event.key.toLowerCase() === 'u') {              // B2.1: undo the dialling
+    if (!GALAXY.on) { console.log('AUDIT: press g first — u restores the clusters.'); return; }
+    if (!CLUSTERS.loaded) { console.log('AUDIT: no clusters loaded — press k first.'); return; }
+    const n = restoreClusters();
+    const unbound = colourClusters();
+    refreshClusterTrail();
+    const c = clusterPick !== null ? CLUSTERS.list[clusterPick] : null;
+    const at = c && c.seed
+      ? ` ${c.id} back to r ${Math.hypot(c.x, c.y, c.z).toFixed(1)} kpc, ` +
+        `|v3D| ${(Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR).toFixed(1)} km/s.`
+      : '';
+    console.log(`AUDIT: ${n} clusters returned to the catalogue epoch — Harris positions, ` +
+      `Gaia velocities, exactly as loaded.${at} ${unbound} unbound at the CURRENT halo ` +
+      `(${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x). The halo knob was not moved; the galaxy ` +
+      `clock keeps running as a stopwatch.`);
+    return;
+  }
   if (event.key === ',' || event.key === '.' || event.key === '/') {   // B2: the halo knob
     if (!GALAXY.on) { console.log('AUDIT: press g first — the halo knob reads the galaxy.'); return; }
     const before = GALAXY.MS;
@@ -390,6 +408,9 @@ window.addEventListener('keydown', (event) => {
       return;
     }
     if (CLUSTERS.loaded) {
+      // The clusters are IN FLIGHT: changing MS changes the force on them NOW,
+      // so their trajectories are path-dependent from here on. / resets the
+      // halo but KEEPS that history. u throws the history away. CHEATS #23.
       console.log(`AUDIT: ${colourClusters()} clusters now unbound — the halo changed under them.`);
       if (clusterPick !== null) refreshClusterTrail();
     }
@@ -678,6 +699,21 @@ function syncClusterCloud() {
   a.needsUpdate = true;
 }
 
+// B2.1: put the clusters back where the catalogues say they are. The halo is
+// NOT touched — that is the point. Dial the halo, press u, and you are asking
+// the honest question: what does the MEASURED cluster do in THIS galaxy?
+function restoreClusters() {
+  let n = 0;
+  for (const c of CLUSTERS.list) {
+    if (!c.seed) continue;
+    c.x = c.seed.x; c.y = c.seed.y; c.z = c.seed.z;
+    c.vx = c.seed.vx; c.vy = c.seed.vy; c.vz = c.seed.vz;
+    c.v3 = c.seed.v3;
+    n++;
+  }
+  return n;
+}
+
 function colourClusters() {
   const col = clusterCloud.geometry.attributes.color;
   if (!col) return 0;
@@ -736,6 +772,14 @@ async function loadClusters() {
     if (pm) { Object.assign(c, pm); matched++; }
   }
   const seeded = seedClusterVelocities(CLUSTERS.list);  // gaiaLab's pipeline, receipted
+  // B2.1: the catalogue epoch, kept aside before anything flies. kdk3 mutates
+  // x/y/z/vx/vy/vz in place, so once the clock runs the measured state is gone
+  // unless it was copied. This is the ONLY copy of where Harris and Gaia say
+  // these 145 objects actually were. u restores it; nothing else may touch it.
+  for (const c of CLUSTERS.list) {
+    if (c.vx === undefined) continue;
+    c.seed = { x: c.x, y: c.y, z: c.z, vx: c.vx, vy: c.vy, vz: c.vz, v3: c.v3 };
+  }
   GAL_CLUSTERS.list = CLUSTERS.list;
   GAL_CLUSTERS.on = seeded > 0;
   CLUSTERS.loaded = true;
