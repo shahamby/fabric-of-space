@@ -10,6 +10,7 @@
 // Run:  node lab/mrozLab.mjs        (MZ5 is Shambu's hand — see slot)
 
 import { writeFileSync } from 'node:fs';
+import { writeSnapshot } from './snapshot.mjs';
 
 // ---------- MZ0: the fetch — two files through the front door ----------
 // SEALED before running: Cepheids.dat >= 100,000 bytes and exactly 832
@@ -28,8 +29,8 @@ async function grab(name, minBytes) {
 
 const cephText  = await grab('Cepheids.dat', 100000);
 const curveText = await grab('rotation_curve.txt', 30000);
-writeFileSync('data/mroz_cepheids.dat', cephText);
-writeFileSync('data/mroz_curve.txt', curveText);
+writeSnapshot('data/mroz_cepheids.dat', cephText, 'Mroz Cepheids');
+writeSnapshot('data/mroz_curve.txt', curveText, 'Mroz curve');
 
 // Cepheids.dat columns (README): Name flag RA Decl l b dist e_dist
 // pmra e_pmra pmdec e_pmdec pm_corr vrad e_vrad — 15 space-split tokens.

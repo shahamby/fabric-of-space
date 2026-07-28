@@ -8,6 +8,7 @@
 //       PLUMBING_ONLY=1 node lab/gaiaLab.mjs (G0-G3 only; census stays sealed)
 
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeSnapshot } from './snapshot.mjs';
 
 const GAIA_URL = 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv'
   + '?-source=J/MNRAS/505/5978/tablea1'
@@ -54,8 +55,7 @@ async function grab(url, snapshot, label, minBytes) {
   const text = await res.text();
   console.log(`G0  ${label}: HTTP ${res.status}, ${text.length} bytes  ` +
     `[${res.status === 200 && text.length > minBytes ? 'PASS' : 'FAIL'}]`);
-  mkdirSync('data', { recursive: true });
-  writeFileSync(snapshot, text);
+  writeSnapshot(snapshot, text, label.trim());
   return text;
 }
 const gaiaText   = await grab(GAIA_URL,   'data/gaia_pm.tsv',   'Gaia PMs  ', 8000);
@@ -327,3 +327,21 @@ PLIVE.GALAXY.haloOn = true;
 const dvSeed = Math.abs(seedA[0].v3 - seedB[0].v3);
 console.log(`G6  seed-frame invariance: |dv| = ${dvSeed.toFixed(3)} km/s  ` +
   `[${dvSeed < 1e-9 ? 'PASS' : 'FAIL'}]  (h must never touch the data)`);
+
+  // ---------- G7: seed-frame invariance under the HALO MASS (B0) ----------
+// G6 sealed the h TOGGLE out of the seeder. It did not seal the halo MASS.
+// Track B puts MS on a live knob, so the same question has to be asked
+// again through the new door: dial the mass, seed the same cluster, and the
+// measured speed must not move. A calibration frame that follows a knob
+// is not a calibration frame.
+const MS_HOUSE = PLIVE.GALAXY.MS;
+PLIVE.GALAXY.MS = MS_HOUSE;        const seedM1 = mkTest(); PLIVE.seedClusterVelocities(seedM1);
+PLIVE.GALAXY.MS = MS_HOUSE * 0.5;  const seedM2 = mkTest(); PLIVE.seedClusterVelocities(seedM2);
+PLIVE.GALAXY.MS = MS_HOUSE * 2.0;  const seedM3 = mkTest(); PLIVE.seedClusterVelocities(seedM3);
+PLIVE.GALAXY.MS = MS_HOUSE;
+const dvHalf = Math.abs(seedM1[0].v3 - seedM2[0].v3);
+const dvDouble = Math.abs(seedM1[0].v3 - seedM3[0].v3);
+const dvMass = Math.max(dvHalf, dvDouble);
+console.log(`G7  seed-mass invariance: |dv| = ${dvHalf.toFixed(3)} at MS/2, ` +
+  `${dvDouble.toFixed(3)} at 2MS km/s  ` +
+  `[${dvMass < 1e-9 ? 'PASS' : 'FAIL'}]  (the knob must never touch the data)`);

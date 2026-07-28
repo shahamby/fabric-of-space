@@ -353,3 +353,20 @@ confessed:
    and carries no z-index, so the camera flies through it and every data
    panel draws over it — a reference sheet must never win a fight with
    an instrument.
+
+## 20. The archive is not rewritten by accident (B0)
+
+**Where:** `lab/snapshot.mjs`; the fetch paths in gaiaLab, clusterLab,
+cephLab, mrozLab.
+
+Four labs re-fetch catalogues the app also ships compiled into its bundle,
+and each one used to write the fresh copy straight over the shipped file.
+VizieR stamps the fetch DATE into every response, so running a test
+changed four of the five sha256 values in CHEATS #18 without changing a
+single measurement. Fail-silent: git status was the only witness, and the
+casualty was the provenance panel — the one instrument whose job is
+proving the data is real.
+
+Re-archiving is now opt-in (SNAPSHOT=1). A normal run fetches, verifies,
+and leaves the shipped bytes untouched. Found by B0's own workflow: G7
+requires running gaiaLab, and running gaiaLab broke SN1.

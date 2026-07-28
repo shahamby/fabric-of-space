@@ -318,6 +318,14 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   a copy of the source to prove the lab can fail. Wired into the Pages
   workflow ahead of the build, beside the eslint gate. README rewritten
   from the same list. CHEATS #19.
+- **B0: COMPLETE** — the halo-mass knob's foundation. MS_CAL freezes the
+  cluster-seeding calibration frame so a live MS can never rewrite measured
+  velocities: gaiaLab G7 FAIL-before 18.497 km/s at MS/2 and 36.604 at 2MS,
+  PASS-after 0.000 / 0.000. F1's disease, second door, caught by probe
+  before the knob existed. Rode along: snapshot writing is now opt-in
+  (lab/snapshot.mjs, SNAPSHOT=1) after running gaiaLab silently rewrote two
+  of the five sealed checksums. CHEATS #20. Next: B1 haloLab — the valley,
+  minimum sealed at 0.993x house, chi2/nu 8.96.
 
 ## Idea backlog
 

@@ -7,6 +7,7 @@
 // Run:  node lab/clusterLab.mjs
 
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeSnapshot } from './snapshot.mjs';
 
 const URL = 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv'
   + '?-source=VII/202/catalog'
@@ -38,7 +39,7 @@ const text = await res.text();
 console.log(`C0  HTTP ${res.status}, ${text.length} bytes  ` +
   `[${res.status === 200 && text.length > 5000 ? 'PASS' : 'FAIL'}]`);
 mkdirSync('data', { recursive: true });
-writeFileSync('data/harris_gc.tsv', text);
+writeSnapshot('data/harris_gc.tsv', text, 'Harris GC');
 
 // ---------- C1: parse ----------
 // VizieR TSV: '#' comments, then header / units / dashes, then rows.

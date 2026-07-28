@@ -261,7 +261,8 @@ export const GALAXY = {
   G: 4.301e-6,                       // kpc·(km/s)²/Msun — audited in W0
   MB: 1.5e10, AB: 0.5,               // bulge
   MD: 6.5e10, AD: 3.0, BD: 0.3,      // disk
-  MS: 5.0e11, RS: 16,                // dark halo
+  MS: 5.0e11, RS: 16,                // dark halo — MS is a KNOB from B1 on
+  MS_CAL: 5.0e11,                    // B0: the frozen calibration mass. Never dialled.
   MBH: 4.30e6,                       // Sgr A* — the published mass (M12f)
 };
 export function galaxyPhi(R) {       // potential at planar radius R kpc, (km/s)²
@@ -391,13 +392,16 @@ function kdk3(s, dt) {                    // the house shape, third axis include
 // Radial piece + two sky pieces in equatorial axes, rotate to galactic,
 // flip to repo (Sun at +X), add the Sun's own ride. Receipt: gaiaLab G3e.
 export function seedClusterVelocities(list) {
-  // F1 (R1): the h key is a DISPLAY toggle; seeding is DATA. The calibration
-  // frame is halo ON (gaiaLab G3c's 232.1 km/s), no matter what the screen
-  // showed when k was pressed. Receipt: gaiaLab G6 seed-frame invariance.
-  const savedHalo = GALAXY.haloOn;
+  // F1 (R1) + B0: the h key is a DISPLAY toggle and MS is a DISPLAY knob;
+  // seeding is DATA. The calibration frame is halo ON at the frozen
+  // calibration mass — gaiaLab G3c's 232.1 km/s — no matter what the
+  // screen showed or what the knob read when k was pressed.
+  // Receipts: G6 (the toggle), G7 (the mass).
+  const savedHalo = GALAXY.haloOn, savedMS = GALAXY.MS;
   GALAXY.haloOn = true;
+  GALAXY.MS = GALAXY.MS_CAL;
   const vlsrModel = galaxyVCirc(8.2);       // always the receipted frame
-  GALAXY.haloOn = savedHalo;
+  GALAXY.haloOn = savedHalo; GALAXY.MS = savedMS;
   const VSUN = [-11.1, -(vlsrModel + 12.24), 7.25];   // Schoenrich+2010 + our curve
   let seeded = 0;
   for (const c of list) {

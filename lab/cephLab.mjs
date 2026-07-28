@@ -8,6 +8,7 @@
 // Run:  node lab/cephLab.mjs
 
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeSnapshot } from './snapshot.mjs';
 
 const URL = 'https://vizier.cds.unistra.fr/viz-bin/asu-tsv'
   + '?-source=J/AcA/69/305/table1'
@@ -27,7 +28,7 @@ const text = await res.text();
 console.log(`CD0 fetch: HTTP ${res.status}, ${text.length} bytes  ` +
   `[${res.status === 200 && text.length > 100000 ? 'PASS' : 'FAIL'}]`);
 mkdirSync('data', { recursive: true });
-writeFileSync('data/cepheids.tsv', text);
+writeSnapshot('data/cepheids.tsv', text, 'Cepheids');
 
 // ---------- CD1: parse — the space-padding lesson applied ----------
 // The probe showed blank Dist cells stuffed with spaces; trim BEFORE
