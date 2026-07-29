@@ -459,3 +459,26 @@ confessed:
    rule is stated rather than left to chance.
 4. THE CAMERA DOES NOT MOVE. f selects and draws the trail; it does not
    fly you there. Nothing hidden — the panel names the winner.
+
+## 26. WHAT IF (W1)
+
+**Where:** `main.js` WHATIF, applyWhatIf, the i and o keys; `physics.js` LIGHT.
+
+The founding rule widened on purpose: physics never cheats, CONSTANTS MAY BE
+DECLARED. What is display, confessed:
+
+1. THERE IS ONE ENGINE. physics.js contains no mode flag and never checks
+   one. WHAT IF lives entirely in main.js and does nothing but assign to
+   declared constants. lab/sandboxLab.mjs SB1 proves the two modes are
+   bit-identical at calibration values, and SB3 proves that check can fail.
+2. THE LABEL IS IN THE PIXELS, because a screenshot can be cropped. A banner
+   across the top naming only the MOVED constants, plus an amber fabric. No
+   console-only disclosure, ever.
+3. ENTERING IS CEREMONIAL. i arms, i confirms, any other key cancels AND IS
+   SWALLOWED — otherwise cancelling with h would silently flip the halo.
+4. LEAVING RESETS EVERYTHING. There is no half-dialled world to walk back
+   into. Same doctrine as u (#23).
+5. NOTHING IS FAKED, EVEN HERE. c x0.01 makes Mercury precess 119 deg per
+   century because that is what 1PN does at that c — the same correction,
+   the same code, one stated constant. The numbers are real consequences of
+   a declared premise. They are not measurements of our universe.

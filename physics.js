@@ -119,7 +119,11 @@ export function eulerStep(bodies, dt, G) {
 // Einstein's leading correction: suppressed by 1/c², so it only matters
 // deep in the well, moving fast — which is Mercury's exact job description.
 export const PN1 = { on: false };        // main.js flips this with the E key
-const C_AU_DAY = 173.144632;             // speed of light in our units
+// W1: the speed of light is a CONSTANT, not a law. TRUTH pins it at the
+// measured value; WHAT IF may move it, and the 1PN correction then does
+// exactly what it always did — 1/c^2 suppressed — only louder. LIGHT.cal is
+// the measured value and is never dialled; LIGHT.c is what the engine reads.
+export const LIGHT = { c: 173.144632, cal: 173.144632 };   // AU/day
 
 function apply1PN(bodies, G, vLead) {
   const sun = bodies.find(b => b.name === 'Sun');
@@ -140,7 +144,7 @@ function apply1PN(bodies, G, vLead) {
     const r  = Math.hypot(rx, ry, rz);
     const v2 = vx*vx + vy*vy + vz*vz;
     const rdotv = rx*vx + ry*vy + rz*vz;
-    const k = gm / (C_AU_DAY*C_AU_DAY * r*r*r);   // the 1/c² volume knob
+    const k = gm / (LIGHT.c*LIGHT.c * r*r*r);      // the 1/c² volume knob
     const radial = 4*gm/r - v2;                    // reshapes the pull with depth & speed
     b.acc[0] += k * (radial*rx + 4*rdotv*vx);      // second piece drags along
     b.acc[1] += k * (radial*ry + 4*rdotv*vy);      // the direction of motion —

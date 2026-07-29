@@ -42,8 +42,15 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 
 ## Non-negotiable conventions
 
-- Physics never cheats. Only rendering cheats, and every display cheat is
-  logged in CHEATS.md (#1-#5).
+- **Physics never cheats. Constants may be declared.** There is ONE engine.
+  In TRUTH mode every constant sits at its measured value and every number on
+  screen is a claim about our universe. In WHAT IF mode any constant may be
+  moved, but the engine is unchanged — same integrator, same force law, same
+  receipts — every moved constant is named in the pixels, and no number
+  produced there is a measurement. WHAT IF must never fork physics.js; the
+  guard is lab/sandboxLab.mjs, which fails if the two modes ever disagree at
+  calibration values. CHEATS.md confesses what the picture does. The banner
+  confesses what the numbers mean.
 - Simulation space: barycentric ecliptic J2000 coordinates in AU, days, and
   solar masses (G is in data/bodies.json _meta). Rendering converts through
   eclToScene(x, y, z) -> (x, z, -y) in bodyMesh.js. Never mix the two spaces.
@@ -364,6 +371,19 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   textarea, [contenteditable]')) return;` at the top of the firewall, receipted
   by typing a word into the box and confirming no key fires. Not shipped with
   S1 because S1 has no input and an untested guard is theatre.
+- **W1: COMPLETE** — WHAT IF opens. One engine, declared constants, no fork.
+  physics.js gains LIGHT { c, cal } on the MS/MS_CAL pattern and contains no
+  mode flag; the mode is entirely main.js. i arms and confirms (cancel key is
+  swallowed so backing out cannot flip the halo), i again leaves and resets
+  every knob, o cycles c through 1 / 0.1 / 0.01 / 0.001 of measured. Label is
+  in the pixels: top banner naming only moved constants, amber fabric.
+  lab/sandboxLab.mjs SB0-SB5 all PASS — SB1 bit-identity at calibration over
+  12 values, SB2 c x0.01 scales the 1PN coefficient by exactly 1e4 and leaves
+  the galaxy curve untouched, SB3 the negative (the identity check reports
+  DIFFERENT when a knob is left dialled), SB4 restore bit-exact. Wired into
+  the Pages gate. CHEATS #26. Next: W2 — Sgr A* mass, which is what makes the
+  event horizon real (10^9x measured puts r_s at 0.41 kpc, larger than one
+  integration step and therefore genuinely crossable).
 
 ## Idea backlog
 

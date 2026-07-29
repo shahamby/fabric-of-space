@@ -26,6 +26,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: node lab/legendLab.mjs
+      - run: node lab/sandboxLab.mjs
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

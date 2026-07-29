@@ -11,6 +11,7 @@ import cepheidSnapshot from './data/cepheids.tsv?raw';    // M12h: the disk's bo
 import mrozSnapshot from './data/mroz_curve.txt?raw';     // M12i: the sky's own curve
 import bodiesSnapshot from './data/bodies.json?raw';       // A1.1: the solar epoch, as BYTES (bodies.js imports the parsed object; provenance needs the file)
 import { makeStarfield } from './starfield.js';
+import { LIGHT } from './physics.js';   // W1: the speed of light, as a declared constant
 
 // ---------- A1: hosted mode ----------
 // The dev server carries the CORS proxies (vite.config.js). A built bundle
@@ -153,6 +154,9 @@ const KEYS = [
   { group: 'GALAXY',        key: '/',     does: 'halo mass back to house — clusters KEEP their history', short: 'halo reset' },
   { group: 'GALAXY',        key: 'u',     does: 'undo: clusters back to the catalogue epoch, halo untouched', short: 'undo dialling' },
   { group: 'GALAXY',        key: 'f',     does: 'find: cycle fastest / farthest / highest / nearest escape', short: 'find a cluster' },
+
+  { group: 'WHAT IF',       key: 'i',     does: 'enter / leave WHAT IF — declared constants, not measurements', short: 'WHAT IF mode' },
+  { group: 'WHAT IF',       key: 'o',     does: 'speed of light: 1x / 1-10th / 1-100th / 1-1000th', short: 'dial c' },
 
   { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons', short: 'live JPL fetch' },
   { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256',        short: 'provenance' },
@@ -378,6 +382,41 @@ window.addEventListener('keydown', (event) => {
     if (!clusterCloud.visible) { clusterPick = null; refreshClusterTrail(); }
     console.log(`AUDIT: globular clusters ${clusterCloud.visible ? 'shown' : 'hidden'} ` +
       `(${CLUSTERS.list.length} loaded from ${CLUSTERS.source}).`);
+    return;
+  }
+  if (WHATIF.armed) {                                 // W1: the confirmation swallows the key
+    WHATIF.armed = false;
+    if (event.key.toLowerCase() === 'i') {
+      WHATIF.on = true;
+      console.log('AUDIT: WHAT IF entered. One engine, declared constants. ' +
+        'Nothing printed from here is a measurement. o cycles the speed of light; ' +
+        'i leaves and resets every knob.');
+    } else {
+      console.log('AUDIT: stayed in TRUTH — the keypress was consumed, not acted on.');
+    }
+    applyWhatIf();
+    return;
+  }
+  if (event.key.toLowerCase() === 'i') {              // W1: the boundary
+    if (!WHATIF.on) { WHATIF.armed = true; applyWhatIf(); return; }
+    const had = whatIfMoved();
+    WHATIF.on = false;
+    whatIfReset();
+    applyWhatIf();
+    console.log(`AUDIT: back in TRUTH. ${had.length ? had.join(', ') + ' reset to measured values' :
+      'nothing had been moved'}. Every constant is where the universe put it.`);
+    return;
+  }
+  if (event.key.toLowerCase() === 'o') {             // W1: the speed of light
+    if (!WHATIF.on) { console.log('AUDIT: press i first — constants only move in WHAT IF.'); return; }
+    WHATIF.cIdx = (WHATIF.cIdx + 1) % WHATIF.cSteps.length;
+    const f = WHATIF.cSteps[WHATIF.cIdx];
+    LIGHT.c = LIGHT.cal * f;
+    applyWhatIf();
+    console.log(`AUDIT: c = ${f}x measured (${(LIGHT.c / 173.144632 * 299792.458).toFixed(0)} km/s). ` +
+      `1PN is suppressed by 1/c^2, so Mercury's drift scales by ${(1 / (f * f)).toExponential(1)}x — ` +
+      `about ${(42.98 / (f * f) / 3600).toExponential(2)} degrees per century. ` +
+      `Press e if Einstein is not already on.`);
     return;
   }
   if (event.key.toLowerCase() === 'f') {              // S1: find the interesting one
@@ -715,6 +754,72 @@ function syncClusterCloud() {
     a.setXYZ(i, c.x, c.z, -c.y);
   }
   a.needsUpdate = true;
+}
+
+// ---------- W1: WHAT IF ----------
+// The rule this project was built on is "physics never cheats." W1 widens it
+// on purpose, and the wording matters: PHYSICS NEVER CHEATS, CONSTANTS MAY BE
+// DECLARED. There is exactly ONE engine. WHAT IF does not fork it, replace it
+// or approximate it — it moves stated constants and lets the same integrator,
+// the same force law and the same receipts do what they always do. Nothing
+// here is faked; things here are simply not measurements.
+//
+// The guard against drift is lab/sandboxLab.mjs: with every knob at its
+// calibration value, WHAT IF must be bit-identical to TRUTH. The day that
+// fails, a fork has happened and the ledger will say which hour.
+const WHATIF = {
+  on: false,
+  armed: false,                     // the confirmation is deliberate ceremony
+  cIdx: 0,
+  cSteps: [1, 0.1, 0.01, 0.001],    // multipliers on the measured speed of light
+};
+
+// Only the constants that have actually MOVED. An empty list means the mode
+// is on but nothing differs — and the banner says exactly that.
+function whatIfMoved() {
+  const moved = [];
+  if (LIGHT.c !== LIGHT.cal) moved.push(`c x${(LIGHT.c / LIGHT.cal).toFixed(3)}`);
+  return moved;
+}
+
+function whatIfReset() {
+  LIGHT.c = LIGHT.cal;
+  WHATIF.cIdx = 0;
+}
+
+const whatIfBanner = document.createElement('div');
+whatIfBanner.style.cssText =
+  'position:fixed; top:0; left:0; right:0; z-index:40; display:none;' +
+  'background:#5a3a10; border-bottom:2px solid #d89a3a; color:#ffd79a;' +
+  'font:bold 13px monospace; padding:6px 14px; text-align:center; letter-spacing:0.5px;';
+document.body.append(whatIfBanner);
+
+const whatIfAsk = document.createElement('div');
+whatIfAsk.style.cssText =
+  'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:50;' +
+  'width:min(520px,92vw); background:rgba(20,12,4,0.96); border:2px solid #d89a3a;' +
+  'border-radius:8px; color:#ffd79a; font:13px/1.6 monospace; padding:18px 22px;' +
+  'white-space:pre-wrap; display:none;';
+whatIfAsk.textContent =
+  'LEAVING TRUTH MODE\n\n' +
+  'In WHAT IF the constants are yours to move. The engine does not change:\n' +
+  'same integrator, same force law, same receipts. But once a constant has\n' +
+  'moved, nothing on this screen is a measurement of our universe.\n\n' +
+  'Press i again to enter.   Any other key stays in TRUTH.';
+document.body.append(whatIfAsk);
+
+// The label has to survive a cropped screenshot, so it lives in the pixels:
+// a banner across the top AND a hue shift on the fabric itself.
+function applyWhatIf() {
+  const moved = whatIfMoved();
+  whatIfAsk.style.display = WHATIF.armed ? 'block' : 'none';
+  whatIfBanner.style.display = WHATIF.on ? 'block' : 'none';
+  whatIfBanner.textContent = WHATIF.on
+    ? `WHAT IF${moved.length ? ' — ' + moved.join(' — ') : ' — nothing moved yet'}` +
+      '  ·  NOT MEASUREMENTS'
+    : '';
+  fabric.material.color.setHex(WHATIF.on ? 0x8a6a2a : 0x3a5a8a);
+  if (GALAXY.on) { drawCurve(); drawVerdict(); }
 }
 
 // ---------- S1: the hunt ----------
