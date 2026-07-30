@@ -1115,3 +1115,213 @@ shortest path to the point: g -> m -> r -> h. CHEATS #19.
 Deviation logged: legendLab.mjs was written by Claude, not Shambu's
 hand, at Shambu's explicit request for a paste-only session. The lab
 authorship rule stands for future sessions.
+
+<!-- RECONSTRUCTION NOTICE: sessions 15-22 were written on 2026-07-29,
+     retroactively, from commit messages + CHEATS entries + CLAUDE.md
+     status text. They are NOT contemporaneous notes. Where a number
+     appears below it was read out of the repo, not recalled. The gap
+     itself is the finding: eight milestones shipped between 07-27 and
+     07-29 while the handoff stood still, and nobody noticed until a
+     session-open audit went looking. -->
+
+## 2026-07-27 — session 15: A2.1 COMPLETE — the legend docks
+
+A2 made the legend exist. A2.1 made it usable while working. ? was
+all-or-nothing: a full-screen overlay you had to dismiss before you
+could touch anything it described. Reading the controls and using the
+controls were mutually exclusive, which is a strange property for a
+reference sheet.
+
+? now cycles closed -> docked -> full. The docked sheet is a
+SHORTENING of the same KEYS array — not a second list, not a hand-kept
+summary — so legendLab guards both views with the same check and there
+is no way for the short version to drift from the long one.
+
+Two deliberate weaknesses: the docked panel takes no mouse events and
+carries no z-index. The camera flies through it and every data panel
+draws over it. A reference sheet must never win a fight with an
+instrument. CHEATS #19 item 4.
+
+## 2026-07-28 — session 16: B0 COMPLETE — sealing the frame before building the knob
+
+Track B opens by making the knob SAFE to build, not by building it.
+MS_CAL freezes the cluster-seeding calibration frame so a live MS can
+never rewrite measured velocities. This is F1's disease finding its
+second door — the same class of leak, caught by probe BEFORE the knob
+that would have triggered it existed.
+
+gaiaLab G7 is the receipt, and it was seen to fail first: 18.497 km/s
+at MS/2 and 36.604 at 2MS before the fix, 0.000 / 0.000 after. A
+negative test never watched failing is theatre.
+
+Rode along, and it is the better story: four labs re-fetch catalogues
+the app also ships compiled into its bundle, and each one wrote the
+fresh copy straight over the shipped file. VizieR stamps the fetch DATE
+into every response — so merely RUNNING A TEST changed four of the five
+sha256 values in CHEATS #18 without changing a single measurement.
+Fail-silent, with git status as the only witness, and the casualty was
+the provenance panel: the one instrument whose entire job is proving
+the data is real. Re-archiving is now opt-in behind SNAPSHOT=1. Found
+by B0's own workflow — G7 requires running gaiaLab, and running
+gaiaLab broke SN1. CHEATS #20.
+
+## 2026-07-28 — session 17: B1 COMPLETE — the valley located, the bluff designed out
+
+lab/haloLab.mjs, 150 lines, and it answers the question B2 will make
+interactive: does chi2/nu actually have a floor, and where.
+
+HL0 handshakes with MZ7 at 9.0 over the same 11 bins — the lab and the
+browser are measuring the same thing before the lab is trusted to
+measure anything new. HL1 finds the floor at MS 4.967e11 Msun, 0.993 x
+house, chi2/nu 8.96. HL2 gives the Delta-chi2 = 1 width as +-3.2%,
+quoted as valley CURVATURE and never as an error bar on the Milky Way:
+the floor sits at 9, not at 1, so the model's systematics dwarf the
+band.
+
+HL3 is bug taxonomy #7 making its second appearance, and it was
+designed out rather than discovered. The finder is handed a window that
+EXCLUDES the floor and is required to report the edge rather than name
+it. Without the guard it would have claimed 1.50 x house — a 51% error
+delivered as a measurement, with a straight face. findFloor now returns
+edge:true and refuses to call an endpoint a minimum.
+
+HL4 records that MS is the NFW characteristic mass, not the quotable
+one: M200 = 8.174e11 Msun at c 12.1, r200 193 kpc. HL5 checks the lab
+left the dial where it found it. CHEATS #21.
+
+## 2026-07-28 — session 18: B2 COMPLETE — the halo mass becomes a dial
+
+, and . step MS by 2%, inside haloLab's own 0.1x-3.0x scan window, and
+/ resets to the house value. The rotation curve, verdict panel, cluster
+census and cluster trail all answer live; the HUD, fabric and seat
+panel follow through animate().
+
+The verdict panel gained a bottom line reading the halo ratio and M200
+— quoting M200 and never MS, per CHEATS #21 — and turns mint at HL1's
+floor. main.js nfwM200 and haloLab HL4 agree independently at 8.174e11
+Msun, c 12.1, r200 193 kpc. Two implementations, one number, neither
+consulted the other.
+
+The knob cannot touch measured data: cluster seeding is pinned to
+MS_CAL, which is what session 16 was for.
+
+Worth logging on its own: legendLab caught the three new keys as
+undocumented on its FIRST run against real work. That is the first time
+the guard has fired outside a drill. It was built in session 14 and
+earned its keep in session 18. CHEATS #22.
+
+## 2026-07-28 — session 19: B2.1 COMPLETE — the knob has a memory
+
+Shambu found this one in flight, by noticing a number looked wrong and
+asking instead of assuming.
+
+The clusters are integrated LIVE, so dialling MS changes the force on
+them mid-flight and their orbits become path-dependent. NGC 6426's
+apocentre moved 14.7 -> 64.8 kpc across one round trip at the SAME
+final halo mass. The readouts were therefore histories, not
+propagations — you were reading where the cluster had been driven, not
+where that halo puts it.
+
+The catalogue epoch is now copied into c.seed once at load, before the
+clock starts, and it survives everything. Two keys, two questions: /
+resets the halo and KEEPS the flown history; u restores the measured
+Harris/Gaia state and leaves the halo where you put it, so you can ask
+what the REAL cluster does in a dialled galaxy. Restore verified
+byte-exact after flying a cluster 200 Myr through a randomly yanked
+halo — 158.0 -> 193.1 km/s, and 158.023 read back.
+
+The galaxy clock is NOT rewound; u restores clusters only, and the
+AUDIT says so rather than hiding it. legendLab 29/29. CHEATS #23.
+
+## 2026-07-28 — session 20: B3 COMPLETE — the valley drawn (and its confession lost)
+
+B2 printed one number and asked you to remember the last one. A number
+you have to remember is not a measurement. B3 puts the whole travel on
+screen: a 44-pixel strip at the foot of the verdict panel showing the
+floor, the width of the floor, and where you are standing, all at once.
+
+buildValley scans chi2/nu across 97 log-spaced points from 0.1x to
+3.0x, ONCE at load — the curve depends on the bins and the potential
+SHAPE, not on where the knob sits. It borrows GALAXY.MS and restores
+it synchronously, the same discipline as haloLab, so nothing ever
+observes an intermediate value. Log in BOTH axes because the knob
+travels 30x and chi2/nu travels 330x.
+
+THE PAPERWORK FAILURE, recorded because it is the point: B3's CHEATS
+entry was written into the COMMIT MESSAGE (5c52ee0) and never into
+CHEATS.md. The ledger has run 22, 23, 25, 26 ever since — a numbering
+gap with no explanation, in the one document whose whole job is
+confessing everything. The confession existed; it was filed to a side
+channel instead of the enforcement point, where no auditor reading the
+ledger would ever see it. Written properly on 2026-07-29 as CHEATS #24.
+
+Found while writing #24, and folded into it: the browser strip samples
+at 3.606% per point, ~72x coarser than haloLab HL2's 0.05% walk. The
+sealed +-3.2% band is 6.4% wide — 1.77 sample intervals. So the
+strip's floor is whichever SAMPLE won, its band edges snap to the grid
+and read systematically narrow, and it will NOT print the sealed
+0.993x / 8.96. Physics untouched; verdictChi2 is the same function the
+lab calls. Read the strip for SHAPE, haloLab for NUMBER. Deferred as
+B4 if it is ever worth fixing. CHEATS #24 items 4, 5, 6.
+
+## 2026-07-28 — session 21: S1 COMPLETE — the hunt
+
+Four questions over the 145 clusters, cycled by f, and no text box
+required — which is exactly why the S0 input guard is still unshipped.
+
+Three queries are pure catalogue geometry: fastest, farthest, highest.
+The fourth, "closest to escaping", divides by escapeSpeed and
+therefore MOVES when the halo knob moves. That asymmetry is not a
+quirk, it is the receipt that the wiring is right — three answers that
+must not respond to the knob and one that must.
+
+Every answer is live. The clusters are in flight and path-dependent
+(#23), so the winner at day 0 need not be the winner at day 900, and
+the AUDIT prints the NUMBER, never just the name, so the reader can
+see what was actually compared. Ties break by Harris catalogue order
+via strictly-greater comparison; no tie has been observed, and the
+rule is stated rather than left to chance. The camera does not move —
+f selects and draws the trail, it does not fly you there.
+
+S0 DEBT STANDS, and deliberately: the keydown firewall has no input
+guard. The moment a text field exists, typing "Terzan" fires t / e / r
+/ z / a / n and spawns a rogue body. S2 must OPEN with
+`if (event.target.matches('input, textarea, [contenteditable]'))
+return;` at the top of the firewall, receipted by typing a word into
+the box and confirming no key fires. Not shipped with S1 because S1
+has no input, and an untested guard is theatre. CHEATS #25.
+
+## 2026-07-29 — session 22: W1 COMPLETE — WHAT IF, one engine, no fork
+
+The temptation with a sandbox is a second code path. W1 refuses it.
+physics.js gains LIGHT { c, cal } on the MS / MS_CAL pattern and
+contains NO mode flag — it never learns which mode it is in. The mode
+lives entirely in main.js. One engine, two modes, no fork, and
+sandboxLab SB5 exists to keep it that way.
+
+The rules that make it honest rather than a toy: constants may be
+DECLARED, never faked. TRUTH mode means every constant at its measured
+value and every number a claim about our universe. WHAT IF mode means
+constants may move, the engine is unchanged, and the moved constants
+are named IN THE PIXELS — a top banner listing only what was dialled,
+plus an amber fabric — because a screenshot can be cropped and a
+number with no label is a lie waiting to be quoted.
+
+Entering is ceremonial: i arms, i confirms, any other key cancels AND
+IS SWALLOWED, so backing out cannot accidentally flip the halo.
+Leaving resets every knob; there is no half-dialled world to walk back
+into. o cycles c through 1 / 0.1 / 0.01 / 0.001 of measured.
+
+lab/sandboxLab.mjs SB0-SB5 all PASS. SB1 is bit-identity at
+calibration over 12 values — WHAT IF with nothing moved must be
+indistinguishable from TRUTH. SB2 confirms c x0.01 scales the 1PN
+coefficient by exactly 1e4 and leaves the galaxy curve untouched. SB3
+is the negative: with a knob still dialled, the identity check must
+report DIFFERENT. SB4 restores bit-exactly. Wired into the Pages gate
+beside eslint and legendLab. CHEATS #26.
+
+Next: W2 — Sgr A* mass, which is what makes the event horizon REAL
+rather than drawn. Measured r_s is 4.116e-10 kpc, 5.6e9 times smaller
+than the closest approach anything has ever made. At 10^9x measured
+mass r_s = 0.41 kpc — larger than one integration step, and therefore
+genuinely crossable.

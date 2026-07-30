@@ -325,6 +325,13 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   a copy of the source to prove the lab can fail. Wired into the Pages
   workflow ahead of the build, beside the eslint gate. README rewritten
   from the same list. CHEATS #19.
+- **A2.1: COMPLETE** — the legend docks. ? now cycles closed -> docked -> full
+  instead of an all-or-nothing overlay, so the reference sheet can stay open
+  while you work. The docked sheet is a SHORTENING of the same KEYS array,
+  never a second list, so legendLab guards both views with one check. It takes
+  no mouse events and carries no z-index: the camera flies through it and every
+  data panel draws over it — a reference sheet must never win a fight with an
+  instrument. CHEATS #19 item 4.
 - **B0: COMPLETE** — the halo-mass knob's foundation. MS_CAL freezes the
   cluster-seeding calibration frame so a live MS can never rewrite measured
   velocities: gaiaLab G7 FAIL-before 18.497 km/s at MS/2 and 36.604 at 2MS,
@@ -365,6 +372,30 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   halo where you put it — so you can ask what the REAL cluster does in a
   dialled galaxy. Restore verified byte-exact after 200 Myr through a randomly
   yanked halo. legendLab 29/29. CHEATS #23.
+- **B3: COMPLETE** — the valley drawn. B2 printed one number and asked you to
+  remember the last one; B3 puts the whole travel on screen. VALLEY scans
+  chi2/nu across 97 log-spaced points from 0.1x to 3.0x house, ONCE at load —
+  the curve depends on the bins and the potential SHAPE, not on where the knob
+  is standing. The dial is borrowed and restored synchronously, same discipline
+  as haloLab, so nothing observes an intermediate MS. The strip is 44 pixels at
+  the foot of the verdict canvas and log in BOTH axes, because the knob travels
+  30x and chi2/nu travels 330x. Three marks: mint dashed for the floor, mint
+  fill for the chi2+1 band, yellow for where you are standing. Reads
+  "VALLEY — press m to load the sky" until the bins exist. Honest limit: the
+  strip samples at 3.606% per point, ~72x coarser than haloLab's 0.05% walk, so
+  its floor and band edges are grid-snapped and will NOT match the sealed
+  0.993x / 8.96 / +-3.2%. CHEATS #24.
+- **S1: COMPLETE** — the hunt. Four questions over the 145 clusters, cycled by
+  f, no text box required — which is why S0's input guard is still unshipped,
+  see below. Three are pure catalogue geometry: fastest, farthest, highest. The
+  fourth, "closest to escaping", divides by escapeSpeed and therefore MOVES when
+  the halo knob moves — that asymmetry is the receipt that the wiring is right.
+  Every answer is live: the clusters are in flight and path-dependent (#23), so
+  the winner at day 0 need not be the winner at day 900, and the AUDIT prints
+  the NUMBER, never just the name. Ties break by Harris catalogue order via
+  strictly-greater comparison; none observed, the rule is stated anyway. The
+  camera does not move — f selects and draws the trail, it does not fly you
+  there. CHEATS #25.
 - **S2 PREREQUISITE (S0):** the keydown firewall has no input guard. The moment
   a text field exists, typing "Terzan" fires t / e / r / z / a / n and spawns a
   rogue body. S2 (name search) MUST open with `if (event.target.matches('input,
@@ -384,6 +415,18 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   the Pages gate. CHEATS #26. Next: W2 — Sgr A* mass, which is what makes the
   event horizon real (10^9x measured puts r_s at 0.41 kpc, larger than one
   integration step and therefore genuinely crossable).
+- **B4: SHELVED** — refine the valley strip. Its floor and +1 band edges snap
+  to a 3.606%-per-sample grid, ~72x coarser than haloLab HL2's 0.05% walk, so
+  the strip cannot print the sealed 0.993x / 8.96 / +-3.2%. Fix would be a
+  local refine around the winning sample, or a denser grid near the floor.
+  Confessed instead of fixed: CHEATS #24 items 4, 5, 6. Only worth doing if
+  the strip is ever asked to be read as a NUMBER rather than a SHAPE.
+- **B5: SHELVED** — lab/ledgerLab.mjs, the guard the docs do not have. eslint
+  guards code against itself; legendLab guards docs against code; NOTHING
+  guards the ledger. Assert CHEATS numbering is contiguous, and that every
+  "CHEATS #N" cited in CLAUDE.md exists in CHEATS.md. Would have fired on the
+  missing #24 the day it happened, instead of 8 sessions and 4 commits later.
+  ~25 lines, wires into the Pages gate beside legendLab.
 
 ## Idea backlog
 

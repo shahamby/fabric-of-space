@@ -439,6 +439,54 @@ and the cluster does NOT return to its original orbit. Apocentre went 14.7
    clock keeps running as a stopwatch, and the tracer stars (j) are not
    touched. Said in the AUDIT rather than hidden.
 
+## 24. The valley (B3)
+
+**Where:** `main.js` VALLEY / buildValley() / drawValley(), the 44-pixel
+strip at the foot of the verdict panel.
+
+B2 gave the halo a knob and printed one number; a number you have to
+remember is not a measurement. B3 draws the whole travel. What is
+display, confessed:
+
+1. THE SCAN IS COMPUTED ONCE, AND IT BORROWS THE DIAL. buildValley runs
+   at load and never again — the curve depends on the bins and the
+   potential SHAPE, not on where the knob is standing. It saves
+   GALAXY.MS, walks 97 points, and restores. Synchronous, so nothing —
+   no frame, no instrument, no AUDIT — ever observes an intermediate MS.
+   Same save/restore discipline as haloLab.
+2. BOTH AXES ARE LOG, AND THAT IS NOT A FLOURISH. The knob travels 30x
+   (0.1 to 3.0) and chi2/nu travels 330x. Nothing else fits in 44
+   pixels. A reader who takes the strip for a linear plot will misjudge
+   the valley's width badly — #8's cousin, the log axis read as linear,
+   is exactly the error this shape invites.
+3. THE MINT BAND IS CURVATURE, NEVER AN ERROR BAR. It marks where
+   chi2/nu rises 1 above the floor. That is the SHARPNESS of the valley,
+   not an uncertainty on the Milky Way's halo mass — the floor sits at 9,
+   not at 1, so the model's systematics dwarf the band. #21 item 2 says
+   this about the number; this says it about the picture.
+4. THE STRIP IS ~72x COARSER THAN THE LAB THAT MEASURED THE VALLEY. 97
+   log-spaced points is 3.606% per sample. haloLab HL2 walks the band in
+   steps of 0.05% of house, after a golden-section refine of 200
+   iterations. The sealed +1 band is +-3.2% — 6.4% wide, or 1.77 sample
+   intervals. So the strip's floor is whichever SAMPLE won, not the true
+   minimum, and its band edges snap to the grid and read systematically
+   NARROW. The physics is identical — verdictChi2 is the same function
+   the lab calls. The resolution is not. Read the strip for the SHAPE;
+   read haloLab for the NUMBER.
+5. THE PANEL'S FLOOR WILL DISAGREE WITH THE SEALED NUMBER, ON PURPOSE.
+   Grid points near the floor land at 0.9319, 0.9655, 1.0003, 1.0364 —
+   none of them 0.993. Sealed 0.993x / chi2/nu 8.96 comes from haloLab
+   and stands. The strip is not broken when it prints something else; it
+   is quantized. Written down so a future reader does not go hunting a
+   bug that is really a pixel budget.
+6. THE STANDING DOT IS CLAMPED TO THE FLOOR LINE. drawValley plots the
+   yellow marker at max(live chi, sampled floor chi), so it cannot fall
+   out of the bottom of the strip. It CAN fall out, because your knob
+   position is continuous while the scan is a grid — your true chi2/nu
+   can beat every sampled point. That clamp is item 4 becoming visible.
+   The marker is also gated to 0.1-3.0x; B2's stops are exactly that
+   range, so the gate is defensive, not a hidden truncation.
+
 ## 25. The hunt (S1)
 
 **Where:** `main.js` HUNT, the f key.
