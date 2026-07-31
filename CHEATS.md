@@ -530,3 +530,67 @@ DECLARED. What is display, confessed:
    century because that is what 1PN does at that c — the same correction,
    the same code, one stated constant. The numbers are real consequences of
    a declared premise. They are not measurements of our universe.
+
+## 27. The event horizon at true scale (W2a)
+
+**Where:** `physics.js` schwarzschildRadius, `main.js` horizon / horizonRim /
+updateHorizon / the s key.
+
+Sgr A* has been in the potential since M12f but never had a SIZE. W2a gives
+it one, and refuses to draw it to taste. What is display, confessed:
+
+1. r_s IS COMPUTED, NEVER CHOSEN. 2GM/c^2, in kpc. State a mass and the
+   Schwarzschild radius that mass actually has does the rest. No sphere was
+   invented anywhere in this milestone.
+2. IT READS THE DIALLED c. r_s ∝ 1/c^2, so slowing light in WHAT IF genuinely
+   GROWS the horizon. Hardcoding c would have been a physics cheat wearing a
+   rendering costume, and captureLab CP4 exists to keep it honest. The same
+   sin was committed one paste later in the AUDIT's step figure and caught
+   by the o dial reading 14.9x where the truth was 0.149x.
+3. THE SPHERE IS BUILT AT UNIT RADIUS AND SCALED TO r_s. 1 scene unit = 1
+   kpc. No minimum size, no glow. The rim ring is 0.97-1.00 of that same
+   radius — an annotation at true scale.
+4. AT MEASURED MASS THE HORIZON IS INVISIBLE, AND THAT IS THE POINT. r_s =
+   4.1155e-10 kpc, 5.6e9 times smaller than the closest approach anything in
+   this simulation has ever made. It is drawn at true size and vanishes. The
+   invisibility IS the measurement, not a bug.
+5. THE MARKER RETIRES WHEN THE REAL THING ARRIVES. sgrA's 0.8-unit sphere
+   and its 1.4-1.7 unit ring (#8) exist BECAUSE the true horizon is
+   invisible. Above the 0.05 kpc clamp they hide and the horizon is drawn
+   alone. Otherwise the real event horizon would sit hidden inside a
+   decorative one, and a viewer would point at the decoration — the worst
+   lie this project could tell.
+6. THE KNOB HAS A FLOOR, AND IT IS THE ENGINE'S. 1.21491e8x is the smallest
+   multiplier putting r_s outside galaxyPhi's 0.05 kpc clamp. Below that the
+   horizon lives where the potential is flat and the force is zero. Same
+   number governs the marker swap: one threshold, two jobs, both principled.
+7. NOTHING HERE IS A MEASUREMENT. The knob lives in WHAT IF only, the banner
+   names it, and every AUDIT line ends by saying so.
+
+## 28. The sheet's gauge (W2b)
+
+**Where:** `physics.js` galaxySheetY, `fabric.js` galaxyDepth / GAL_REF_R.
+
+1. THE SHEET IS PINNED TO ITS OWN FAR CORNER, 56.5685 kpc, not to an
+   absolute zero. This is a GAUGE CHOICE, not a costume: a gravitational
+   potential has no absolute zero and only differences are observable. The
+   re-referenced sheet is arguably MORE honest than the old one.
+2. WHY IT CHANGED. Absolute depth ran to -51 units with Sgr A* at 1e10x and
+   left the camera behind — the horizon floated in empty space above a sheet
+   that had sunk out of frame. Reported from the browser, predicted from the
+   arithmetic, fixed by choosing a gauge.
+3. WHAT IT COSTS. The baseline picture MOVED. The funnel at house values now
+   reads 4.04 units deep where it used to read 9.2. Every screenshot taken
+   before W2b used the old gauge. Said out loud so nobody hunts a regression.
+4. WHAT IT BUYS. The funnel deepens 4.04 -> 18.32 units relative to its rim
+   across the knob's travel. The effect is 4.5x MORE visible, which is the
+   only test this project judges by.
+5. SATURATION, AND IT IS REAL PHYSICS. Past ~1e9x the sheet stops reading
+   the knob at all: with phi ~ 1/r everywhere, log|phi(R)| - log|phi(ref)|
+   = log(ref/R) and the mass CANCELS. 1e9x and 1e10x differ by 5.253e-4
+   units. A pure point-mass well is scale-free under this rendering, so past
+   saturation the horizon's radius is the ONLY instrument still responding.
+   The black disc is not decoration; eventually it is the whole readout.
+6. THE MATH LIVES IN physics.js SO A LAB CAN REACH IT. The display dials
+   stay in fabric.js and are passed in; captureLab reads them out of
+   fabric.js by text rather than copying them. Receipts CP7-CP10.

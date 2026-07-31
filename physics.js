@@ -268,6 +268,7 @@ export const GALAXY = {
   MS: 5.0e11, RS: 16,                // dark halo — MS is a KNOB from B1 on
   MS_CAL: 5.0e11,                    // B0: the frozen calibration mass. Never dialled.
   MBH: 4.30e6,                       // Sgr A* — the published mass (M12f)
+  MBH_CAL: 4.30e6,                   // W2a: the frozen published mass. Never dialled.
 };
 export function galaxyPhi(R) {       // potential at planar radius R kpc, (km/s)²
   const g = GALAXY, r = Math.max(R, 0.05);   // clamp: Sgr A*'s zone, not resolved here
@@ -277,6 +278,30 @@ export function galaxyPhi(R) {       // potential at planar radius R kpc, (km/s)
   phi -= g.G * g.MBH / r;   // M12f: the engine, inside the same clamp.
   return phi;               // B4 receipt: a 0.04 km/s whisper outside 8.6 pc.
 }
+
+// W2a: the horizon is a LENGTH the mass already has, not a sphere we drew.
+// r_s = 2GM/c^2, in kpc. It reads LIGHT.c, so dialling light slower in WHAT IF
+// genuinely GROWS the horizon — hardcoding c here would have been a physics
+// cheat wearing a rendering costume. Receipted in lab/captureLab.mjs CP1-CP4.
+export function schwarzschildRadius(Msun) {
+  const cKms = LIGHT.c * (299792.458 / LIGHT.cal);
+  return 2 * GALAXY.G * Msun / (cKms * cKms);
+}
+
+// W2b: the sheet's height at radius R, referenced to refR where it is pinned
+// to zero. A potential has NO absolute zero — only differences are observable
+// — so referencing the sheet to its own rim is a GAUGE CHOICE, not a costume.
+// It also keeps the sheet in frame when Sgr A* is dialled: absolute depth ran
+// to -51 units and left the camera behind, while the funnel's depth RELATIVE
+// to its rim grows 4.04 -> 18.32 and is the thing worth looking at anyway.
+//
+// The math lives here, not in fabric.js, so lab/captureLab.mjs can reach it.
+// The display dials stay in fabric.js and are passed in. Receipts CP7-CP10.
+export function galaxySheetY(R, refR, depth, phiRef) {
+  const c = (r) => Math.log10(1 + Math.abs(galaxyPhi(r)) / phiRef);
+  return -depth * (c(R) - c(refR));
+}
+
 // ---------- M12c: stars that RIDE the well (kpc, Myr) ----------
 // Same potential, same kick-drift-kick shape as the house integrator.
 // Receipted in lab/starsLab.mjs (7/7) before any of it reached the browser.
@@ -400,12 +425,16 @@ export function seedClusterVelocities(list) {
   // seeding is DATA. The calibration frame is halo ON at the frozen
   // calibration mass — gaiaLab G3c's 232.1 km/s — no matter what the
   // screen showed or what the knob read when k was pressed.
-  // Receipts: G6 (the toggle), G7 (the mass).
-  const savedHalo = GALAXY.haloOn, savedMS = GALAXY.MS;
+  // Receipts: G6 (the toggle), G7 (the halo mass), G8 (the Sgr A* mass).
+  // W2a.1: MBH joined the knobs and re-opened this door. Any constant that
+  // enters galaxyPhi enters this frame — pin every one of them, not the
+  // ones that happened to be dialable when the comment was written.
+  const savedHalo = GALAXY.haloOn, savedMS = GALAXY.MS, savedMBH = GALAXY.MBH;
   GALAXY.haloOn = true;
   GALAXY.MS = GALAXY.MS_CAL;
-  const vlsrModel = galaxyVCirc(8.2);       // always the receipted frame
-  GALAXY.haloOn = savedHalo; GALAXY.MS = savedMS;
+  GALAXY.MBH = GALAXY.MBH_CAL;
+  const vlsrModel = galaxyVCirc(8.2);       // always the receipted frame: 232.1 km/s
+  GALAXY.haloOn = savedHalo; GALAXY.MS = savedMS; GALAXY.MBH = savedMBH;
   const VSUN = [-11.1, -(vlsrModel + 12.24), 7.25];   // Schoenrich+2010 + our curve
   let seeded = 0;
   for (const c of list) {

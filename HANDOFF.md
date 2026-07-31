@@ -1320,8 +1320,96 @@ is the negative: with a knob still dialled, the identity check must
 report DIFFERENT. SB4 restores bit-exactly. Wired into the Pages gate
 beside eslint and legendLab. CHEATS #26.
 
-Next: W2 — Sgr A* mass, which is what makes the event horizon REAL
-rather than drawn. Measured r_s is 4.116e-10 kpc, 5.6e9 times smaller
-than the closest approach anything has ever made. At 10^9x measured
-mass r_s = 0.41 kpc — larger than one integration step, and therefore
-genuinely crossable.
+Next: W2 — Sgr A* mass, which is what makes the event horizon REAL rather
+than drawn. Measured r_s is 4.116e-10 kpc, 5.6e9 times smaller than the
+closest approach anything has ever made. At 10^9x measured mass r_s = 0.41
+kpc — larger than one integration step, and therefore genuinely crossable.
+
+## 2026-07-31 — session 23: W2a + W2a.1 + W2b COMPLETE — the horizon is a length
+
+Three milestones in one commit because the second and third are the first
+one's debts, and shipping W2a alone would have shipped a data corruption.
+
+W2a gives Sgr A* a size and refuses to draw it to taste. r_s = 2GM/c^2, a
+unit sphere scaled to that radius, 1 scene unit = 1 kpc, no minimum size. At
+the published mass it is 4.1155e-10 kpc and INVISIBLE — and the invisibility
+is the measurement. The knob has a floor the engine set rather than one we
+chose: 1.21491e8x, the smallest multiplier putting r_s outside galaxyPhi's
+0.05 kpc clamp. The same threshold retires the CHEATS #8 marker, so the real
+horizon is never drawn hidden inside the decorative one that stood in for it.
+
+CP4 is the receipt worth keeping: r_s reads the DIALLED c, so slowing light
+grows the horizon. Hardcoding c would have been a physics cheat in rendering
+clothes. Then, one paste later, the s AUDIT's step figure was written with a
+hardcoded c — the exact sin, directly beneath the comment warning against
+it. Caught by the o dial printing "14.9x this horizon" where the truth was
+0.149x, i.e. crossable in one step. Dialling light slower turns out to be a
+second, independent route to a crossable horizon, and the readout was
+hiding it.
+
+### The incident: the third door
+
+W2a added a constant to galaxyPhi and did not audit who else reads galaxyPhi.
+seedClusterVelocities builds the Sun's ride from galaxyVCirc(8.2). It pins
+haloOn (G6) and MS (G7) to calibration. It did not pin MBH, because MBH was
+not a knob when that code was written and the comment listing its receipts
+read as complete.
+
+  Sgr A*      vlsrModel      frame shift
+  1x            232.1 km/s        0.0
+  1e6x         1519.6         1287.5
+  1e10x      150180.2       149948.1
+
+Every cluster velocity is measured against that number. At 1e6x the census
+reported 126 of 126 unbound — while the AUDIT said, truthfully, "at the
+CURRENT halo (1.00x)". A label that is accurate and still deceives, because
+it names the knob that did not move. gaiaLab G8: 1281.972 and 149942.276
+km/s before the pin, 0.000 and 0.000 after, with G0-G7 green throughout so
+G8 is seen to fail on its own merits.
+
+### The galaxyPhi reader audit — the architectural lesson
+
+Every reader falls in exactly one of three buckets, and the bucket decides
+the rule. Adding a constant to galaxyPhi means walking this list, not
+patching the site that happened to look wrong.
+
+  SEED (data)     must pin to calibration    physics.js:407          the bug
+  DYNAMICS        must honour the live knob  physics.js:287,312,383,326
+  READOUT         must name what is dialled  8 sites, all now labelled
+
+Taxonomy #11, THE UNLABELLED READOUT, is earned here: a correct number
+printed against an undeclared knob. The lap read 33.2 Myr where every record
+says 217.1; vCirc read 1519.6 where G3c says 232.1. Nothing was wrong. The
+label was incomplete, which is worse, because the number is one a reader has
+memorised. dialledInto() and dialledShort() now close all eight sites.
+NOTE: the taxonomy numbering in this file (ends at 7, no-op negative)
+disagrees with CLAUDE.md line 246 (calls the bracket bluff item 7). Two
+things numbered 7. Reconcile before the next entry is added.
+
+### W2b: the sheet gets a gauge
+
+At 1e10x the fabric sank to -51 units and left the camera behind, with the
+horizon floating above a sheet that was no longer in frame — predicted from
+the arithmetic before Shambu confirmed it. galaxyDepth is now referenced to
+the sheet's own far corner rather than an absolute zero. That is a GAUGE
+CHOICE, not a costume: a potential has no absolute zero and only differences
+are observable. The funnel deepens 4.04 -> 18.32 units relative to its rim,
+4.5x MORE visible, and the baseline picture moved (house funnel 9.2 -> 4.04),
+which is said out loud in CHEATS #28 so nobody hunts a regression.
+
+CP10 found something nobody asked for: past ~1e9x the sheet stops reading
+the knob entirely. With phi ~ 1/r everywhere, log|phi(R)| - log|phi(ref)| =
+log(ref/R) and the mass cancels — 1e9x and 1e10x differ by 5.253e-4 units.
+A pure point-mass well is scale-free under this rendering. Past saturation
+the horizon's radius is the only instrument still responding, which means
+the black disc is not decoration; eventually it is the whole readout.
+
+### Receipts
+
+captureLab CP0-CP10 (new file), gaiaLab G8 (new), legendLab 33/33,
+sandboxLab SB0-SB5, lint and build clean. Two FAIL-before/PASS-after pairs
+captured honestly: captureLab's first FAIL was scrollback from a previous
+run and was rejected and re-taken; G8's FAIL-before is the real leak.
+
+Authorship note: from 2026-07-29 Claude delivers all code including labs.
+The receipts, sealed predictions and negative tests are unchanged.

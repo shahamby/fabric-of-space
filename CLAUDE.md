@@ -9,10 +9,13 @@ compressed display. v1 is a solar-system sandbox; v2 is a Milky Way star map.
 - You are pairing with a beginner coder who is a senior network security
   professional. Explain every code block you produce: what it does and why.
   Teaching beats speed.
-- 60/40 workload split: the human writes most of the code by following your
-  exemplar patterns. You scaffold the math-heavy modules (integrator,
-  potential mesh), supply data, and review. Do NOT write full solutions for
-  tasks assigned to the human — guide, hint, and review instead.
+- CODE AUTHORSHIP (2026-07-29, supersedes the 60/40 split and the 2026-07-18
+  lab rule): Claude delivers ALL code complete and paste-ready with exact
+  anchors — lab/*.mjs included. There is no longer a "Shambu's hand"
+  assignment on any receipt. Shambu pastes, runs, verifies, commits, and
+  retains the right to interrogate anything he does not believe. Historical
+  "Shambu's hand" notes in Status and HANDOFF are LEFT AS WRITTEN — they are
+  a record of what happened, not a rule still in force.
 - Propose a brief plan before any non-trivial change and wait for agreement.
 - Visual-first teaching: for any math or physics concept, lead with a picture,
   animation, or plain-language physical metaphor before any equation; when a
@@ -427,6 +430,51 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   "CHEATS #N" cited in CLAUDE.md exists in CHEATS.md. Would have fired on the
   missing #24 the day it happened, instead of 8 sessions and 4 commits later.
   ~25 lines, wires into the Pages gate beside legendLab.
+- **MOBILE: TABLED 2026-07-29** — deliberately, until the desktop build is one
+  we are satisfied with. Not blocked; deferred. What the investigation found,
+  so it is not re-derived later: (1) the app ALREADY renders and scrolls on
+  iPhone at the hosted URL — camera and tap-select work because OrbitControls
+  and Pointer Events are touch-native, so that work is already done; (2) F6 is
+  NOT a mobile prerequisite — 14,641 galaxyPhi calls measure 0.376 ms desktop,
+  ~2.6 ms on a low-end phone, 16% of a 60fps budget, so the arithmetic is not
+  the bottleneck; the per-frame 176 kB vertex re-upload is where F6 would
+  actually pay; (3) the unmeasured risk is fabric.js's wireframe:true on a
+  120x120 plane — 28,800 triangles rasterised as GL_LINES, which mobile drivers
+  handle badly; (4) the real problem is that 32 single-character keys have no
+  touch surface, which is a UI design problem, not a technical one — the point
+  needs 6 buttons (g h r m v Space), not 32. REJECTED as the answer: raising
+  the soft keyboard via a hidden input. It works and it is 5 lines, but it
+  covers half the screen, puts [ ] = three taps deep, makes every mistyped
+  letter fire a real action, and requires S0's input guard to ship first. When
+  mobile resumes it resumes with buttons, and legendLab must be extended to
+  guard the button surface as a FOURTH thing that can drift from KEYS.
+- **W2a: COMPLETE** — the event horizon becomes a length. MBH_CAL freezes the
+  published mass; s dials Sgr A* through 1x / 1e6 / 1e9 / 1e10 in WHAT IF
+  only, because a 4.3e15 Msun hole fits no data and TRUTH mode is for claims
+  about our universe. schwarzschildRadius reads the DIALLED c, so r_s ∝ 1/c^2
+  and slowing light grows the horizon. Drawn at true size from a unit sphere;
+  the CHEATS #8 marker retires above galaxyPhi's 0.05 kpc clamp so the real
+  horizon is never hidden inside a decorative one. captureLab CP0-CP6.
+  Sealed: r_s 4.11554e-10 measured, 0.411554 kpc at 1e9x, knob floor
+  1.21491e8x, one 0.2 Myr step at c overshoots the horizon 149.0x. CHEATS #27.
+- **W2a.1: COMPLETE** — the third door. W2a put MBH into galaxyPhi and did not
+  audit who else reads it. seedClusterVelocities pins haloOn and MS to
+  calibration and did NOT pin MBH, so dialling the hole moved the Sun's own
+  ride — 232.1 km/s became 1519.6 at 1e6x and 150180.2 at 1e10x — and every
+  cluster velocity was measured against it. 126 clusters read unbound while
+  the AUDIT truthfully said "halo 1.00x". gaiaLab G8 is the receipt: 1281.972
+  and 149942.276 km/s before the pin, 0.000 and 0.000 after. Also closed
+  taxonomy #11 at all eight readouts and fixed a hardcoded c in the s AUDIT
+  that made a crossable horizon read as uncrossable. Full galaxyPhi reader
+  audit in HANDOFF session 23: SEED pins, DYNAMICS honours, READOUT labels.
+- **W2b: COMPLETE** — the sheet gets a gauge. galaxyDepth is referenced to the
+  sheet's own far corner (56.5685 kpc) instead of an absolute zero, because a
+  potential has no absolute zero and only differences are observable. Fixes
+  the sheet sinking to -51 units and leaving the camera behind at high MBH;
+  the funnel now deepens 4.04 -> 18.32 units relative to its rim, 4.5x MORE
+  visible. Baseline picture moved (house funnel 9.2 -> 4.04) and that is said
+  out loud. captureLab CP7-CP10, including CP10's finding: past ~1e9x the
+  sheet is SCALE-FREE and only r_s still reads the knob. CHEATS #28.
 
 ## Idea backlog
 

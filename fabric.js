@@ -3,7 +3,7 @@
 // The question asked at the vertex is, " How deep is the gravity well here?"
 // Same per-unit-mass math as the potential energy of a ball on a trampoline, but the "ball" is a planet and the "trampoline" is the fabric of space itself.-
 import * as THREE from 'three';
-import { galaxyPhi } from './physics.js';   // M12b: the measured well
+import { galaxySheetY } from './physics.js';   // M12b: the measured well, W2b: pinned to its own rim
 
 // Honest physics contstants
 const SIZE = 80; // Sheet spans plus (+) and minus (-) 40 AU; Neptune's orbit is -30 AU, so the sheet is big enough to see the whole solar system.
@@ -21,6 +21,7 @@ const KM_PER_AU = 149597870.7;
 // M12b galaxy-mode display dials (cheat #8): shape honest, depth costumed
 const GAL_DEPTH = 6;      // scene units at full log compression
 const GAL_PHI_REF = 1e4;  // (km/s)² "sea level" for the galactic sheet
+const GAL_REF_R = Math.hypot(SIZE / 2, SIZE / 2);  // W2b: the sheet's far corner, pinned to y=0
 
 export function makeFabric() {
   const geometry = new THREE.PlaneGeometry(SIZE, SIZE, SEGMENTS, SEGMENTS);
@@ -85,6 +86,12 @@ export function updateGalaxyFabric(fabric) {
 }
 // M12c: the sheet's own height at radius R. One source of truth, so a star
 // placed on the fabric sits ON the fabric — never above it, never through it.
+// W2b: pinned to the sheet's own corner. A potential has no absolute zero —
+// only differences are observable — so this is a GAUGE CHOICE, not a costume.
+// It also keeps the sheet in frame when Sgr A* is dialled: absolute depth ran
+// to -51 units and left the camera behind, while the funnel's depth relative
+// to its rim grows 4.04 -> 18.32 and is the thing worth looking at anyway.
+// Math lives in physics.js so lab/captureLab.mjs can reach it. CP7-CP10.
 export function galaxyDepth(R) {
-  return -GAL_DEPTH * Math.log10(1 + Math.abs(galaxyPhi(R)) / GAL_PHI_REF);
+  return galaxySheetY(R, GAL_REF_R, GAL_DEPTH, GAL_PHI_REF);
 }

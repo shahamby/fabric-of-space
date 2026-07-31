@@ -11,7 +11,7 @@ import cepheidSnapshot from './data/cepheids.tsv?raw';    // M12h: the disk's bo
 import mrozSnapshot from './data/mroz_curve.txt?raw';     // M12i: the sky's own curve
 import bodiesSnapshot from './data/bodies.json?raw';       // A1.1: the solar epoch, as BYTES (bodies.js imports the parsed object; provenance needs the file)
 import { makeStarfield } from './starfield.js';
-import { LIGHT } from './physics.js';   // W1: the speed of light, as a declared constant
+import { LIGHT, schwarzschildRadius } from './physics.js';   // W1: c declared. W2a: r_s = 2GM/c^2
 
 // ---------- A1: hosted mode ----------
 // The dev server carries the CORS proxies (vite.config.js). A built bundle
@@ -157,6 +157,7 @@ const KEYS = [
 
   { group: 'WHAT IF',       key: 'i',     does: 'enter / leave WHAT IF — declared constants, not measurements', short: 'WHAT IF mode' },
   { group: 'WHAT IF',       key: 'o',     does: 'speed of light: 1x / 1-10th / 1-100th / 1-1000th', short: 'dial c' },
+  { group: 'WHAT IF',       key: 's',     does: 'Sgr A* mass: 1x / 1e6 / 1e9 / 1e10 — horizon is r_s = 2GM/c2', short: 'dial Sgr A*' },
 
   { group: 'RECORDS',       key: 'L',     does: 'fetch today\'s state vectors from NASA/JPL Horizons', short: 'live JPL fetch' },
   { group: 'RECORDS',       key: 'P',     does: 'provenance — every dataset, bytes and sha256',        short: 'provenance' },
@@ -351,12 +352,13 @@ window.addEventListener('keydown', (event) => {
     for (const m of bodyMeshes) m.visible = !GALAXY.on;
     fieldLines.visible = GALAXY.on ? false : BFIELD.on;
     sgrA.visible = sunSeat.visible = GALAXY.on;
+    updateHorizon();   // W2a: the marker retires when the true horizon resolves
     if (!GALAXY.on) { GAL_STARS.on = false; tracerCloud.visible = realCloud.visible = false; }
     selected = null; galaxyPick = null; panel.style.display = 'none';   // M12c: no stale readout across the mode switch
     if (!GALAXY.on) { clusterCloud.visible = false; clusterPick = null; clusterTrail.visible = false; curveCanvas.style.display = 'none'; verdictCanvas.style.display = 'none'; cepheidCloud.visible = false; }   // M12d/M12e/M12g/M12h/M12j
     console.log(`AUDIT: galaxy mode ${GALAXY.on ? 'ON — 1 unit = 1 kpc' : 'OFF — 1 unit = 1 AU'}. ` +
       `Solar sim continues underneath. phi(8.2 kpc) = ${galaxyPhi(8.2).toFixed(0)} (km/s)^2, ` +
-      `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
+      `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.${dialledInto()}`);
     return;
   }
   if (event.key.toLowerCase() === 'j') {              // M12c: stars on the sheet
@@ -366,7 +368,7 @@ window.addEventListener('keydown', (event) => {
     tracerCloud.visible = realCloud.visible = GAL_STARS.on;
     console.log(`AUDIT: galaxy stars ${GAL_STARS.on ? `ON — 4 spokes straight at t=0, 240 tracers + ${HYG_SAMPLE.length} real` : 'OFF'}. ` +
       `Sun's lap at 8.2 kpc = ${(2 * Math.PI * 8.2 / (galaxyVCirc(8.2) * KMS_TO_KPC_MYR)).toFixed(1)} Myr, ` +
-      `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.`);
+      `dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'}.${dialledInto()}`);
     return;
   }
   if (event.key.toLowerCase() === 'k') {              // M12d: the real halo
@@ -417,6 +419,32 @@ window.addEventListener('keydown', (event) => {
       `1PN is suppressed by 1/c^2, so Mercury's drift scales by ${(1 / (f * f)).toExponential(1)}x — ` +
       `about ${(42.98 / (f * f) / 3600).toExponential(2)} degrees per century. ` +
       `Press e if Einstein is not already on.`);
+    return;
+  }
+  if (event.key.toLowerCase() === 's') {             // W2a: Sgr A*'s mass
+    if (!WHATIF.on) { console.log('AUDIT: press i first — constants only move in WHAT IF.'); return; }
+    WHATIF.sIdx = (WHATIF.sIdx + 1) % WHATIF.sSteps.length;
+    const f = WHATIF.sSteps[WHATIF.sIdx];
+    GALAXY.MBH = GALAXY.MBH_CAL * f;
+    const { rs, resolved } = updateHorizon();
+    applyWhatIf();
+    // W2a.1: read the DIALLED c, not the measured one. r_s already does —
+    // printing a measured-c step against a dialled-c horizon compares two
+    // different universes. Caught when o x0.01 made the ratio read 14.9x
+    // where the truth was 0.149x, i.e. crossable in one step.
+    const cKmsNow = LIGHT.c * (299792.458 / LIGHT.cal);
+    const step = cKmsNow * KMS_TO_KPC_MYR * GAL_STARS.DT;
+    console.log(`AUDIT: Sgr A* = ${f.toExponential(0)}x published (${GALAXY.MBH.toExponential(2)} Msun). ` +
+      `r_s = 2GM/c^2 = ${rs.toExponential(4)} kpc — computed from the dialled c, never drawn to taste. ` +
+      (resolved
+        ? `Outside the ${HORIZON_RESOLVED} kpc galaxyPhi clamp, so the CHEATS #8 marker retires and ` +
+          `the horizon is drawn at TRUE size. One ${GAL_STARS.DT} Myr step at c covers ` +
+          `${step.toFixed(3)} kpc = ${step / rs < 0.1 ? (step / rs).toExponential(2) : (step / rs).toFixed(1)}x ` +
+          `this horizon — ${step > rs ? 'which is why W2b needs ' : 'so at THIS c a point test would suffice; in general W2b still needs '}` +
+          `a segment-crossing test and its own substep, not a point-in-sphere check.`
+        : `Still inside the ${HORIZON_RESOLVED} kpc clamp, where galaxyPhi is flat and the force is ` +
+          `zero. Unresolved, so the CHEATS #8 marker still stands in for it.`) +
+      ` NOT A MEASUREMENT.`);
     return;
   }
   if (event.key.toLowerCase() === 'f') {              // S1: find the interesting one
@@ -478,13 +506,13 @@ window.addEventListener('keydown', (event) => {
     console.log(`AUDIT: halo mass ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(3)}x house — ` +
       `M200 ${v.M200.toExponential(2)} Msun (c ${v.c.toFixed(1)}, r200 ${v.r200.toFixed(0)} kpc), ` +
       `vCirc(8.2) ${galaxyVCirc(8.2).toFixed(1)} km/s, chi2/nu ${chi}. ` +
-      `Floor is 0.993x at 8.96 — lab/haloLab.mjs HL1.`);
+      `Floor is 0.993x at 8.96 — lab/haloLab.mjs HL1.${dialledInto('halo')}`);
     return;
   }
   if (event.key.toLowerCase() === 'h') {              // M12b: dark matter, live
     GALAXY.haloOn = !GALAXY.haloOn;
     console.log(`AUDIT: dark halo ${GALAXY.haloOn ? 'ON' : 'OFF'} — ` +
-      `phi(24.6 kpc) = ${galaxyPhi(24.6).toFixed(0)} (km/s)^2. Watch the outskirts.`);
+      `phi(24.6 kpc) = ${galaxyPhi(24.6).toFixed(0)} (km/s)^2. Watch the outskirts.${dialledInto()}`);
     if (CLUSTERS.loaded) {
       console.log(`AUDIT: ${colourClusters()} clusters now unbound — futures changed mid-flight.`);
       if (clusterPick !== null) refreshClusterTrail();   // same cluster, new fate
@@ -648,6 +676,38 @@ sunSeat.position.set(8.2, 0, 0);
 sgrA.visible = sunSeat.visible = false;
 scene.add(sgrA, sunSeat);
 const galaxyMarkers = [sgrA, sunSeat];   // M12c: the only pickable things in galaxy mode
+
+// ---------- W2a: the event horizon, at the size the mass actually gives it ----------
+// 1 scene unit = 1 kpc (sunSeat sits at 8.2 for 8.2 kpc). The sphere is built at
+// UNIT radius and scaled to r_s, so no length is invented anywhere in here. The
+// rim is 0.97-1.00 of that same radius — an annotation at true scale, not a glow
+// drawn for effect.
+//
+// The 0.8-unit sgrA marker and its 1.4-1.7 unit ring (CHEATS #8) exist BECAUSE
+// the measured horizon is 4.1e-10 kpc and invisible. The moment r_s clears the
+// 0.05 kpc galaxyPhi clamp — the same threshold captureLab CP3 measures — the
+// stand-in retires and the real thing is drawn alone. A true horizon hidden
+// inside a decorative one is the worst lie this project could tell.
+const HORIZON_RESOLVED = 0.05;      // kpc — the galaxyPhi clamp. captureLab CP3.
+const horizon = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), BLACK_HOLE_MAT);
+const horizonRim = new THREE.Mesh(
+  new THREE.RingGeometry(0.97, 1.0, 64),
+  new THREE.MeshBasicMaterial({ color: 0xff6a1a, side: THREE.DoubleSide,
+    transparent: true, opacity: 0.9 }));
+horizonRim.rotateX(-Math.PI / 2);
+horizon.add(horizonRim);
+horizon.visible = false;
+scene.add(horizon);
+
+function updateHorizon() {
+  const rs = schwarzschildRadius(GALAXY.MBH);
+  const resolved = rs > HORIZON_RESOLVED;
+  horizon.scale.setScalar(rs);          // unit sphere -> exactly r_s kpc
+  horizon.visible = GALAXY.on && resolved;
+  sgrA.visible = GALAXY.on && !resolved;
+  return { rs, resolved };
+}
+
 // ---------- M12d: the real halo — 147 globular clusters ----------
 // POSITIONS ARE MEASURED (Harris 1996, 2010 ed., via VizieR; conversion
 // validated against the catalogue's own Rgc column in clusterLab C2).
@@ -772,19 +832,49 @@ const WHATIF = {
   armed: false,                     // the confirmation is deliberate ceremony
   cIdx: 0,
   cSteps: [1, 0.1, 0.01, 0.001],    // multipliers on the measured speed of light
+  sIdx: 0,
+  sSteps: [1, 1e6, 1e9, 1e10],      // W2a: multipliers on Sgr A*'s published mass
 };
+
+// Taxonomy #11, the unlabelled readout: a derived number printed against an
+// undeclared knob. phi(8.2) reads -147558 at the house values and -2402958
+// with Sgr A* at 1e6x — correct physics, and indistinguishable from a bug
+// unless the label names what moved. Every AUDIT printing a derived quantity
+// appends this. NOT the same list as whatIfMoved(): MS is dialled in TRUTH
+// (B2), MBH only in WHAT IF, and both feed phi.
+function dialledInto(skip) {
+  const d = [];
+  if (skip !== 'halo' && GALAXY.MS !== GALAXY.MS_CAL) d.push(`halo ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x`);
+  if (skip !== 'bh' && GALAXY.MBH !== GALAXY.MBH_CAL) d.push(`Sgr A* ${(GALAXY.MBH / GALAXY.MBH_CAL).toExponential(0)}x`);
+  return d.length ? ` [dialled: ${d.join(', ')} — NOT the measured galaxy]` : '';
+}
+
+// Short form for the HUD and panels, which redraw every frame and cannot
+// carry the full sentence. Empty at house values, so it costs nothing until
+// something has actually moved.
+function dialledShort() {
+  const d = [];
+  if (GALAXY.MS !== GALAXY.MS_CAL) d.push(`halo ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x`);
+  if (GALAXY.MBH !== GALAXY.MBH_CAL) d.push(`Sgr A* ${(GALAXY.MBH / GALAXY.MBH_CAL).toExponential(0)}x`);
+  return d.length ? `  [DIALLED: ${d.join(', ')}]` : '';
+}
 
 // Only the constants that have actually MOVED. An empty list means the mode
 // is on but nothing differs — and the banner says exactly that.
 function whatIfMoved() {
   const moved = [];
   if (LIGHT.c !== LIGHT.cal) moved.push(`c x${(LIGHT.c / LIGHT.cal).toFixed(3)}`);
+  if (GALAXY.MBH !== GALAXY.MBH_CAL) {
+    moved.push(`Sgr A* x${(GALAXY.MBH / GALAXY.MBH_CAL).toExponential(0)}`);
+  }
   return moved;
 }
 
 function whatIfReset() {
   LIGHT.c = LIGHT.cal;
   WHATIF.cIdx = 0;
+  GALAXY.MBH = GALAXY.MBH_CAL;
+  WHATIF.sIdx = 0;
 }
 
 const whatIfBanner = document.createElement('div');
@@ -819,6 +909,7 @@ function applyWhatIf() {
       '  ·  NOT MEASUREMENTS'
     : '';
   fabric.material.color.setHex(WHATIF.on ? 0x8a6a2a : 0x3a5a8a);
+  updateHorizon();   // W2a: leaving WHAT IF must put the marker back
   if (GALAXY.on) { drawCurve(); drawVerdict(); }
 }
 
@@ -848,7 +939,8 @@ const HUNT = {
         const r = Math.hypot(c.x, c.y, c.z);
         const v = Math.hypot(c.vx, c.vy, c.vz) / KMS_TO_KPC_MYR;
         return `v/vEsc ${(v / escapeSpeed(r)).toFixed(3)} ` +
-          `(${v.toFixed(1)} of ${escapeSpeed(r).toFixed(1)} km/s at r ${r.toFixed(1)} kpc)`;
+          `(${v.toFixed(1)} of ${escapeSpeed(r).toFixed(1)} km/s at r ${r.toFixed(1)} kpc)` +
+          dialledShort();
       } },
   ],
 };
@@ -2069,7 +2161,7 @@ function animate(now) {              // 'now' = stopwatch reading from the brows
     const vc = galaxyVCirc(8.2);
     panel.textContent = `The Sun's seat\n` +
       `R: 8.20 kpc from Sgr A*\n` +
-      `circular speed: ${vc.toFixed(1)} km/s\n` +
+      `circular speed: ${vc.toFixed(1)} km/s${dialledShort()}\n` +
       `lap: ${(2 * Math.PI * 8.2 / (vc * KMS_TO_KPC_MYR)).toFixed(1)} Myr\n` +
       `dark halo: ${GALAXY.haloOn ? 'ON' : 'OFF'}`;
     panel.style.display = 'block';
@@ -2110,7 +2202,7 @@ if (GALAXY.on && (GAL_STARS.on || GAL_CLUSTERS.on)) {   // M12c: the disk turns;
     if (GAL_STARS.on) syncGalaxyStars();
     if (GAL_CLUSTERS.on && clusterCloud.visible) { syncClusterCloud(); colourClusters(); }
     const sunLapMyr = 2 * Math.PI * 8.2 / (galaxyVCirc(8.2) * KMS_TO_KPC_MYR);   // F3: live — honours h
-    hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap ${sunLapMyr.toFixed(1)} Myr`;
+    hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap ${sunLapMyr.toFixed(1)} Myr${dialledShort()}`;
   }
   if (GALAXY.on) updateGalaxyFabric(fabric);
   else updateFabric(fabric, simBodies, G, trueScale);

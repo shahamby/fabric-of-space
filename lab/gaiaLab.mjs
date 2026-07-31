@@ -345,3 +345,27 @@ const dvMass = Math.max(dvHalf, dvDouble);
 console.log(`G7  seed-mass invariance: |dv| = ${dvHalf.toFixed(3)} at MS/2, ` +
   `${dvDouble.toFixed(3)} at 2MS km/s  ` +
   `[${dvMass < 1e-9 ? 'PASS' : 'FAIL'}]  (the knob must never touch the data)`);
+
+// ---------- G8: seed-frame invariance under the SGR A* MASS (W2a.1) ----------
+// G6 sealed the h TOGGLE out of the seeder. G7 sealed the halo MASS. W2a put
+// Sgr A* on a live knob, which is a THIRD door into the same frame and nobody
+// checked it: galaxyVCirc(8.2) reads galaxyPhi, and galaxyPhi carries
+// -G*MBH/r. Dial the hole and the Sun's own ride moves — 232.1 km/s becomes
+// 1519.6 at 1e6x and 150180.2 at 1e10x — and EVERY cluster velocity is
+// measured against it. That is how a black hole nobody's cluster ever felt
+// unbinds 126 of them while the AUDIT truthfully reports "halo 1.00x".
+//
+// The lesson is architectural, not local: a constant added to galaxyPhi is a
+// constant added to the seed frame, the census, the escape speed, the lap
+// time and the sheet. Adding one means auditing all of them.
+const MBH_HOUSE = PLIVE.GALAXY.MBH;
+PLIVE.GALAXY.MBH = MBH_HOUSE;         const seedB1 = mkTest(); PLIVE.seedClusterVelocities(seedB1);
+PLIVE.GALAXY.MBH = MBH_HOUSE * 1e6;   const seedB2 = mkTest(); PLIVE.seedClusterVelocities(seedB2);
+PLIVE.GALAXY.MBH = MBH_HOUSE * 1e10;  const seedB3 = mkTest(); PLIVE.seedClusterVelocities(seedB3);
+PLIVE.GALAXY.MBH = MBH_HOUSE;
+const dv6 = Math.abs(seedB1[0].v3 - seedB2[0].v3);
+const dv10 = Math.abs(seedB1[0].v3 - seedB3[0].v3);
+const dvBH = Math.max(dv6, dv10);
+console.log(`G8  seed-hole invariance: |dv| = ${dv6.toFixed(3)} at 1e6x, ` +
+  `${dv10.toFixed(3)} at 1e10x km/s  ` +
+  `[${dvBH < 1e-9 ? 'PASS' : 'FAIL'}]  (a third knob, the same frame)`);
