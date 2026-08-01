@@ -1413,3 +1413,108 @@ run and was rejected and re-taken; G8's FAIL-before is the real leak.
 
 Authorship note: from 2026-07-29 Claude delivers all code including labs.
 The receipts, sealed predictions and negative tests are unchanged.
+
+## Session append — 2026-08-01 (session 24: W2c, the galaxy clock subdivides)
+
+Opened on a fresh-clone audit. Clean: HEAD 231e557, CHEATS contiguous, HANDOFF
+current, SillyUserQuestions with no OPEN lines, full gate green.
+
+**T0, the taxonomy reconciliation.** The audit found the numbering worse than
+the handoff said. HANDOFF line 209 held a canonical block 1-7 that was never
+updated after M9; everything numbered afterwards was assigned ad hoc in session
+prose against a list nobody re-read. Three overlapping series, collisions at
+2, 7, 8, 9, 10, 11 and 12, and the old series colliding with itself twice.
+Resolved into docs/TAXONOMY.md: items 1-7 preserved verbatim, 8-16 renumbered
+from what had been earned, a CITATION MAP translating every historical mention,
+and one entry RETIRED because legendLab made it structurally impossible.
+
+**W2c.** Substep the galaxy clock. The open question at session start was which
+bodies set the count. Answered partly by fact — the Sun's seat is a static mesh
+at main.js:673 and never integrates, so it cannot vote — and partly by
+principle: all three flying populations vote, because excluding one integrates
+it at a resolution already declared insufficient and says nothing, which is a
+fail-silent channel inside the loop built to close one. Vindicated the same
+afternoon in the browser: tracer T54, seeded past 4 kpc, held the vote from
+0.18 kpc while 126 clusters were loaded.
+
+Target and cap were argued from measurement, not taste. ST4's dt^2 law:
+
+     20 steps/orbit -> 4.831e-2 radial amplitude
+     40 steps/orbit -> 1.226e-2   ratio 3.94
+     80 steps/orbit -> 3.080e-3   ratio 3.98
+    160 steps/orbit -> 7.708e-4   ratio 4.00
+
+At 20 steps/orbit the cap of 200 would have delivered 6.6 steps/orbit at 1e10x,
+a 44% radial breathing — an artifact a viewer reads as physics. Settled at
+target 40, cap 700: 23.2 steps/orbit and 3.6% at the top of the knob.
+
+The endpoint radius was rejected as the convergence observable. It reads
+non-monotonically under refinement (0.29% at 20 steps/orbit, 0.47% at 40)
+because it samples a phase. Amplitude over a fixed number of orbits is
+phase-independent and gives the clean 3.94 / 3.98 / 4.00. A taxonomy #7 no-op
+caught before it was trusted.
+
+**W2c.1.** The count on screen. ST7's confession had been testifying into a Node
+console nobody reads while flying.
+
+**W2c.2.** Two designs measured and REJECTED rather than shipped.
+
+  THE CRUX (cap lifted to 5000 so neither is throttled):
+
+    Sgr A* 1e9x
+      target  40, travel OFF          |dE/E0| 3.44e-2  bound true   peak n 2
+      target  40, travel eps 0.05     |dE/E0| 5.27e-3  bound true   peak n 5
+      target 126, travel OFF          |dE/E0| 6.13e-3  bound true   peak n 4
+    Sgr A* 1e10x
+      target  40, travel OFF          |dE/E0| 1.40e+4  bound false  peak n 908
+      target  40, travel eps 0.05     |dE/E0| 1.11e+2  bound false  peak n 312
+      target 126, travel OFF          |dE/E0| 6.58e+1  bound false  peak n 73
+
+  Raising target alone matches the travel criterion at 1e9x and BEATS it at
+  1e10x at a quarter the cost. The travel criterion is a target increase
+  wearing a second name. Derived principled as eps = 2*pi/target it is inert.
+
+  ADAPTIVE LOOP A/B:
+    FIXED  1e9x  orbit only  3.44e-2  |  ADAPTIVE  3.44e-2   identical
+    FIXED  1e9x  +travel     5.27e-3  |  ADAPTIVE  4.39e-3   ~20%
+    FIXED 1e10x  orbit only  1.41e+4  |  ADAPTIVE  1.41e+3   10x better
+    FIXED 1e10x  +travel     1.11e+2  |  ADAPTIVE  3.14e+4   283x WORSE
+
+  Sign flips with configuration in an already-unbound regime. Chaos, not signal.
+
+  CONVERGENCE, which is why chasing it is futile:
+    cap    700 -> min r 2.82e1 kpc, E/E0 -3.14e+4
+    cap  3,000 -> min r 2.29e1 kpc, E/E0 -5.33e+2
+    cap 20,000 -> min r 9.37e0 kpc, E/E0 -1.22e+2
+    cap 120,000 -> min r 5.27e0 kpc, E/E0 -2.94e-1   (4.8 seconds per frame)
+
+  What shipped is the label. Free-fall to the 0.05 kpc clamp at 1e10x reaches
+  2.720e6 km/s = 9.1c before any discretisation error. The engine is Newtonian.
+  BEYOND NEWTON names the body and the multiple; ST9's negative keeps it dark
+  at house values (7.74e-4c).
+
+**Two bugs caught in the browser, both by Shambu reading a label.**
+
+  "(unnamed)" for all 126 clusters: they carry .id, not .name (main.js:462
+  hunts on best.id). It slipped ST6 because the lab's fixture was seeded with
+  name: 'DIVER' — the lab and the code agreed about a shape the data does not
+  have. TAXONOMY #17, the fixture that does not match the field. Both fixture
+  and code fixed; ST6 and ST8 now seed with .id.
+
+  The emptied halo: walking s through 1x -> 1e10x and back twice with clusters
+  in flight ejects the population, one reading 357.9c. Not the integrator —
+  CHEATS #23 arriving at the Sgr A* knob, where B2.1 had documented MS only.
+  Dialling up binds; dialling down removes the well and leaves the speed. u
+  restores byte-exact. CHEATS #23 amended.
+
+**A pre-existing bug logged, not fixed.** stepGalaxyStars runs 199 steps when
+200 are requested: repeated `carry -= DT` drifts microscopically below DT and
+one step is dropped. Unchanged by W2c. ST3 reads the count back from
+GAL_STARS.myr rather than assuming it.
+
+**Receipts.** stepLab ST0-ST9, FAIL-before captured against unpatched
+physics.js (ST0 FAIL, ST1 showing 0.6 -> 10,751.467 kpc). Cross-machine
+determinism demonstrated twice more: the full ST1-ST7 set and then ST8/ST9
+reproduced digit-for-digit on Windows against values computed independently.
+Full gate green — lint, captureLab, legendLab, sandboxLab, starsLab, gaiaLab
+(G6/G7/G8 all 0.000), build.

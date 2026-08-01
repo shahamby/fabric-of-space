@@ -117,6 +117,17 @@ CAPTURE, whose negative test must WATCH a point test tunnel through the
 horizon and survive. Until that receipt exists this entry is a prediction,
 not a pattern.
 
+## 17. The fixture that does not match the field
+A test double built with a property the real data does not carry. The lab
+passes, the code passes, and the two agree about a shape that never occurs.
+stepLab ST6 seeded its fake cluster as `{ name: 'DIVER' }` and the substep
+readout read `s.name`, so both agreed — while all 126 real Harris clusters
+carry `.id` and printed `(unnamed)` on the public HUD. Caught only in the
+browser, by reading a label where a catalogue name belonged. Rule: a fixture
+must be built from the SAME FIELD the production path reads, and when a lab
+stands in for catalogue data, one real row is checked against the fixture's
+shape. Earned W2c.2, 2026-08-01.
+
 ---
 
 ## RETIRED
@@ -148,3 +159,4 @@ rather than numbered: a pattern the build cannot express is not a pattern.
 | CLAUDE.md:249 "taxonomy item 7" | bracket bluff | **13** |
 | CLAUDE.md:350 "taxonomy #7's second appearance" | bracket bluff | **13** |
 | CLAUDE.md:467 "taxonomy #11" | unlabelled readout | **15** |
+

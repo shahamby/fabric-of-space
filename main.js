@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { buildSimBodies, G, loadBodyMeshes } from './bodies.js';
 import { eclToScene, KM_PER_AU, makeBodyMesh } from './bodyMesh.js';
 import { makeFabric, updateFabric, updateGalaxyFabric, galaxyDepth } from './fabric.js';
-import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR, GAL_CLUSTERS, seedClusterVelocities, clusterOrbit, galaxyVCircInner } from './physics.js';
+import { computeAccelerations, dipoleTesla, findContacts, leapfrogStep, mergeBodies, PN1, totalEnergy, BFIELD, GALAXY, galaxyPhi, GAL_STARS, seedGalaxyStars, stepGalaxyStars, galaxyVCirc, KMS_TO_KPC_MYR, GAL_CLUSTERS, seedClusterVelocities, clusterOrbit, galaxyVCircInner, GAL_STEP, galaxySubstepCount } from './physics.js';
 import { HYG_SAMPLE } from './hygSample.js';
 import harrisVrSnapshot from './data/harris_vr.tsv?raw';  // M12e: Harris incl. heliocentric Vr
 import gaiaSnapshot from './data/gaia_pm.tsv?raw';        // M12e: Gaia EDR3 proper motions
@@ -857,6 +857,53 @@ function dialledShort() {
   if (GALAXY.MS !== GALAXY.MS_CAL) d.push(`halo ${(GALAXY.MS / GALAXY.MS_CAL).toFixed(2)}x`);
   if (GALAXY.MBH !== GALAXY.MBH_CAL) d.push(`Sgr A* ${(GALAXY.MBH / GALAXY.MBH_CAL).toExponential(0)}x`);
   return d.length ? `  [DIALLED: ${d.join(', ')}]` : '';
+}
+
+// W2c.1: the subdivision, on screen. stepLab ST7 proved the cap reports what
+// it ACHIEVED and never what it wanted — but that receipt was testifying into
+// a Node console nobody reads while flying. Bug #8, the gauge without a
+// needle. This is the needle.
+//
+// The count is RECOMPUTED here rather than read back from the last step, so
+// the line stays live while paused instead of reporting a frozen corpse.
+//
+// No error percentage is quoted. stepLab ST4 measured the dt^2 law for ONE
+// orbit at 0.6 kpc; that coefficient is not general, and printing it as if it
+// were would be inventing a number the lab never took.
+function stepHud() {
+  galaxySubstepCount();
+  const S = GAL_STEP;
+  if (!S.byName) return 'STEP  nothing in flight';
+  const who = `innermost ${S.byName} at ${S.byR.toFixed(2)} kpc`;
+
+  // W2c.2: past c the engine is Newtonian in a regime Newton does not describe.
+  // Free-fall to the 0.05 kpc clamp at Sgr A* 1e10x reaches 9.1c BEFORE any
+  // integration error, so no subdivision at any price cures this — only a
+  // label can. stepLab ST9, and its negative: at house values this stays dark
+  // at 7.7e-4c, because a warning that is always on warns about nothing.
+  const beyond = S.overC > 1
+    ? `\nBEYOND NEWTON — ${S.fastestName} at ${S.overC.toFixed(1)}x the speed of light. ` +
+      `This engine is Newtonian; that path describes nothing.`
+    : '';
+
+  if (S.truthClamped) {
+    // TRUTH mode never subdivides, so that every sealed number reproduces bit
+    // for bit. The cost is that TRUTH can itself be under-resolved, which
+    // CHEATS.md "NOT CHEATS" confesses in prose and this branch confesses on
+    // screen — the only place it can be caught in the act.
+    return `STEP  1 x ${GAL_STARS.DT} Myr — TRUTH, no subdivision — ` +
+           `${S.achieved.toFixed(1)} steps/orbit for ${who}` +
+           (S.achieved < S.target
+             ? `  — BELOW the ${S.target} target: TRUTH does not subdivide, so this orbit is UNDER-RESOLVED`
+             : '') + beyond;
+  }
+  if (S.n >= S.cap) {
+    return `STEP  ${S.n} x ${GAL_STARS.DT} Myr — CAPPED at ${S.cap}: ` +
+           `${S.achieved.toFixed(1)} steps/orbit, ${S.target} wanted — ${who} — ` +
+           `NOT TRUSTWORTHY, the engine cannot vouch for this path` + beyond;
+  }
+  return `STEP  ${S.n} x ${GAL_STARS.DT} Myr — ${S.achieved.toFixed(1)} steps/orbit ` +
+         `(want ${S.target}) — ${who}` + beyond;
 }
 
 // Only the constants that have actually MOVED. An empty list means the mode
@@ -2203,6 +2250,7 @@ if (GALAXY.on && (GAL_STARS.on || GAL_CLUSTERS.on)) {   // M12c: the disk turns;
     if (GAL_CLUSTERS.on && clusterCloud.visible) { syncClusterCloud(); colourClusters(); }
     const sunLapMyr = 2 * Math.PI * 8.2 / (galaxyVCirc(8.2) * KMS_TO_KPC_MYR);   // F3: live — honours h
     hud.textContent += `\nGalaxy clock: ${GAL_STARS.myr.toFixed(0)} Myr — Sun's lap ${sunLapMyr.toFixed(1)} Myr${dialledShort()}`;
+    hud.textContent += `\n${stepHud()}`;
   }
   if (GALAXY.on) updateGalaxyFabric(fabric);
   else updateFabric(fabric, simBodies, G, trueScale);

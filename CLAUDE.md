@@ -476,6 +476,39 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   out loud. captureLab CP7-CP10, including CP10's finding: past ~1e9x the
   sheet is SCALE-FREE and only r_s still reads the knob. CHEATS #28.
 
+- **W2c: COMPLETE** — the galaxy clock subdivides. At DT 0.2 Myr a cluster at
+  0.6 kpc completed 9.5 orbits inside ONE step at Sgr A* 1e9x; ten unsubdivided
+  steps took a circular body from 0.6 to 10,751 kpc. Each step is now spent as
+  n_sub substeps until the innermost INTEGRATED body gets 40 steps/orbit,
+  capped at 700. All three populations vote — tracers, HYG stars and clusters —
+  because a tracer migrates inward and takes the vote (seen in the browser:
+  T54 seeded past 4 kpc, voting from 0.18 kpc). n_sub clamps to 1 whenever
+  MBH === MBH_CAL, and DT/1 is bit-exact, so TRUTH mode is unchanged and every
+  sealed number still reproduces: stepLab ST3 reads 3.33479341669428608e+0 on
+  both paths. The halo knob never moves the clock (ST5, n_sub 1 across
+  0.1x-3.0x). stepLab ST0-ST7.
+
+- **W2c.1: COMPLETE** — the count on screen. ST7 proved the cap reports what it
+  ACHIEVED and not what it wanted, but that receipt was testifying into a Node
+  console nobody reads while flying — bug #8, the gauge without a needle. The
+  galaxy HUD now publishes n_sub, the body that set it, the radius, and the
+  steps/orbit actually delivered, recomputed each frame so it stays live while
+  paused. No new keys; legendLab still reads 33/33.
+
+- **W2c.2: COMPLETE** — where Newton stops. The orbit criterion resolves a
+  circular orbit; a PLUNGE crosses the well in a fraction of a period and is
+  not resolved (ST8: bound at 1e9x, ejected at 1e10x with the cap binding, so
+  the readout confesses). Two candidate fixes were measured and REJECTED — a
+  travel criterion that was a worse relabelled target increase, and an adaptive
+  per-substep loop that bought nothing reliable; tables in HANDOFF session 24.
+  What shipped instead is the honest label: free-fall to the 0.05 kpc clamp at
+  1e10x reaches 9.1c BEFORE any integration error, so the HUD says BEYOND
+  NEWTON and names the body and the multiple (ST9, negative at 7.74e-4c). Also
+  fixed: clusters carry .id, not .name, and the substep readout printed
+  "(unnamed)" for all 126 — TAXONOMY #17, the fixture that does not match the
+  field. CHEATS "NOT CHEATS" gains the plunge entry; CHEATS #23 amended to name
+  the Sgr A* knob, whose downward turn empties the halo.
+
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,

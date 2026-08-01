@@ -332,7 +332,7 @@ export function galaxyVCircInner(R, withBH, haloOverride) {
   return Math.sqrt(v2);
 }
 
-function galaxyAccel(x, y) {              // kpc/Myr^2, inward along r-hat
+export function galaxyAccel(x, y) {       // kpc/Myr^2, inward along r-hat
   const R = Math.max(Math.hypot(x, y), 0.05), h = 1e-4;
   const dPhi = (galaxyPhi(R + h) - galaxyPhi(R - h)) / (2 * h);
   const a = -dPhi * KMS_TO_KPC_MYR * KMS_TO_KPC_MYR / R;
@@ -374,14 +374,111 @@ function kdk(s, dt) {                     // kick - drift - kick, the house shap
   s.vx += 0.5 * dt * ax; s.vy += 0.5 * dt * ay;
 }
 
+// W2c: HOW FINELY must this frame be chopped? The fixed 0.2 Myr galaxy step
+// is meaningless once something orbits faster than that: with Sgr A* dialled
+// to 1e9x, a cluster at 0.6 kpc laps 9.5 times inside ONE step. The fix is not
+// a smaller DT for everyone — it is a DT divided only as far as the fastest
+// thing actually on screen demands.
+//
+// WHO VOTES: every body the loop integrates — tracers, HYG stars and clusters
+// alike. Excluding a population would integrate it at a resolution we have
+// already declared insufficient and say nothing about it: a fail-silent
+// channel inside the loop built to close one. Decided 2026-08-01.
+//
+// THE FLOOR is galaxyPhi's own 0.05 kpc clamp. Inside it the potential is flat,
+// there is no orbit, and a step count computed there means nothing.
+//
+// THE CAP is 200 substeps, about one 8 ms half-frame. Uncapped it reaches
+// 25,043 for a body at the clamp with Sgr A* at 1e10x — roughly one second of
+// arithmetic per frame. Past the cap the STATE is under-resolved, and
+// GAL_STEP.achieved says so out loud. That is an integration limit, not a
+// rendering cheat — CHEATS.md "NOT CHEATS" — and taxonomy #15 is the reason
+// it is never allowed to stay quiet.
+//
+// GRANULARITY: the count is taken ONCE per 0.2 Myr step, not per substep. A
+// body that dives inside a single step is resolved by the count it entered
+// with. Cheap, stable, and stated rather than discovered.
+export const GAL_STEP = {
+  target: 40,          // steps per orbit demanded of the innermost integrated body
+  cap: 700,            // hard ceiling; past it we accept coarser and confess it
+  n: 1,                // substeps actually run on the last step
+  achieved: 0,         // steps/orbit the innermost body actually received
+  byName: '',          // WHO set the count — taxonomy #15: never an unlabelled number
+  byR: 0,              // and at what radius, kpc
+  fastest: 0,          // W2c.2: fastest integrated body, km/s
+  fastestName: '',     // and which one
+  overC: 0,            // that speed in units of the DIALLED c. Past 1 the engine is
+                       // answering Newtonianly in a regime Newton does not describe,
+                       // and no amount of subdivision makes the answer mean anything.
+  truthClamped: true,  // n forced to 1 because Sgr A* sits at its calibration mass
+};
+
+// Scan every integrated body, find the innermost, and report the subdivision
+// its orbit demands. Fills GAL_STEP so the HUD can name what set the count.
+export function galaxySubstepCount() {
+  const S = GAL_STEP;
+  S.truthClamped = GALAXY.MBH === GALAXY.MBH_CAL;
+
+  let minR = Infinity, who = '', fastest = 0, fastWho = '';
+  const vote = (s, R, speed) => {
+    // tracers and HYG stars carry .name; Harris clusters carry .id (main.js:462
+    // hunts on best.id). Reading only .name printed "(unnamed)" for all 126
+    // clusters — a readout that cannot say WHO is taxonomy #15 with the name
+    // filed off. Caught in the browser, 2026-08-01.
+    const label = s.name || s.id || '(unnamed)';
+    if (R < minR) { minR = R; who = label; }
+    if (speed > fastest) { fastest = speed; fastWho = label; }
+  };
+  for (const s of GAL_STARS.tracers) vote(s, Math.hypot(s.x, s.y), Math.hypot(s.vx, s.vy));
+  for (const s of GAL_STARS.real)    vote(s, Math.hypot(s.x, s.y), Math.hypot(s.vx, s.vy));
+  if (GAL_CLUSTERS.on) {
+    for (const s of GAL_CLUSTERS.list) {
+      if (s.vx !== undefined) vote(s, Math.hypot(s.x, s.y, s.z), Math.hypot(s.vx, s.vy, s.vz));
+    }
+  }
+  if (!Number.isFinite(minR)) {        // nothing in flight: nothing to resolve
+    S.n = 1; S.achieved = 0; S.byName = ''; S.byR = 0;
+    S.fastest = 0; S.fastestName = ''; S.overC = 0;
+    return 1;
+  }
+
+  const R = Math.max(minR, 0.05);                          // the clamp is the floor
+  const v = galaxyVCircInner(R, true) * KMS_TO_KPC_MYR;    // kpc/Myr
+  const period = 2 * Math.PI * R / v;                      // Myr per orbit
+  const wanted = S.target * GAL_STARS.DT / period;
+
+  S.byName = who;
+  S.byR = minR;
+  S.n = S.truthClamped ? 1 : Math.min(S.cap, Math.max(1, Math.ceil(wanted)));
+  S.achieved = period / (GAL_STARS.DT / S.n);
+
+  // W2c.2: is anything moving faster than light? Nothing in a Newtonian engine
+  // forbids it, so at a dialled Sgr A* it happens: free-fall to the 0.05 kpc
+  // clamp at 1e10x reaches 9.1c even integrated perfectly. That is not a
+  // resolution failure and no subdivision cures it. The only honest response is
+  // to say so where the number is read — the same discipline as the WHAT IF
+  // banner. Receipt: stepLab ST9.
+  const cKms = LIGHT.c * (299792.458 / LIGHT.cal);
+  S.fastest = fastest / KMS_TO_KPC_MYR;
+  S.fastestName = fastWho;
+  S.overC = S.fastest / cKms;
+  return S.n;
+}
+
 // Fixed-step accumulator — same discipline as the solar loop, own clock.
+// Each 0.2 Myr step is now spent as GAL_STEP.n identical substeps. At
+// calibration n is 1 and DT / 1 is bit-exact, so TRUTH mode is unchanged.
 export function stepGalaxyStars(realSeconds) {
   GAL_STARS.carry += realSeconds * GAL_STARS.MYR_PER_SEC;
   let steps = 0;
   while (GAL_STARS.carry >= GAL_STARS.DT && steps < 200) {
-    for (const s of GAL_STARS.tracers) kdk(s, GAL_STARS.DT);
-    for (const s of GAL_STARS.real)    kdk(s, GAL_STARS.DT);
-    if (GAL_CLUSTERS.on) for (const s of GAL_CLUSTERS.list) { if (s.vx !== undefined) kdk3(s, GAL_STARS.DT); }
+    const n = galaxySubstepCount();
+    const sub = GAL_STARS.DT / n;
+    for (let k = 0; k < n; k++) {
+      for (const s of GAL_STARS.tracers) kdk(s, sub);
+      for (const s of GAL_STARS.real)    kdk(s, sub);
+      if (GAL_CLUSTERS.on) for (const s of GAL_CLUSTERS.list) { if (s.vx !== undefined) kdk3(s, sub); }
+    }
     GAL_STARS.myr += GAL_STARS.DT;
     GAL_STARS.carry -= GAL_STARS.DT;
     steps++;

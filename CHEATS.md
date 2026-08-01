@@ -438,6 +438,17 @@ and the cluster does NOT return to its original orbit. Apocentre went 14.7
 5. THE GALAXY CLOCK IS NOT REWOUND. u restores the clusters only; the
    clock keeps running as a stopwatch, and the tracer stars (j) are not
    touched. Said in the AUDIT rather than hidden.
+6. AMENDED 2026-08-01 (W2c.2): THIS APPLIES TO THE SGR A* KNOB TOO, and
+   far more violently. B2.1 documented MS only. Dialling MBH UP is
+   harmless — a deeper well binds tighter. Dialling it back DOWN is not:
+   a cluster that fell toward 4.3e16 Msun and gained 1e5 km/s keeps that
+   speed when the hole reverts to 4.3e6. The well vanishes; the kinetic
+   energy does not, and the halo empties. Observed in the browser by
+   Shambu walking s through 1x -> 1e10x and back twice with 126 clusters
+   in flight: innermost body left at 508 kpc, one at 357.9c. Not a
+   defect — the honest consequence of moving a constant mid-flight. u
+   is the undo and it works: Pal 14 restored to r 67.2 kpc, |v3D|
+   176.8 km/s, byte-exact from c.seed.
 
 ## 24. The valley (B3)
 
@@ -631,7 +642,7 @@ integration limit, not a costume.
    dipole under-sampling — the same species of admission.
 2. ON SCREEN, always, not only when the cap binds: the HUD publishes n_sub, the
    body that set it, and the steps per orbit ACTUALLY ACHIEVED. At 1e10x that
-   reads 6.6, not 20. A cap that stays quiet is taxonomy #15, the unlabelled
+   reads 23.2, not 40. A cap that stays quiet is taxonomy #15, the unlabelled
    readout — a correct number printed against an undeclared limit.
 3. lab/stepLab.mjs ST7 is the receipt that the readout reports the cap rather
    than the target.
@@ -643,3 +654,42 @@ under-resolved for anything that reaches roughly 0.1 kpc, where the requirement
 first exceeds 1. Nothing in the loaded catalogues goes there — the innermost
 Harris cluster seats at 0.6 kpc — but a cluster on a dived orbit could, and if
 one ever does, the readout must say so before the number is believed.
+
+## The plunge, and where Newton stops (W2c.2)
+
+**Where:** `physics.js` GAL_STEP.overC, `main.js` stepHud's BEYOND NEWTON line.
+
+**What it is.** The substep resolves the CIRCULAR ORBIT PERIOD at the innermost
+radius. A body falling nearly straight in crosses the whole well in a fraction
+of a circular period, so at a dialled Sgr A* the criterion is reading a clock
+the body is not on. A Pal-14-like cluster at 1e10x moved 63% of its own radius
+in one step and flipped from bound to unbound. Receipt: stepLab ST8.
+
+**Why no bigger cap fixes it.** It converges — the energy error falls from
+3.14e4 x E0 at cap 700 to 0.294 x E0 at cap 120,000 — but 120,000 substeps is
+4.8 seconds per frame. Two designs were measured against this case and REJECTED
+rather than shipped, recorded in HANDOFF session 24:
+
+  A TRAVEL CRITERION (v*DT <= eps*r) turned out to be a relabelled target
+  increase and a worse one. Target 126 alone beat it at 1e10x, 6.58e1 to
+  1.11e2, at a quarter the substeps. Derived honestly as eps = 2*pi/target it
+  changes nothing at all — a feature that never moves an observable, which is
+  taxonomy #7 wearing a feature's clothes instead of a test's.
+
+  AN ADAPTIVE PER-SUBSTEP LOOP bought nothing reliable: identical at 1e9x with
+  the orbit criterion alone, and its sign flipped with configuration at 1e10x,
+  which is chaos in an already-unbound regime, not signal.
+
+**Why it is not a cheat, and not really a numerics problem either.** Free-fall
+to the 0.05 kpc clamp at Sgr A* 1e10x reaches 2.720e6 km/s — 9.1c — BEFORE any
+discretisation error at all. The engine is Newtonian. At that dial it is
+answering a question outside the regime it describes, and no subdivision at any
+price makes the answer mean anything. Nothing is drawn that the state does not
+contain; the state itself has left physics. So the response is not to integrate
+harder. It is to stop claiming: when any integrated body exceeds the dialled c,
+the HUD says BEYOND NEWTON and names the body and the multiple. Receipt:
+stepLab ST9, with its negative — at house values the flag stays dark at
+7.74e-4c, because a warning that is always on warns about nothing.
+
+**The knob stays reachable.** 1e10x is not removed. The failure is instructive
+and this project has never hidden one.
