@@ -594,3 +594,52 @@ it one, and refuses to draw it to taste. What is display, confessed:
 6. THE MATH LIVES IN physics.js SO A LAB CAN REACH IT. The display dials
    stay in fabric.js and are passed in; captureLab reads them out of
    fabric.js by text rather than copying them. Receipts CP7-CP10.
+
+---
+
+# NOT CHEATS — limits that live elsewhere
+
+This ledger numbers ONE kind of thing: the picture diverging from the state.
+Some honest limits are not that, and numbering them here would blur the only
+distinction this file exists to keep. They are recorded here anyway, unnumbered,
+so a reader who comes looking is not met with silence and left to guess whether
+the limit was hidden or simply never noticed.
+
+The test: does the SIMULATION STATE stay true, and is the DISPLAY showing
+something other than that state? If yes, it is a cheat and it gets a number.
+If the state itself is knowingly approximate, that is a limit — it belongs in
+CLAUDE.md's known limits and, when a user can steer into it, on the screen.
+
+## The substep cap (W2c)
+
+**Where:** `physics.js` `stepGalaxyStars`, the `n_sub` cap of 200.
+
+**What it is.** The galaxy clock subdivides its 0.2 Myr step until the innermost
+integrated body gets 20 steps per orbit. The subdivision is capped at 200
+substeps, because an uncapped count reaches 25,043 for a body sitting at the
+0.05 kpc clamp with Sgr A* dialled to 1e10x — about one second of arithmetic
+per frame.
+
+**Why it is not a cheat.** Nothing is drawn that the state does not contain.
+Past the cap the STATE ITSELF is under-resolved: the trajectory is a worse
+approximation to the real orbit than the 20-steps rule demands. The picture is
+telling the truth about a number that is coarser than we would like. That is an
+integration limit, not a costume.
+
+**Where the confession actually lives.**
+1. CLAUDE.md known limits, beside M9's contact-tunnelling entry and M10c's
+   dipole under-sampling — the same species of admission.
+2. ON SCREEN, always, not only when the cap binds: the HUD publishes n_sub, the
+   body that set it, and the steps per orbit ACTUALLY ACHIEVED. At 1e10x that
+   reads 6.6, not 20. A cap that stays quiet is taxonomy #15, the unlabelled
+   readout — a correct number printed against an undeclared limit.
+3. lab/stepLab.mjs ST7 is the receipt that the readout reports the cap rather
+   than the target.
+
+**The honest edge of this entry.** TRUTH mode clamps n_sub to 1 unconditionally,
+so that MBH === MBH_CAL stays bit-identical and every sealed number in the
+project remains reproducible. That clamp means TRUTH mode is itself
+under-resolved for anything that reaches roughly 0.1 kpc, where the requirement
+first exceeds 1. Nothing in the loaded catalogues goes there — the innermost
+Harris cluster seats at 0.6 kpc — but a cluster on a dived orbit could, and if
+one ever does, the readout must say so before the number is believed.

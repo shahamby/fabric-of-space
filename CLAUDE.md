@@ -246,7 +246,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   (lab/bhLab.mjs 8/8: horizon bridge 2.9538; S2's 16.05-yr clock
   reproduced at 16.08; crossover 8.61 pc, numeric = Shambu's analytic
   at 1x and 100x; fingerprint -0.486/+0.498; B5's negative test caught
-  the bracket bluff — taxonomy item 7). Panel debt paid: clicking
+  the bracket bluff — taxonomy #13). Panel debt paid: clicking
   Sgr A* shows the curve FALLING toward center. CHEATS #12 filed.
   - **M12g: COMPLETE** — the curve on screen. A 320x170 canvas instrument
   (v toggles, galaxy mode only) draws 200 samples of galaxyVCircInner on
@@ -347,7 +347,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   lab/haloLab.mjs HL0 handshakes with MZ7 at 9.0 over the same 11 bins;
   HL1 finds the floor at MS 4.967e11 Msun (0.993 x house), chi2/nu 8.96;
   HL2 the Delta-chi2 = 1 width is +-3.2%, quoted as valley curvature and
-  never as an error bar; HL3 is taxonomy #7's second appearance — the
+  never as an error bar; HL3 is taxonomy #13's second appearance — the
   finder is handed a window that excludes the floor and must report the
   edge instead of naming it, which without the guard would have claimed
   1.50 x house, a 51% error stated as a measurement. HL4 records that MS
@@ -464,7 +464,7 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   cluster velocity was measured against it. 126 clusters read unbound while
   the AUDIT truthfully said "halo 1.00x". gaiaLab G8 is the receipt: 1281.972
   and 149942.276 km/s before the pin, 0.000 and 0.000 after. Also closed
-  taxonomy #11 at all eight readouts and fixed a hardcoded c in the s AUDIT
+  taxonomy #15 at all eight readouts and fixed a hardcoded c in the s AUDIT
   that made a crossable horizon read as uncrossable. Full galaxyPhi reader
   audit in HANDOFF session 23: SEED pins, DYNAMICS honours, READOUT labels.
 - **W2b: COMPLETE** — the sheet gets a gauge. galaxyDepth is referenced to the
