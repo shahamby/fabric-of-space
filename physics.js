@@ -388,9 +388,11 @@ function kdk(s, dt) {                     // kick - drift - kick, the house shap
 // THE FLOOR is galaxyPhi's own 0.05 kpc clamp. Inside it the potential is flat,
 // there is no orbit, and a step count computed there means nothing.
 //
-// THE CAP is 200 substeps, about one 8 ms half-frame. Uncapped it reaches
+// THE CAP is 700 substeps (W2c.1 raised it from 200). Uncapped it reaches
 // 25,043 for a body at the clamp with Sgr A* at 1e10x — roughly one second of
-// arithmetic per frame. Past the cap the STATE is under-resolved, and
+// arithmetic per frame. At 700 the 1e10x case still holds 23.2 steps/orbit,
+// where a 200 cap delivered 6.6 — stepLab ST4's note is the measurement.
+// Past the cap the STATE is under-resolved, and
 // GAL_STEP.achieved says so out loud. That is an integration limit, not a
 // rendering cheat — CHEATS.md "NOT CHEATS" — and taxonomy #15 is the reason
 // it is never allowed to stay quiet.

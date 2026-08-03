@@ -424,12 +424,20 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   local refine around the winning sample, or a denser grid near the floor.
   Confessed instead of fixed: CHEATS #24 items 4, 5, 6. Only worth doing if
   the strip is ever asked to be read as a NUMBER rather than a SHAPE.
-- **B5: SHELVED** — lab/ledgerLab.mjs, the guard the docs do not have. eslint
-  guards code against itself; legendLab guards docs against code; NOTHING
-  guards the ledger. Assert CHEATS numbering is contiguous, and that every
-  "CHEATS #N" cited in CLAUDE.md exists in CHEATS.md. Would have fired on the
-  missing #24 the day it happened, instead of 8 sessions and 4 commits later.
-  ~25 lines, wires into the Pages gate beside legendLab.
+- **B5 / T0.1: COMPLETE** — lab/ledgerLab.mjs, the guard the docs did not have.
+  eslint guards code against itself; legendLab guards docs against code;
+  NOTHING guarded the ledger. LD1/LD2 assert CHEATS.md and docs/TAXONOMY.md
+  number 1..N with no gap, repeat, or blank heading; LD3/LD4 assert every
+  "CHEATS #N" and "taxonomy #N" cited in CLAUDE.md and HANDOFF.md resolves;
+  LD5 is the negative, three sabotages each seen to fire. TAXONOMY's citation
+  map is excluded by name because it quotes the dead pattern series on purpose.
+  FAIL-BEFORE was not manufactured: the guard was written first and fired on
+  the live repo, catching CHEATS.md:624 and :658 — the W2c and W2c.2 entries
+  shipped unnumbered in the same commit that shelved this lab. Numbered #29
+  and #30. The audit also found CHEATS #29 quoting a 200 cap and a 20-steps
+  target that W2c.1 had replaced with 700 and 40, and the same stale figures
+  in physics.js's GAL_STEP comment; both corrected with an amendment note.
+  Wired into the Pages gate after lint. Logged as taxonomy #18, PROPOSED.
 - **MOBILE: TABLED 2026-07-29** — deliberately, until the desktop build is one
   we are satisfied with. Not blocked; deferred. What the investigation found,
   so it is not re-derived later: (1) the app ALREADY renders and scrolls on

@@ -621,19 +621,24 @@ something other than that state? If yes, it is a cheat and it gets a number.
 If the state itself is knowingly approximate, that is a limit — it belongs in
 CLAUDE.md's known limits and, when a user can steer into it, on the screen.
 
-## The substep cap (W2c)
+## 29. The substep cap (W2c)
 
-**Where:** `physics.js` `stepGalaxyStars`, the `n_sub` cap of 200.
+**Amended 2026-08-03 (T0.1).** Written against W2c's original 20 steps/orbit and
+200-substep cap. W2c.1 raised those to 40 and 700; this entry was not updated,
+so the confession quoted numbers the build does not ship. Corrected below.
+stepLab ST4's note and ST7 are the receipts.
+
+**Where:** `physics.js` `stepGalaxyStars`, the `n_sub` cap of 700.
 
 **What it is.** The galaxy clock subdivides its 0.2 Myr step until the innermost
-integrated body gets 20 steps per orbit. The subdivision is capped at 200
+integrated body gets 40 steps per orbit. The subdivision is capped at 700
 substeps, because an uncapped count reaches 25,043 for a body sitting at the
 0.05 kpc clamp with Sgr A* dialled to 1e10x — about one second of arithmetic
 per frame.
 
 **Why it is not a cheat.** Nothing is drawn that the state does not contain.
 Past the cap the STATE ITSELF is under-resolved: the trajectory is a worse
-approximation to the real orbit than the 20-steps rule demands. The picture is
+approximation to the real orbit than the 40-steps rule demands. The picture is
 telling the truth about a number that is coarser than we would like. That is an
 integration limit, not a costume.
 
@@ -655,7 +660,7 @@ first exceeds 1. Nothing in the loaded catalogues goes there — the innermost
 Harris cluster seats at 0.6 kpc — but a cluster on a dived orbit could, and if
 one ever does, the readout must say so before the number is believed.
 
-## The plunge, and where Newton stops (W2c.2)
+## 30. The plunge, and where Newton stops (W2c.2)
 
 **Where:** `physics.js` GAL_STEP.overC, `main.js` stepHud's BEYOND NEWTON line.
 

@@ -1518,3 +1518,78 @@ determinism demonstrated twice more: the full ST1-ST7 set and then ST8/ST9
 reproduced digit-for-digit on Windows against values computed independently.
 Full gate green — lint, captureLab, legendLab, sandboxLab, starsLab, gaiaLab
 (G6/G7/G8 all 0.000), build.
+
+## Session append — 2026-08-03 (session 25: B5 / T0.1, the ledger gets a guard)
+
+Opened with the fresh-clone audit at `55553eb`. Full gate green: lint clean,
+legendLab L0–L4, sandboxLab SB0–SB5, stepLab ST0–ST9 10/10, build 840 ms.
+
+Three findings from the audit, none of them physics:
+
+**F1 — CHEATS.md numbering broken.** Entries 29 and 30 (W2c, W2c.2) shipped
+with no number at all, in commit `55553eb` — the same commit whose Status
+bullet shelved the lab that would have caught them. This is CHEATS #24's
+failure repeating five days later, which is exactly the argument for the
+guard.
+
+**F2 — CHEATS #29 quoted retired numbers.** Written at W2c against a 200
+substep cap and a 20 steps/orbit target. W2c.1 raised those to 700 and 40 and
+the confession was never amended. `physics.js`'s own GAL_STEP comment carried
+the same stale figures three lines above `cap: 700`. A confession that quotes
+the wrong number is worse than no confession. Both corrected, with an
+amendment note dated in the entry rather than silently overwritten.
+
+**F3 — W31 recap not written.** `docs/weekly/` holds W28–W30. Due 2026-08-02,
+carried into this session as the next task.
+
+Also confirmed closed and already committed, against a stale expectation:
+taxonomy #17's `.id`/`.name` fix (physics.js:428, stepLab ST6 reading "set by
+DIVER"), the `TAXOMONY.md` → `TAXONOMY.md` rename, and the three CLAUDE.md
+citation repairs to #13 and #15.
+
+**B5 / T0.1 — lab/ledgerLab.mjs.** Reads the ledgers as text, imports nothing
+from the project, and claims only that the paperwork refers to things that
+exist. LD1/LD2 numbering contiguity over CHEATS.md and docs/TAXONOMY.md;
+LD3/LD4 citation resolution over CLAUDE.md and HANDOFF.md; LD5 the negative —
+three sabotages (unnumbered heading, gap at #20, and a citation of an entry
+number that was never written), each required to both MUTATE and be CAUGHT, so
+a no-op sabotage cannot pass itself off as a receipt (taxonomy #7).
+
+The first draft of this paragraph named that third sabotage by its literal
+token. LD3 read HANDOFF.md, found it, and failed the gate on the session note
+describing the guard. That is not a false positive — it is the only proof so
+far that LD3 reads HANDOFF at all, since every real citation in the file
+already resolved. Rewritten in prose. Standing consequence: a ledger guard that
+scans prose will also scan prose ABOUT the ledger, so session notes describe
+citations rather than spell them.
+
+Two scoping decisions worth recording. The parser accepts both CHEATS heading
+dialects (`## #1 — Title` for entries 1–5, `## 6. Title` for 6+) rather than
+normalising the old ones, because rewriting history to satisfy a guard is the
+wrong direction. And TAXONOMY's CITATION MAP section is excluded from LD4 by
+exact heading name: it quotes the dead pattern series deliberately, and
+scanning it would fire on history that is already reconciled.
+
+FAIL-BEFORE, run before any fix, on the live repo:
+`LD1 CHEATS.md numbering broken: CHEATS.md:624 unnumbered entry "The substep
+cap (W2c)" | CHEATS.md:658 unnumbered entry "The plunge, and where Newton
+stops (W2c.2)" [FAIL]`, exit 1.
+
+PASS-AFTER: LD0 reads 30 numbered + 0 unnumbered in CHEATS, 18 + 0 in
+TAXONOMY; LD3 61 CHEATS citations resolve, LD4 12 taxonomy citations resolve;
+exit 0. Full gate green, build 220 ms.
+
+Wired into `.github/workflows/pages.yml` after lint. A broken ledger now
+blocks the deploy.
+
+**Taxonomy #18 logged as PROPOSED, no receipt.** The stale confession — an
+entry that quotes numbers a later milestone replaced. ledgerLab guards that
+entries EXIST; it cannot guard that they are TRUE. Earning it needs a lab that
+reads a declared constant out of source and asserts the ledger quotes it.
+Named honestly as a prediction rather than claimed as a caught pattern.
+
+**Open, unchanged:** the `carry -= DT` accumulator drift (ST3 runs 199 of 200
+requested — pre-existing, confessed in the receipt line itself); CHEATS #23's
+MBH-knob halo-emptying behaviour.
+
+**Next:** the W31 recap, then the accumulator drift.

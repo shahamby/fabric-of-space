@@ -128,6 +128,18 @@ must be built from the SAME FIELD the production path reads, and when a lab
 stands in for catalogue data, one real row is checked against the fixture's
 shape. Earned W2c.2, 2026-08-01.
 
+## 18. The stale confession — PROPOSED, NO RECEIPT YET
+A ledger entry that quotes numbers a later milestone replaced. CHEATS #29
+was written against W2c's 20 steps/orbit and 200-substep cap; W2c.1 raised
+those to 40 and 700 and the confession was left alone, so the public ledger
+described a build that no longer existed — and `physics.js`'s own comment
+agreed with the ledger rather than with the constant three lines below it.
+Distinct from #8: the needle exists and moves, it is the LABEL that is
+stale. ledgerLab guards that entries exist and are numbered; it cannot yet
+guard that they are TRUE. Will be earned when a lab reads a declared
+constant out of source and asserts the ledger quotes it. Until that receipt
+exists this entry is a prediction, not a pattern. Found by audit 2026-08-03.
+
 ---
 
 ## RETIRED

@@ -25,6 +25,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      - run: node lab/ledgerLab.mjs
       - run: node lab/legendLab.mjs
       - run: node lab/sandboxLab.mjs
       - run: npm run build
