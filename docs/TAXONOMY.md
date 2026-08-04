@@ -154,6 +154,21 @@ on the working copy beside the clone, and the staged list is counted against
 the named list before a milestone commit — or `git commit --only` removes the
 possibility. Until then, a prediction. Found 2026-08-03.
 
+## 20. The bug described by its first symptom
+A defect recorded by the first thing anyone noticed about it, then carried
+forward in that shape until someone measures it. The galaxy accumulator was
+logged for three sessions as "runs 199 steps when 200 are requested." That
+description is wrong in one direction and understated in another. In
+continuous playback NO step is lost — the unpaid step is deferred to the next
+frame, and 60 frames asking 150 each run all 9,000 (carryLab CA4). The real
+injury was never the count: it was `myr` drifting from `n*DT` without bound,
+2.7e-10 Myr by 9,000 steps and never corrected, plus every lab harness
+requesting a fixed count in one call getting k-1 for 42 of the first 300 k.
+The recorded symptom was the one case that happened to be visible in a
+receipt. Rule: a bug logged from a single observation is a SIGHTING, not a
+diagnosis, and the census that separates the two is written before the fix.
+Earned W2c.3, 2026-08-03.
+
 ---
 
 ## RETIRED

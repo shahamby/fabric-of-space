@@ -340,7 +340,7 @@ export function galaxyAccel(x, y) {       // kpc/Myr^2, inward along r-hat
 }
 
 export const GAL_STARS = {
-  on: false, myr: 0, carry: 0,
+  on: false, myr: 0, owed: 0, backlog: 0, nsteps: 0,
   DT: 0.2,            // Myr per fixed step — 500+ steps per inner orbit
   MYR_PER_SEC: 8,     // playback rate; the Sun laps in ~27 s (CHEATS #9)
   tracers: [],        // synthetic disk sample: shape invented, motion real
@@ -363,7 +363,9 @@ export function seedGalaxyStars(hygSample, n = 240) {
   }
   GAL_STARS.real = hygSample.map(([name, x, y, z]) => seatStar(name, x, y, z));
   GAL_STARS.myr = 0;
-  GAL_STARS.carry = 0;
+  GAL_STARS.owed = 0;
+  GAL_STARS.backlog = 0;
+  GAL_STARS.nsteps = 0;
 }
 
 function kdk(s, dt) {                     // kick - drift - kick, the house shape
@@ -471,9 +473,25 @@ export function galaxySubstepCount() {
 // Each 0.2 Myr step is now spent as GAL_STEP.n identical substeps. At
 // calibration n is 1 and DT / 1 is bit-exact, so TRUTH mode is unchanged.
 export function stepGalaxyStars(realSeconds) {
-  GAL_STARS.carry += realSeconds * GAL_STARS.MYR_PER_SEC;
-  let steps = 0;
-  while (GAL_STARS.carry >= GAL_STARS.DT && steps < 200) {
+  // The debt is counted in STEPS OWED, never in Myr. DT is 0.2, which has no
+  // exact binary form, so the pre-W2c.3 loop's repeated `carry -= DT` drifted
+  // one direction without bound and left a whole step unpaid for 42 of the
+  // first 300 single-shot requests. Receipt: carryLab CA1-CA4.
+  //
+  // Every line below is exact by construction:
+  //   owed - Math.floor(owed)  is bit-exact for any float, always
+  //   backlog                  is an integer, and integer +/- is exact
+  //   myr = nsteps * DT        is one multiply, never a running sum
+  GAL_STARS.owed += realSeconds * GAL_STARS.MYR_PER_SEC / GAL_STARS.DT;
+  const whole = Math.floor(GAL_STARS.owed);
+  GAL_STARS.owed -= whole;              // EXACT — the fraction, and only it, carries over
+  GAL_STARS.backlog += whole;           // integer debt, spendable now or later
+
+  // THE CAP is unchanged at 200 steps per call. Debt above it is not forgiven,
+  // it stays in backlog and is spent next frame — the same deferral the old
+  // loop performed with carry, now without the drift. Receipt: carryLab CA5.
+  const want = Math.min(GAL_STARS.backlog, 200);
+  for (let step = 0; step < want; step++) {
     const n = galaxySubstepCount();
     const sub = GAL_STARS.DT / n;
     for (let k = 0; k < n; k++) {
@@ -481,10 +499,10 @@ export function stepGalaxyStars(realSeconds) {
       for (const s of GAL_STARS.real)    kdk(s, sub);
       if (GAL_CLUSTERS.on) for (const s of GAL_CLUSTERS.list) { if (s.vx !== undefined) kdk3(s, sub); }
     }
-    GAL_STARS.myr += GAL_STARS.DT;
-    GAL_STARS.carry -= GAL_STARS.DT;
-    steps++;
   }
+  GAL_STARS.backlog -= want;
+  GAL_STARS.nsteps += want;
+  GAL_STARS.myr = GAL_STARS.nsteps * GAL_STARS.DT;
 }
 // ---------- M12e: the clusters get their velocity ----------
 // Gaia EDR3 proper motions (Vasiliev & Baumgardt 2021) x Harris distances

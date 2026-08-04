@@ -1621,3 +1621,72 @@ contribute uninvited passengers.
 **Corrected next task:** not the W31 recap, which exists. Next is either the
 ledger-truth lab that would earn taxonomy #18, or the `carry -= DT` accumulator
 drift.
+
+## Session append — 2026-08-03 (session 26: W2c.3, the accumulator pays what it owes)
+
+Picked the `carry -= DT` drift as the next task because it was the smallest
+open bug and the only one that was not paperwork. It did not stay small.
+
+**The sealed prediction was wrong twice, both times found by building the lab.**
+
+First, the census was computed with an unbounded loop and the engine caps at
+200 steps per call. Corrected: 42 short of the first 300, not 142, in bands
+[15,45] and [190,200] — above 200 the cap hides the defect completely.
+
+Second, and this is the one that matters: **"199 of 200" is not what the bug
+does.** In continuous playback — the browser topping up every frame — NO step
+is lost. The unpaid step is deferred to the next frame. 60 frames requesting
+150 each run all 9,000. The description had been carried in ST3's note and in
+HANDOFF for three sessions, and it named the wrong injury. The real damage was
+`GAL_STARS.myr` drifting from `n*DT` monotonically and without correction —
+3.908e-14 Myr at 100 steps, 2.722e-10 at 9,000 — and every lab harness that
+requests a fixed count in ONE call, which is exactly what stepLab's runEngine
+does, silently receipting at k-1 instead of k. Logged as taxonomy #20, EARNED.
+
+**lab/carryLab.mjs, CA0-CA6.** Drives the real engine through the same
+copy-to-.mjs shim stepLab uses, so the engine under test is the engine that
+ships; it does not re-implement the loop, because a lab that reimplements what
+it tests agrees with its own copy and learns nothing (taxonomy #14). The
+harness reads whichever accounting is loaded and says which in CA0, so the
+same file runs on both sides of the fix.
+
+CA6 is the negative and it is the reason the rest means anything. 0.25 IS
+exactly representable in binary. With DT swapped to 0.25 the same census reads
+0 short where DT=0.2 read 42 — pre-fix, with nothing repaired. The instrument
+was seen to move with the arithmetic before it was trusted to read zero.
+
+**The fix.** Count steps owed, never Myr. `owed - Math.floor(owed)` is bit-exact
+for any float; `backlog` is an integer so its arithmetic is exact; `myr` is
+`nsteps * DT`, one multiply, never summed. The 200 cap is unchanged and CA5
+guards it, because "fix the count by removing the cap" is the cheap wrong
+answer and it needed to be closed off explicitly.
+
+**One honest wrinkle in the sequence.** The backlog field was designed AFTER
+the FAIL-before was captured, because clamping `owed -= want` at the cap would
+have reintroduced the exact drift being removed — subtracting a large integer
+from a float is not guaranteed exact. That needed one field in the lab harness.
+The edited harness was re-run against UNFIXED physics.js first and reproduced
+the FAIL-before identically: 42, 199, 3.908e-14, 2.722e-10. The harness moved;
+what it asserts did not.
+
+**A sealed number moved, deliberately.** ST3's engine x goes
+3.33479341669428608e+0 -> 3.29137215247030257e+0. It runs 200 steps now instead
+of 199. The assertion — bit-identical to the plain integrator — still holds.
+The value changed because the count is correct, not because the physics is.
+
+**CA6 goes quiet after the fix.** It now reads 0 against 0. Its entire value
+was in the FAIL-before. Recorded so nobody later reads a silent negative as a
+strong one.
+
+**Gate.** carryLab AND stepLab both wired into pages.yml. stepLab had never
+been in the deploy gate at all — ten receipts including the whole W2c substep
+argument were running only when someone remembered to type them.
+
+**CHEATS #31 — the other clock still drifts.** main.js:2156's solar loop has
+the identical defect at DT=0.05, measured at the same 42 of 300. Deliberately
+not fixed: it is browser-only code with no lab behind it, and folding an
+unreceipted change into a receipted milestone is the thing this project does
+not do. It gets its own milestone and its own FAIL-before.
+
+**Open:** CHEATS #23's MBH-knob halo emptying. CHEATS #31, the solar clock.
+Taxonomy #18 and #19 remain PROPOSED with no receipt.

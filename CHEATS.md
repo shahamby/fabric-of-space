@@ -698,3 +698,27 @@ stepLab ST9, with its negative — at house values the flag stays dark at
 
 **The knob stays reachable.** 1e10x is not removed. The failure is instructive
 and this project has never hidden one.
+
+## 31. The other clock still drifts (W2c.3)
+
+**Where:** `main.js:2156-2162`, the SOLAR loop's `carry += real * timeScale` /
+`carry -= DT` with `DT = 0.05` sim-days.
+
+**What it is.** W2c.3 rebuilt the GALAXY accumulator to count steps owed
+instead of Myr owed, because `DT = 0.2` has no exact binary form and repeated
+subtraction drifted one direction without bound. The solar clock has the
+identical defect with `DT = 0.05`, and it was NOT fixed. Measured with the same
+census: 42 of the first 300 single-shot requests run one step short, exactly as
+the galaxy clock did.
+
+**Why it ships anyway.** The solar loop is browser-only code with no lab behind
+it. Folding an unreceipted change into a receipted milestone is the thing this
+project does not do. It gets its own milestone and its own FAIL-before.
+
+**What it actually costs.** In continuous playback, nothing is lost — the
+unpaid step is deferred to the next frame, not discarded. What drifts is the
+sim-day clock itself, monotonically, the same way `GAL_STARS.myr` drifted by
+2.7e-10 Myr over 9,000 galaxy steps before the fix. Every solar readout that
+reads elapsed sim-days inherits it.
+
+**Receipt:** carryLab's census applied to `DT = 0.05`, logged 2026-08-03.

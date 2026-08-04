@@ -424,6 +424,24 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   local refine around the winning sample, or a denser grid near the floor.
   Confessed instead of fixed: CHEATS #24 items 4, 5, 6. Only worth doing if
   the strip is ever asked to be read as a NUMBER rather than a SHAPE.
+- **W2c.3: COMPLETE** — the accumulator pays what it owes. stepGalaxyStars
+  counted MYR owed and paid down by repeated `carry -= DT`; DT is 0.2, which
+  has no exact binary form, so the error accumulated one direction without
+  bound. It now counts STEPS owed: `owed - Math.floor(owed)` is bit-exact for
+  any float, `backlog` is an integer, and `myr = nsteps * DT` is one multiply
+  instead of a running sum. The 200-step cap is unchanged and unpaid debt is
+  still deferred, not forgiven. lab/carryLab.mjs CA0-CA6 drives the real
+  engine, never a re-implementation. FAIL-BEFORE: 42 of the first 300
+  single-shot requests ran a step short in bands [15,45] and [190,200], the
+  clock off by 3.908e-14 Myr at 100 steps and 2.722e-10 at 9,000. PASS-AFTER:
+  all zero, exactly. CA6 is the negative — with DT=0.25, exact in binary, the
+  same census read 0 short against 42, so the post-fix zero is a measurement
+  and not a tautology. stepLab ST3 now runs 200 of 200 where it ran 199, still
+  bit-identical to the plain integrator, its x moving 3.33479341669428608e+0 ->
+  3.29137215247030257e+0 because the step COUNT is now right. carryLab and
+  stepLab both wired into the Pages gate; stepLab had never been in it.
+  The solar clock in main.js has the identical defect, measured at the same 42
+  of 300, and is deliberately NOT fixed here — CHEATS #31. Taxonomy #20 EARNED.
 - **B5 / T0.1: COMPLETE** — lab/ledgerLab.mjs, the guard the docs did not have.
   eslint guards code against itself; legendLab guards docs against code;
   NOTHING guarded the ledger. LD1/LD2 assert CHEATS.md and docs/TAXONOMY.md

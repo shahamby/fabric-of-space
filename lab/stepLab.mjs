@@ -72,7 +72,9 @@ function runEngine(bodies, k) {
   P.GAL_STARS.tracers = bodies;
   P.GAL_STARS.real = [];
   P.GAL_CLUSTERS.on = false;
-  P.GAL_STARS.carry = k * DT;
+  P.GAL_STARS.owed = 0;
+  P.GAL_STARS.backlog = k;      // W2c.3: the debt is counted in STEPS, exactly
+  P.GAL_STARS.nsteps = 0;
   P.GAL_STARS.myr = 0;
   P.stepGalaxyStars(0);
 }
@@ -122,18 +124,19 @@ undial();
 // MBH at calibration clamps n to 1, and DT / 1 is exact in IEEE754, so the
 // engine must do precisely what the pre-W2c integrator did — to the last bit.
 //
-// The step COUNT is read back from GAL_STARS.myr rather than assumed. The
-// accumulator loses a step at large carry (199 run for a requested 200) because
-// repeated `carry -= DT` drifts microscopically below DT. That is PRE-EXISTING
-// behaviour, unchanged by W2c, and it is logged rather than silently absorbed.
+// The step COUNT is read back from GAL_STARS.nsteps rather than assumed.
+// Before W2c.3 this request ran 199 of 200: the accumulator counted Myr owed
+// and repeated `carry -= DT` drifted below DT, leaving a step unpaid. It now
+// counts STEPS owed, `owed - Math.floor(owed)` is bit-exact, and the count is
+// exact for every k. Receipt: carryLab CA1-CA4.
 const engineBody = seat('T0', 8.2);
 const plainBody = seat('T0', 8.2);
 runEngine([engineBody], 200);
-const ranSteps = Math.round(P.GAL_STARS.myr / DT);
+const ranSteps = P.GAL_STARS.nsteps;
 for (let i = 0; i < ranSteps; i++) kdkPlain(plainBody, DT);
 const bitSame = engineBody.x === plainBody.x && engineBody.y === plainBody.y &&
                 engineBody.vx === plainBody.vx && engineBody.vy === plainBody.vy;
-console.log(`ST3 TRUTH mode, ${ranSteps} steps (200 requested — accumulator drift, pre-existing): ` +
+console.log(`ST3 TRUTH mode, ${ranSteps} steps of 200 requested (W2c.3: exact, was 199): ` +
   `n_sub ${P.GAL_STEP.n}, clamped ${P.GAL_STEP.truthClamped}; engine x ` +
   `${engineBody.x.toExponential(17)} vs plain ${plainBody.x.toExponential(17)} — bit-identical ` +
   `${bitSame}  [${check('ST3', bitSame && P.GAL_STEP.n === 1)}]`);
@@ -248,7 +251,7 @@ function plunge(mult, steps) {
   const E0 = 0.5 * spd() ** 2 + P.galaxyPhi(rad3());
   let peak = 0;
   for (let i = 0; i < steps; i++) {
-    P.GAL_STARS.carry = DT; P.GAL_STARS.myr = 0;
+    P.GAL_STARS.owed = 0; P.GAL_STARS.backlog = 1; P.GAL_STARS.nsteps = 0; P.GAL_STARS.myr = 0;
     P.stepGalaxyStars(0);
     peak = Math.max(peak, P.GAL_STEP.n);
   }
