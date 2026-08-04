@@ -1593,3 +1593,31 @@ requested — pre-existing, confessed in the receipt line itself); CHEATS #23's
 MBH-knob halo-emptying behaviour.
 
 **Next:** the W31 recap, then the accumulator drift.
+
+## Erratum — 2026-08-03, same session, after the push of b41805f
+
+**Finding F3 above is wrong.** It states the W31 recap was not written. It was
+written 2026-08-01, 149 lines, covering 07-27 → 08-02 — and it was sitting
+STAGED and uncommitted in the working index the whole time. The audit was run
+against a fresh clone, which by construction cannot see the workbench. A clone
+shows what is COMMITTED; it says nothing about what is staged, modified, or
+untracked on the machine doing the work. The session-opening fresh-clone audit
+needs `git status` on the working copy beside it, or it will keep reporting
+absences that are only absences of a commit.
+
+**Consequence, in the same commit.** b41805f staged seven named paths and
+committed eight. `docs/weekly/2026-W31.md` was already in the index, and
+`git add <paths>` adds to the index without un-staging anything already there.
+The commit message describes lab/ledgerLab.mjs and names no recap; the commit
+contains one. `git status` printed all eight files before the commit and the
+mismatch was read past. Nothing is damaged — the recap is correct and belonged
+in the repo — but the commit does not contain what its message says it
+contains, and milestone atomicity is the rule it breaks.
+
+Rule earned: the staged list is COUNTED against the named list before every
+milestone commit, or `git commit --only <paths>` is used so the index cannot
+contribute uninvited passengers.
+
+**Corrected next task:** not the W31 recap, which exists. Next is either the
+ledger-truth lab that would earn taxonomy #18, or the `carry -= DT` accumulator
+drift.

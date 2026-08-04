@@ -140,6 +140,20 @@ guard that they are TRUE. Will be earned when a lab reads a declared
 constant out of source and asserts the ledger quotes it. Until that receipt
 exists this entry is a prediction, not a pattern. Found by audit 2026-08-03.
 
+## 19. The clone is not the workbench — PROPOSED, NO RECEIPT YET
+An audit run against a fresh clone reports the state of what is COMMITTED and
+is silent about what is staged, modified, or untracked on the machine doing
+the work. On 2026-08-03 the session audit reported the W31 recap "not
+written." It had been written two days earlier and was sitting staged in the
+index. The same blindness has a second edge: `git add <paths>` adds to the
+index without un-staging what is already in it, so b41805f named seven paths
+and committed eight, carrying a 149-line recap its message never mentions.
+Distinct from #3 and #4, which are about what a paste carries; this is about
+what a COMMIT carries. Will be earned when the session ritual runs `git status`
+on the working copy beside the clone, and the staged list is counted against
+the named list before a milestone commit — or `git commit --only` removes the
+possibility. Until then, a prediction. Found 2026-08-03.
+
 ---
 
 ## RETIRED
