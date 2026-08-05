@@ -535,6 +535,15 @@ v1's data pipeline is closed: NASA → proxy → parser → provenance → physi
   field. CHEATS "NOT CHEATS" gains the plunge entry; CHEATS #23 amended to name
   the Sgr A* knob, whose downward turn empties the halo.
 
+- **T0.2: COMPLETE** and committed. `lab/truthLab.mjs` — the ledger-truth
+  guard. ledgerLab asserts the paperwork refers to things that exist; this
+  asserts it says true things. TR1 parses `GAL_STEP` out of `physics.js` as
+  text; TR2/TR3 require every steps-per-orbit and substep-cap figure in
+  CHEATS #29 to equal the shipped constant; TR4 is three sabotages, each
+  required to mutate and be caught. Amendment paragraphs are excluded by
+  opening token — they quote retired figures on purpose. Earns taxonomy #18.
+  Gated in pages.yml between carryLab and stepLab.
+
 ## Idea backlog
 
 - Event-horizon mode: r_s ≈ 2.95 km × mass_msun per body; when radius_km < r_s,

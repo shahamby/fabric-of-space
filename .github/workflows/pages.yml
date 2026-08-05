@@ -29,6 +29,7 @@ jobs:
       - run: node lab/legendLab.mjs
       - run: node lab/sandboxLab.mjs
       - run: node lab/carryLab.mjs
+      - run: node lab/truthLab.mjs
       - run: node lab/stepLab.mjs
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3

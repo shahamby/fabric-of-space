@@ -1690,3 +1690,47 @@ not do. It gets its own milestone and its own FAIL-before.
 
 **Open:** CHEATS #23's MBH-knob halo emptying. CHEATS #31, the solar clock.
 Taxonomy #18 and #19 remain PROPOSED with no receipt.
+
+## Session 16 — 2026-08-04, T0.2: the ledger-truth lab
+
+Closed by machine the hole the previous session closed by hand.
+lab/truthLab.mjs reads the declared constants out of physics.js as text and
+requires the ledger's prose to quote them. Entry 29 in CHEATS was the case that
+motivated it: it described a build that no longer existed while being perfectly
+well-formed.
+
+Two FAIL-befores, and the difference between them is the interesting part. The
+real historical file fires on a missing heading rather than a wrong number,
+because the numbering and the amendment shipped together and history therefore
+cannot exhibit the defect in isolation. A reconstruction with the entry numbered
+and its amendment stripped fires on exactly the right thing and names all four
+figures.
+
+TR4 reads FAIL in both of those runs by design: the negative will not certify
+itself while the positive it drives is broken.
+
+A third finding, and the sharpest one. The reconstruction was first attempted as
+a shell one-liner containing a negation operator. Interactive bash consumed it
+as history expansion, the file was never modified, and the run that followed
+read the clean file and printed PASS. A no-op negative, produced inside the very
+milestone built to catch claims that are well-formed and untrue. The sabotage
+harness is not exempt from taxonomy #8. Rerun with the operator removed, the
+middle sabotage correctly self-reports NO-OP.
+
+This entry itself was rewritten before the commit landed. Its first draft said
+taxonomy #19 had been "amended" — true when written, false an hour later once
+#19 was earned. A stale confession in prose that truthLab does not scan, inside
+the milestone built to catch stale confessions. The guard covers declared
+constants quoted in CHEATS. It does not cover narrative, and narrative is where
+this one lived.
+
+Taxonomy #18 EARNED by truthLab. Taxonomy #19 EARNED by the staging count that
+held this very commit: five paths named, four staged, HANDOFF.md missing. This
+commit also carries an amendment to #19 that was written in an earlier session
+and found uncommitted in the working copy during that same check — named here so
+it is not an unrecorded passenger.
+
+DOCUMENTATION BUDGET, agreed this session: a lab receipt is required when a
+number appears on screen. Not required for refactors, plumbing, or docs. Weekly
+recaps discontinued. No further meta-guards — ledgerLab and truthLab are the
+last two. Next work is the core/experiment split, then physics.

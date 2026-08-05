@@ -128,7 +128,7 @@ must be built from the SAME FIELD the production path reads, and when a lab
 stands in for catalogue data, one real row is checked against the fixture's
 shape. Earned W2c.2, 2026-08-01.
 
-## 18. The stale confession — PROPOSED, NO RECEIPT YET
+## 18. The stale confession — EARNED T0.2
 A ledger entry that quotes numbers a later milestone replaced. CHEATS #29
 was written against W2c's 20 steps/orbit and 200-substep cap; W2c.1 raised
 those to 40 and 700 and the confession was left alone, so the public ledger
@@ -137,10 +137,16 @@ agreed with the ledger rather than with the constant three lines below it.
 Distinct from #8: the needle exists and moves, it is the LABEL that is
 stale. ledgerLab guards that entries exist and are numbered; it cannot yet
 guard that they are TRUE. Will be earned when a lab reads a declared
-constant out of source and asserts the ledger quotes it. Until that receipt
-exists this entry is a prediction, not a pattern. Found by audit 2026-08-03.
+constant out of source and asserts the ledger quotes it. Found by audit
+2026-08-03. EARNED 2026-08-04 by lab/truthLab.mjs, which reads GAL_STEP out of
+physics.js as text and requires CHEATS #29's prose to quote the shipped
+figures. FAIL-before was captured twice: against the real 55553eb file, where
+it fires on the missing number rather than the stale one — the numbering and
+the amendment landed in the same commit, so history cannot isolate this defect
+— and against a reconstruction with the entry numbered and unamended, where
+TR2 and TR3 name both retired figures against both shipped ones.
 
-## 19. The clone is not the workbench — PROPOSED, NO RECEIPT YET
+## 19. The clone is not the workbench — EARNED T0.2
 An audit run against a fresh clone reports the state of what is COMMITTED and
 is silent about what is staged, modified, or untracked on the machine doing
 the work. On 2026-08-03 the session audit reported the W31 recap "not
@@ -151,8 +157,16 @@ and committed eight, carrying a 149-line recap its message never mentions.
 Distinct from #3 and #4, which are about what a paste carries; this is about
 what a COMMIT carries. Will be earned when the session ritual runs `git status`
 on the working copy beside the clone, and the staged list is counted against
-the named list before a milestone commit — or `git commit --only` removes the
-possibility. Until then, a prediction. Found 2026-08-03.
+the named list before a milestone commit. `git commit --only` narrows the risk
+but does not remove it: it rejects untracked paths outright, so a new file
+must be `git add`ed first and the index is live again the moment it is.
+Counting the staged list is the only step that always works. Found 2026-08-03, amended the same day when --only was
+tried. EARNED 2026-08-04 (T0.2): the session ritual ran `git status` on the
+working copy beside the clone, and the staged list was counted against the named
+list before the milestone commit. It read four paths where five had been named —
+HANDOFF.md had not been edited at all — and the commit was held. The amendment
+above was itself found sitting uncommitted in the working copy during the same
+check, which is the pattern a third time.
 
 ## 20. The bug described by its first symptom
 A defect recorded by the first thing anyone noticed about it, then carried
