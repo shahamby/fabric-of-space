@@ -56,7 +56,7 @@ dynamics stay Newtonian (that's cheat #5 in the ledger).
 
 ## Quick start
 
-Requires Node.js and npm.
+Requires Node.js 24 (LTS) and npm.
 
 ```bash
 git clone https://github.com/shahamby/fabric-of-space.git
